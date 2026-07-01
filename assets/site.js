@@ -24,43 +24,49 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 const services = {
   product: {
     number: "01",
-    title: "Product/UI",
+    title: "Product Design & UI UX Design",
     body: "I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.",
     list: ["Product flows", "Wireframes", "High-fidelity UI"]
   },
   mobile: {
     number: "02",
-    title: "Mobile App",
+    title: "Mobile App Design",
     body: "I design mobile app screens, user flows, onboarding, dashboards, profiles, forms, and interaction states for iOS and Android products.",
     list: ["Onboarding flows", "App screens", "Mobile prototypes"]
   },
   saas: {
     number: "03",
-    title: "SaaS/Web App",
+    title: "SaaS Dashboard & Web App Design",
     body: "I design dashboards, admin panels, portals, CRMs, analytics pages, internal tools, and complex web app interfaces.",
     list: ["Dashboards", "Admin panels", "Data-heavy UI"]
   },
   audit: {
     number: "04",
-    title: "UX Audit",
+    title: "UX Audit & Product Redesign",
     body: "I review existing products, identify friction, improve weak flows, and redesign screens for better usability and clarity.",
     list: ["UX reviews", "Flow cleanup", "Screen redesigns"]
   },
   websites: {
     number: "05",
-    title: "Websites",
+    title: "Landing Page & Website Design",
     body: "I design clean, responsive websites and landing pages for startups, SaaS products, portfolios, campaigns, and digital services.",
     list: ["Landing pages", "Portfolio sites", "Responsive design"]
   },
-  ai: {
+  nocode: {
     number: "06",
-    title: "AI Product",
+    title: "No Code Website Development",
+    body: "I build clean no-code websites and lightweight production pages that preserve the design details and stay easy to update.",
+    list: ["Framer builds", "No-code websites", "Launch-ready pages"]
+  },
+  ai: {
+    number: "07",
+    title: "AI Product Design & Prototyping",
     body: "I design AI-powered product experiences, AI assistants, prompt-based flows, chatbot interfaces, agent workflows, and AI-assisted prototypes.",
     list: ["AI assistants", "Prompt flows", "Agent workflows"]
   },
   illustration: {
-    number: "07",
-    title: "Illustration",
+    number: "08",
+    title: "Custom Vector Illustration & Brand Assets",
     body: "I create custom vector illustrations, icons, empty states, onboarding visuals, hero graphics, and product visuals for apps and websites.",
     list: ["Custom icons", "Empty states", "Hero graphics"]
   }
@@ -75,6 +81,12 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   const detailList = serviceLayout.querySelector("[data-service-list]");
   const prevButton = serviceLayout.querySelector("[data-service-prev]");
   const nextButton = serviceLayout.querySelector("[data-service-next]");
+
+  function scrollCardIntoView(card, behavior = "smooth") {
+    if (!rail || !card) return;
+    const targetLeft = Math.max(0, card.offsetLeft - 18);
+    rail.scrollTo({ left: targetLeft, behavior });
+  }
 
   function getSelectedIndex() {
     return Math.max(0, serviceCards.findIndex((card) => card.classList.contains("is-selected")));
@@ -95,7 +107,8 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
       card.classList.toggle("is-selected", selected);
       card.setAttribute("aria-pressed", String(selected));
       if (selected && shouldScroll) {
-        card.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+        scrollCardIntoView(card);
+        window.setTimeout(() => scrollCardIntoView(card), 280);
       }
     });
 
