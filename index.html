@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Ayo Design Studio creates identities, websites, product interfaces, and launch systems that move businesses forward." />
+    <title>ayo.dsgn | Design that moves your business</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/site.css?v=1.4" />
+    <style>
+      /* ── Home Projects Carousel ── */
+      .proj-home-carousel-wrap {
+        position: relative;
+        margin-top: 48px;
+        overflow: hidden;
+      }
+      .proj-home-carousel {
+        display: flex;
+        gap: 20px;
+        padding: 16px 24px 36px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        cursor: grab;
+        -webkit-overflow-scrolling: touch;
+      }
+      .proj-home-carousel::-webkit-scrollbar { display: none; }
+      .proj-home-carousel.is-dragging { cursor: grabbing; scroll-snap-type: none; user-select: none; }
+      .home-proj-card {
+        position: relative;
+        flex: 0 0 clamp(300px, 36vw, 540px);
+        background: #ffffff;
+        border: 0.3px solid #f8f1f1;
+        border-radius: 10px;
+        overflow: hidden;
+        scroll-snap-align: start;
+        transition: transform 280ms cubic-bezier(.22,.68,0,1.2), box-shadow 280ms ease;
+      }
+      .home-proj-card:hover { transform: translateY(-6px); box-shadow: 0 18px 48px rgba(0,0,0,0.1); }
+      .home-proj-card-img { height: clamp(220px, 26vw, 360px); overflow: hidden; background: #eaeaea; }
+      .home-proj-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 480ms ease; }
+      .home-proj-card:hover .home-proj-card-img img { transform: scale(1.03); }
+      .home-proj-card-body { padding: 18px 20px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; border-top: 1px solid rgba(5,5,5,0.07); }
+      .home-proj-card-body h3 { margin: 0; font-family: var(--serif); font-size: clamp(20px, 2.2vw, 32px); font-weight: 400; line-height: 1.05; color: var(--ink); }
+      .home-proj-card-body p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+      .home-proj-card-btn { flex-shrink: 0; padding: 9px 14px; border-radius: 8px; background: #f0f0f0; color: var(--ink); font-family: var(--serif); font-size: 13px; white-space: nowrap; transition: background 180ms ease, color 180ms ease; align-self: flex-end; }
+      .home-proj-card-btn:hover { background: var(--blue); color: #fff; }
+      .proj-home-carousel-wrap::after { content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 80px; background: linear-gradient(to left, var(--paper), transparent); pointer-events: none; z-index: 2; }
+      /* ── Heading italic fix ── */
+      .home .projects-section h2 em { font-style: italic; font-family: var(--serif); }
+    </style>
+  </head>
+  <body class="home">
+    <header class="site-header" data-theme="dark">
+      <div class="nav-wrap">
+        <a class="brand-mark" href="/" aria-label="ayo.dsgn home">
+          <img src="/assets/figma/eeb5f86796cf958f01a7a8a3fda01faaece6ecaf.svg" alt="ayo.dsgn" />
+        </a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="/projects/">Projects</a>
+          <a href="/services/">Services</a>
+          <a href="/about/">About me</a>
+          <a href="/playground/">Playground</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+        <a class="nav-cta" href="/contact/">Book a call</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-section" id="home">
+        <div class="hero-content">
+          <h1>Your idea deserves <br />more than <span>pretty screens</span></h1>
+          <p>I help founders and businesses turn ideas, messy products, and growing brands into clear digital experiences people can understand, use, and trust.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+            <a class="button button-ghost-light" href="/projects/">See all projects</a>
+          </div>
+        </div>
+        <p class="hero-wordmark" aria-hidden="true">ayo.<br />dsgn</p>
+      </section>
+
+      <section class="projects-section" id="projects" aria-labelledby="projects-heading">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">Selected work</p>
+            <h2 id="projects-heading">All <em>Projects</em></h2>
+          </div>
+          <div class="section-actions">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+            <a class="button button-outline" href="/projects/">See all projects</a>
+          </div>
+        </div>
+
+        <!-- Horizontal swipable project carousel — matches Figma 99:189 -->
+        <div class="proj-home-carousel-wrap">
+          <div class="proj-home-carousel" id="home-proj-carousel" role="list" aria-label="Project showcase">
+
+            <article class="home-proj-card" role="listitem">
+              <div class="home-proj-card-img">
+                <img src="/assets/figma/3e5974e834a0aa4b6425e8c4ee805306490e8c27.png" alt="Slumber Pal" loading="lazy" />
+              </div>
+              <div class="home-proj-card-body">
+                <div>
+                  <h3>Slumber Pal</h3>
+                  <p>Mobile App</p>
+                </div>
+                <a class="home-proj-card-btn" href="/projects/">See full project</a>
+              </div>
+            </article>
+
+            <article class="home-proj-card" role="listitem">
+              <div class="home-proj-card-img">
+                <img src="/assets/figma/37b2352dc66365d6ed787d1342787e4138587b3a.png" alt="SPND" loading="lazy" />
+              </div>
+              <div class="home-proj-card-body">
+                <div>
+                  <h3>SPND</h3>
+                  <p>Mobile App</p>
+                </div>
+                <a class="home-proj-card-btn" href="/projects/">See full project</a>
+              </div>
+            </article>
+
+            <article class="home-proj-card" role="listitem">
+              <div class="home-proj-card-img">
+                <img src="/assets/figma/806cfb6178eb1eac5761a7d02b64e60a5c8cac92.png" alt="Orca Security" loading="lazy" />
+              </div>
+              <div class="home-proj-card-body">
+                <div>
+                  <h3>Orca Security Ltd</h3>
+                  <p>Website Revamp</p>
+                </div>
+                <a class="home-proj-card-btn" href="/projects/">See full project</a>
+              </div>
+            </article>
+
+            <article class="home-proj-card" role="listitem">
+              <div class="home-proj-card-img">
+                <img src="/assets/figma/81fcaefb95dea242921abf0d763f8e13ff129d4f.png" alt="Knowlab" loading="lazy" />
+              </div>
+              <div class="home-proj-card-body">
+                <div>
+                  <h3>Knowlab</h3>
+                  <p>SaaS Dashboard</p>
+                </div>
+                <a class="home-proj-card-btn" href="/projects/">See full project</a>
+              </div>
+            </article>
+
+            <article class="home-proj-card" role="listitem">
+              <div class="home-proj-card-img">
+                <img src="/assets/figma/0c7c471f4462b69dc0e8f477667eaed5f3931761.png" alt="Bloodlines" loading="lazy" />
+              </div>
+              <div class="home-proj-card-body">
+                <div>
+                  <h3>Bloodlines</h3>
+                  <p>Landing page &amp; SaaS design</p>
+                </div>
+                <a class="home-proj-card-btn" href="/projects/">See full project</a>
+              </div>
+            </article>
+
+            <article class="home-proj-card" role="listitem">
+              <div class="home-proj-card-img">
+                <img src="/assets/figma/bc833ee86d65f655cba770420f4cc4d1381fa7b1.png" alt="Bitzsznn" loading="lazy" />
+              </div>
+              <div class="home-proj-card-body">
+                <div>
+                  <h3>Bitzsznn</h3>
+                  <p>Website page</p>
+                </div>
+                <a class="home-proj-card-btn" href="/projects/">See full project</a>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+        <div class="center-action">
+          <a class="text-link-button" href="/projects/">See all projects</a>
+        </div>
+      </section>
+
+      <section class="services-section" id="services" aria-labelledby="services-heading">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">Capabilities</p>
+            <h2 id="services-heading">All Services</h2>
+            <p class="section-desc" style="max-width: 570px; margin-top: 18px; color: var(--muted); font-size: 18px; line-height: 1.55;">
+              Practical, end-to-end design support for teams that need useful strategy, clean visuals, and a launch-ready build.
+            </p>
+          </div>
+          <div class="section-actions">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+            <a class="button button-outline" href="/services/">See all services</a>
+          </div>
+        </div>
+
+        <div class="services-layout">
+          <div class="service-rail" tabindex="0" aria-label="Swipe or scroll services">
+            <button class="service-card is-selected" type="button" data-service="strategy" aria-pressed="true">
+              <span>01</span>
+              <strong>Strategy</strong>
+            </button>
+            <button class="service-card" type="button" data-service="design" aria-pressed="false">
+              <span>02</span>
+              <strong>Design</strong>
+            </button>
+            <button class="service-card" type="button" data-service="development" aria-pressed="false">
+              <span>03</span>
+              <strong>Development</strong>
+            </button>
+            <button class="service-card" type="button" data-service="testing" aria-pressed="false">
+              <span>04</span>
+              <strong>Testing</strong>
+            </button>
+            <button class="service-card" type="button" data-service="launch" aria-pressed="false">
+              <span>05</span>
+              <strong>Launch</strong>
+            </button>
+            <button class="service-card" type="button" data-service="support" aria-pressed="false">
+              <span>06</span>
+              <strong>Support</strong>
+            </button>
+          </div>
+
+          <article class="service-detail" aria-live="polite">
+            <p class="detail-number">01</p>
+            <div>
+              <h3 data-service-title>Strategy</h3>
+              <p data-service-body>I help teams, businesses and companies shape websites and mobile apps around clear business strategy, audience needs, and launch goals.</p>
+            </div>
+            <ul data-service-list>
+              <li>Offer positioning</li>
+              <li>Page architecture</li>
+              <li>Conversion paths</li>
+            </ul>
+            <a class="button button-soft" href="/contact/">Book a call</a>
+          </article>
+        </div>
+
+        <div class="center-action">
+          <a class="text-link-button" href="/services/">See all services</a>
+        </div>
+      </section>
+
+      <section class="about-preview-section" id="about-preview" aria-labelledby="about-preview-heading">
+        <div class="about-preview-inner">
+          <div class="about-preview-copy">
+            <h2 id="about-preview-heading">About <em>me</em></h2>
+            <p class="about-lede">Hi, I am Michael Ayomide,</p>
+            <p>I help teams, businesses and companies build websites and mobile apps, that helps build business strategies.</p>
+            <div class="skill-tags" aria-label="Core skills">
+              <span>Brand strategy</span>
+              <span>Product design</span>
+              <span>Web design</span>
+              <span>No-code builds</span>
+              <span>Design systems</span>
+              <span>AI prototypes</span>
+              <span>Frontend QA</span>
+              <span>Launch support</span>
+            </div>
+            <div class="social-row" aria-label="Social links">
+              <a href="https://www.behance.net/" aria-label="Behance">Be</a>
+              <a href="https://dribbble.com/" aria-label="Dribbble">Dr</a>
+              <a href="https://github.com/" aria-label="GitHub">Gh</a>
+              <a href="https://x.com/" aria-label="X">X</a>
+              <a href="https://www.linkedin.com/" aria-label="LinkedIn">in</a>
+            </div>
+            <div class="about-actions">
+              <a class="button button-primary" href="/contact/">Book a call</a>
+              <a class="button button-outline" href="/about/">Download CV</a>
+            </div>
+          </div>
+          <div class="about-image-stack" aria-hidden="true">
+            <img src="/assets/figma/about-image-stack.png" alt="" />
+          </div>
+        </div>
+      </section>
+
+      <section class="testimonials-section" id="testimonials" aria-labelledby="testimonials-heading">
+        <p class="testimonial-watermark watermark-one" aria-hidden="true">ayo.<br />dsgn</p>
+        <p class="testimonial-watermark watermark-two" aria-hidden="true">dsgn</p>
+        <div class="testimonials-top">
+          <h2 id="testimonials-heading">What clients say</h2>
+          <div class="section-actions">
+            <a class="button button-pink" href="/contact/">Book a call</a>
+            <a class="button button-ghost-light" href="/projects/">See all projects</a>
+          </div>
+        </div>
+
+        <div class="testimonial-ticker" data-ticker tabindex="0" aria-label="Client testimonials ticker">
+          <div class="testimonial-track">
+            <article class="testimonial-card tilt-left">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs, and research publications across Nigeria. Ayo thought through the structure and the experience.</p>
+              <footer><strong>Ayo Bankole</strong><span>Co-founder, Caladium Foundation</span></footer>
+            </article>
+            <article class="testimonial-card tilt-right">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>Working with Ayo was a great experience. He pays attention to details, listens well, works fast, and the quality of his work has a very classy vibe.</p>
+              <footer><strong>Hay_artz stores</strong><span>Founder</span></footer>
+            </article>
+            <article class="testimonial-card tilt-left">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I needed an ecommerce website for my fashion brand. The design is clean, the execution was smooth, and he delivered exactly what I had in mind.</p>
+              <footer><strong>Kingsley Inyang</strong><span>CEO, Delluxe Vogue</span></footer>
+            </article>
+            <article class="testimonial-card tilt-soft">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. His work is neat, he pays attention to details, and communication was smooth.</p>
+              <footer><strong>Olumide Adepoju</strong><span>CEO, Orca Securities Ltd</span></footer>
+            </article>
+            <article class="testimonial-card tilt-right">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I needed a website for Bitzsznn that captures the energy and lets me collect payments directly. The site looks premium and ticketing flows smoothly.</p>
+              <footer><strong>Yungbitz</strong><span>CEO, Bitzsznn Entertainment</span></footer>
+            </article>
+            <article class="testimonial-card tilt-left" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs, and research publications across Nigeria. Ayo thought through the structure and the experience.</p>
+              <footer><strong>Ayo Bankole</strong><span>Co-founder, Caladium Foundation</span></footer>
+            </article>
+            <article class="testimonial-card tilt-right" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>Working with Ayo was a great experience. He pays attention to details, listens well, works fast, and the quality of his work has a very classy vibe.</p>
+              <footer><strong>Hay_artz stores</strong><span>Founder</span></footer>
+            </article>
+            <article class="testimonial-card tilt-left" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I needed an ecommerce website for my fashion brand. The design is clean, the execution was smooth, and he delivered exactly what I had in mind.</p>
+              <footer><strong>Kingsley Inyang</strong><span>CEO, Delluxe Vogue</span></footer>
+            </article>
+            <article class="testimonial-card tilt-soft" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>â˜…â˜…â˜…â˜…â˜†</strong></div>
+              <p>I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. His work is neat, he pays attention to details, and communication was smooth.</p>
+              <footer><strong>Olumide Adepoju</strong><span>CEO, Orca Securities Ltd</span></footer>
+            </article>
+            <article class="testimonial-card tilt-right" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>â˜…â˜…â˜…â˜…â˜†</strong></div>
+              <p>I needed a website for Bitzsznn that captures the energy and lets me collect payments directly. The site looks premium and ticketing flows smoothly.</p>
+              <footer><strong>Yungbitz</strong><span>CEO, Bitzsznn Entertainment</span></footer>
+            </article>
+          </div>
+        </div>
+
+        <div class="testimonial-meta">
+          <p>I help teams, businesses and companies build websites and mobile apps, that helps build business strategies.</p>
+          <div class="proof-stats">
+            <span><strong>2+ years</strong>of design experience</span>
+            <span><strong>97%</strong>customer satisfaction</span>
+          </div>
+        </div>
+        <div class="trusted-strip" aria-label="Trusted by several teams and organizations">
+          <img src="/assets/figma/5e851a9c4c93df963b878e22930ebd901b11d6e9.svg" alt="Hay Artz" />
+          <img src="/assets/figma/d517d39e4789cebe5f1f9f4fed8c59d2ece45453.png" alt="Delluxe Vogue" />
+          <img src="/assets/figma/062e42fc656bb9eb84bcb34c99f896eb7b760ef2.png" alt="Bitzsznn Entertainment" />
+          <img src="/assets/figma/e942ad15b7cec5068b22494754e808b99e019394.png" alt="Caladium SME Bootcamp" />
+          <img src="/assets/figma/b16174b9b9d31569486f8b8a1bb3f8e0468893b2.png" alt="Orca Securities" />
+          <img src="/assets/figma/292e1469c323e1fb0db7c47cf29e03cf9d1b2a3b.png" alt="BloodLines" />
+        </div>
+        <p class="trusted-note">Trusted by several teams &amp; organizations</p>
+      </section>
+
+      <section class="process-section" id="process" aria-labelledby="process-heading">
+        <div class="process-inner">
+          <h2 id="process-heading">My <em>process</em></h2>
+          <div class="process-steps" aria-label="Project process">
+            <article class="process-step process-step-large">
+              <div class="process-icon">
+                <img src="/assets/figma/process-discover.svg" alt="" />
+              </div>
+              <h3>Discover</h3>
+              <p>Understand the product, users, business goals, competitors, and key problems.</p>
+            </article>
+            <article class="process-step">
+              <div class="process-icon">
+                <img src="/assets/figma/process-strategy.svg" alt="" />
+              </div>
+              <h3>Strategy</h3>
+              <p>Map the flow, content, layout, user journey, and product logic.</p>
+            </article>
+            <article class="process-step">
+              <div class="process-icon">
+                <img src="/assets/figma/process-design.svg" alt="" />
+              </div>
+              <h3>Design</h3>
+              <p>Create polished UI screens, prototypes, visuals, and responsive layouts.</p>
+            </article>
+            <article class="process-step">
+              <div class="process-icon">
+                <img src="/assets/figma/process-deliver.svg" alt="" />
+              </div>
+              <h3>Deliver &amp; Build</h3>
+              <p>Prepare clean handoff files, design systems, no-code builds, and AI-assisted prototypes ready for development or launch.</p>
+            </article>
+          </div>
+          <div class="process-cta">
+            <p>Discover an easy way to achieve real results! My collaborative, data-driven approach is customized for your business, guaranteeing you get impactful outcomes. Book a call today to learn how I can help you succeed!</p>
+            <a class="button button-primary" href="/contact/">Book a call</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="playground-section" id="playground" aria-labelledby="playground-heading">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">My Playground</p>
+            <h2 id="playground-heading">Playground</h2>
+          </div>
+          <div class="section-actions">
+            <a class="button button-outline" href="/playground/">See full playground</a>
+          </div>
+        </div>
+
+        <div class="playground-board">
+          <div class="playground-toolbar">
+            <div class="search-box">
+              <input type="text" id="playground-search" placeholder="Please enter the title for your interaction, animation, game, or illustration." aria-label="Search playground items" />
+            </div>
+            <div class="mode-control">
+              <button class="mode-trigger" id="mode-trigger-btn" type="button">Canvas</button>
+              <div class="mode-menu" id="mode-dropdown-menu">
+                <button type="button" data-mode="canvas" class="active">Canvas</button>
+                <button type="button" data-mode="list">List</button>
+              </div>
+            </div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-pills" id="filter-pills-container">
+              <button type="button" class="active" data-filter="Everything">Everything</button>
+              <button type="button" data-filter="User Interactions">User Interactions</button>
+              <button type="button" data-filter="Visual Effects">Visual Effects</button>
+              <button type="button" data-filter="Interactive Games">Interactive Games</button>
+              <button type="button" data-filter="Artworks">Artworks</button>
+              <button type="button" data-filter="UI Designs">UI Designs</button>
+            </div>
+            <button class="reset-link" id="reset-filters-btn" type="button">Reset all filters</button>
+          </div>
+
+          <!-- Canvas View -->
+          <div class="canvas-view" id="playground-canvas-view">
+            <!-- Center featured display -->
+            <div class="canvas-feature" id="canvas-feature-item">
+              <div class="canvas-feature-media" id="feature-media-container">
+                <!-- Video or Image goes here -->
+              </div>
+              <h3 id="feature-title">Featured Interaction</h3>
+            </div>
+            <!-- Surrounding items will be rendered dynamically by JavaScript -->
+            <div id="canvas-cards-container"></div>
+          </div>
+
+          <!-- List View -->
+          <div class="list-view" id="playground-list-view">
+            <p class="list-count" id="list-items-count">Showing 0 playground items</p>
+            <div id="list-rows-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="faq-section" id="faq" aria-labelledby="faq-heading">
+        <div class="faq-inner">
+          <p class="section-kicker">FAQ</p>
+          <h2 id="faq-heading">What people are <em>asking</em></h2>
+          <div class="faq-list">
+            <details class="faq-item">
+              <summary>What is your typical project timeline?</summary>
+              <div class="faq-answer">
+                <p>Most brand-led websites and product interface designs take between 2 to 4 weeks from discovery to final handoff. Timeline depends on scope and asset readiness.</p>
+              </div>
+            </details>
+            <details class="faq-item">
+              <summary>Do you build the websites you design?</summary>
+              <div class="faq-answer">
+                <p>Yes, I develop lightweight, production-ready static pages, frontend components, and CMS integrations. For complex apps, I hand over clean design tokens and CSS details to engineering teams.</p>
+              </div>
+            </details>
+            <details class="faq-item">
+              <summary>What tools and platforms do you use?</summary>
+              <div class="faq-answer">
+                <p>I design in Figma and build using HTML, CSS, JavaScript, Next.js, or Webflow. I focus on clean setups that stay easy to maintain and scale after launch.</p>
+              </div>
+            </details>
+            <details class="faq-item">
+              <summary>How do we get started?</summary>
+              <div class="faq-answer">
+                <p>Book a brief call through the contact form. We will review your project goals, scope, and timeline to make sure it is a great fit, then outline the next steps.</p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-card-blue">
+          <div class="footer-logo-wrap">
+            <span class="footer-logo-glyph">ayo.</span>
+            <span class="footer-logo-sub">dsgn</span>
+          </div>
+        </div>
+        <div class="footer-card-white">
+          <div class="footer-card-content">
+            <div class="footer-cta-col">
+              <h2>Take your project to the next level. Let's talk!</h2>
+              <div class="footer-cta-actions">
+                <a class="button button-pink" href="/contact/">Book a discovery call</a>
+                <a class="button-arrow" href="/contact/">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div class="footer-nav-col">
+              <h3>Navigation</h3>
+              <div class="footer-nav-links">
+                <a href="/projects/">Projects</a>
+                <a href="/services/">Services</a>
+                <a href="/playground/">Playground</a>
+                <a href="/#process">Process</a>
+                <a href="/#testimonials">Testimonials</a>
+                <a href="/#faq">FAQs</a>
+                <a href="/about/">About</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-card-bottom">
+            <div class="footer-social-section">
+              <h4>Stay in touch!</h4>
+              <div class="footer-social-links">
+                <a href="https://www.behance.net/">Behance</a>
+                <span class="divider"></span>
+                <a href="https://dribbble.com/">Dribbble</a>
+                <span class="divider"></span>
+                <a href="https://github.com/">GitHub</a>
+                <span class="divider"></span>
+                <a href="https://x.com/">X</a>
+                <span class="divider"></span>
+                <a href="https://linkedin.com/">LinkedIn</a>
+              </div>
+            </div>
+            <div class="footer-copyright">
+              &copy; <span data-year></span> Ayo. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="/assets/site.js?v=1.4"></script>
+    <script>
+      // Home project carousel — drag-to-scroll
+      const hpc = document.getElementById('home-proj-carousel');
+      if (hpc) {
+        let down = false, sx = 0, ss = 0;
+        hpc.addEventListener('pointerdown', e => { down = true; sx = e.clientX; ss = hpc.scrollLeft; hpc.classList.add('is-dragging'); hpc.setPointerCapture(e.pointerId); });
+        hpc.addEventListener('pointermove', e => { if (!down) return; hpc.scrollLeft = ss - (e.clientX - sx); });
+        const end = () => { down = false; hpc.classList.remove('is-dragging'); };
+        hpc.addEventListener('pointerup', end);
+        hpc.addEventListener('pointercancel', end);
+      }
+    </script>
+  </body>
+</html>

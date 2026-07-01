@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Ayo's Playground — refined UI exploration interactions, engaging games, illustrations, and enhanced business strategies." />
+    <title>ayo.dsgn | Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/site.css?v=1.4" />
+    <style>
+      .playground-page {
+        background: #f0f0f0;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      /* Dot Grid Canvas Background */
+      .canvas-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.5px, transparent 1.5px);
+        background-size: 24px 24px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ─── Hero ─── */
+      .play-hero {
+        position: relative;
+        z-index: 1;
+        padding: 140px 0 0;
+        width: min(calc(100% - 48px), 1436px);
+        margin: 0 auto;
+      }
+      .play-hero-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 40px;
+        flex-wrap: wrap;
+        padding-bottom: 40px;
+      }
+      .play-hero h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(48px, 6vw, 76px);
+        font-weight: 400;
+        line-height: 1.05;
+        color: #010101;
+      }
+      .play-hero h1 em { font-style: italic; }
+      .play-hero-desc {
+        margin: 16px 0 0;
+        max-width: 580px;
+        color: #483f3f;
+        font-size: 15px;
+        line-height: 1.65;
+      }
+      .play-hero-ctas {
+        display: flex;
+        gap: 12px;
+      }
+
+      /* ─── Controls Bar (Search + Tabs + Canvas Mode) ─── */
+      .play-controls-bar {
+        position: relative;
+        z-index: 2;
+        width: min(calc(100% - 48px), 1436px);
+        margin: 40px auto 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border: 0.5px solid rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        padding: 20px 24px;
+      }
+      
+      .play-search-row {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .play-search-input-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 280px;
+      }
+      .play-search-input-wrap svg {
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: #767373;
+        pointer-events: none;
+      }
+      .play-search-input {
+        width: 100%;
+        padding: 14px 48px 14px 20px;
+        background: #f7f7f7;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 8px;
+        font-family: var(--display);
+        font-size: 14px;
+        color: #010101;
+        outline: none;
+        transition: border-color 200ms, background 200ms;
+      }
+      .play-search-input:focus {
+        border-color: var(--blue);
+        background: #ffffff;
+      }
+
+      .play-canvas-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        background: #f7f7f7;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 8px;
+        font-family: var(--display);
+        font-size: 14px;
+        font-weight: 500;
+        color: #483f3f;
+        cursor: pointer;
+        transition: background 180ms;
+      }
+      .play-canvas-toggle:hover { background: #eeeeee; }
+      .play-canvas-toggle svg { width: 16px; height: 16px; transition: transform 200ms; }
+
+      .play-filter-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .play-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .play-tab {
+        padding: 8px 16px;
+        border-radius: 20px;
+        background: transparent;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        font-family: var(--display);
+        font-size: 13px;
+        font-weight: 500;
+        color: #483f3f;
+        cursor: pointer;
+        transition: background 200ms, color 200ms, border-color 200ms;
+      }
+      .play-tab:hover { background: rgba(0, 0, 0, 0.04); }
+      .play-tab.is-active {
+        background: #333333;
+        color: #ffffff;
+        border-color: #333333;
+      }
+
+      .play-reset-btn {
+        background: none;
+        border: none;
+        color: #767373;
+        font-family: var(--display);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 0;
+        transition: color 180ms;
+      }
+      .play-reset-btn:hover { color: var(--blue); }
+
+      /* ─── Grid / Canvas Layout ─── */
+      .play-grid-container {
+        position: relative;
+        z-index: 1;
+        width: min(calc(100% - 48px), 1436px);
+        margin: 20px auto 80px;
+      }
+      .play-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+
+      /* Playground Card */
+      .play-card {
+        background: #ffffff;
+        border: 0.3px solid #f8f1f1;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: transform 300ms cubic-bezier(.22,.68,0,1.2), box-shadow 300ms ease;
+      }
+      .play-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 42px rgba(0, 0, 0, 0.08);
+      }
+
+      /* Multi-size layout (Figma-faithful variety) */
+      .play-card.size-large {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+      .play-card.size-wide {
+        grid-column: span 2;
+      }
+
+      .play-card-media {
+        position: relative;
+        height: 200px;
+        background: #eaeaea;
+        overflow: hidden;
+      }
+      .size-large .play-card-media { height: 420px; }
+      .size-wide .play-card-media { height: 240px; }
+
+      .play-card-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 400ms ease;
+      }
+      .play-card:hover .play-card-media img { transform: scale(1.03); }
+
+      .play-card-tag {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        padding: 5px 10px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        border-radius: 4px;
+        font-family: var(--display);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--blue);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+
+      .play-card-body {
+        padding: 16px 20px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-top: 1px solid rgba(5, 5, 5, 0.06);
+        background: #ffffff;
+      }
+      .play-card-body h3 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 18px;
+        font-weight: 400;
+        color: #483f3f;
+      }
+      .size-large .play-card-body h3 {
+        font-size: 26px;
+      }
+      .play-card-btn {
+        flex-shrink: 0;
+        padding: 8px 14px;
+        border-radius: 6px;
+        background: #f0f0f0;
+        color: #483f3f;
+        font-family: var(--serif);
+        font-size: 12px;
+        white-space: nowrap;
+        transition: background 180ms, color 180ms;
+        cursor: pointer;
+      }
+      .play-card-btn:hover {
+        background: var(--blue);
+        color: #ffffff;
+      }
+
+      /* See all actions */
+      .play-footer-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+      }
+      
+      /* Filter fallback state */
+      .no-results {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 80px 24px;
+        background: #ffffff;
+        border-radius: 12px;
+        border: 0.5px solid rgba(0, 0, 0, 0.08);
+      }
+      .no-results h4 {
+        margin: 0 0 8px;
+        font-family: var(--serif);
+        font-size: 24px;
+        color: #010101;
+      }
+      .no-results p {
+        margin: 0;
+        color: #767373;
+        font-size: 14px;
+      }
+
+      @media (max-width: 1100px) {
+        .play-grid { grid-template-columns: repeat(3, 1fr); }
+      }
+      @media (max-width: 850px) {
+        .play-grid { grid-template-columns: repeat(2, 1fr); }
+        .play-card.size-large { grid-column: span 2; grid-row: span 1; }
+        .size-large .play-card-media { height: 260px; }
+      }
+      @media (max-width: 600px) {
+        .play-grid { grid-template-columns: 1fr; }
+        .play-card.size-large, .play-card.size-wide { grid-column: span 1; }
+      }
+    </style>
+  </head>
+  <body class="playground-page">
+    <div class="canvas-grid-bg"></div>
+
+    <header class="site-header is-light" style="position: relative; z-index: 10;">
+      <div class="nav-wrap">
+        <a class="brand-mark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="/projects/">Projects</a>
+          <a href="/services/">Services</a>
+          <a href="/about/">About me</a>
+          <a href="/playground/" aria-current="page">Playground</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+        <a class="nav-cta" href="/contact/">Book a call</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="play-hero" aria-labelledby="play-h1">
+        <div class="play-hero-row">
+          <div>
+            <h1 id="play-h1">My <em>Playground</em></h1>
+            <p class="play-hero-desc">Here are my refined UI exploration interactions, engaging games, illustrations, and enhanced business strategies for UI.</p>
+          </div>
+          <div class="play-hero-ctas">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Controls Bar -->
+      <section class="play-controls-bar" aria-label="Playground filters">
+        <div class="play-search-row">
+          <div class="play-search-input-wrap">
+            <input class="play-search-input" id="playground-search" type="search" placeholder="Please enter the title for your interaction, animation, game, or illustration." aria-label="Search items" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </div>
+          <button class="play-canvas-toggle" type="button">
+            <span>Canvas</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+        </div>
+
+        <div class="play-filter-row">
+          <ul class="play-tabs" role="tablist">
+            <li><button class="play-tab is-active" role="tab" aria-selected="true" data-category="all">Everything</button></li>
+            <li><button class="play-tab" role="tab" aria-selected="false" data-category="interactions">User Interactions</button></li>
+            <li><button class="play-tab" role="tab" aria-selected="false" data-category="effects">Visual Effects</button></li>
+            <li><button class="play-tab" role="tab" aria-selected="false" data-category="games">Interactive Games</button></li>
+            <li><button class="play-tab" role="tab" aria-selected="false" data-category="artworks">Artworks</button></li>
+            <li><button class="play-tab" role="tab" aria-selected="false" data-category="designs">UI Designs</button></li>
+          </ul>
+          <button class="play-reset-btn" id="play-reset" type="button">Reset all filters</button>
+        </div>
+      </section>
+
+      <!-- Grid Container -->
+      <section class="play-grid-container" aria-label="Playground explorer">
+        <div class="play-grid" id="playground-grid">
+
+          <!-- Zucchini Food Carousel (Large Featured) -->
+          <article class="play-card size-large" data-name="Zucchini Food Carousel" data-category="interactions">
+            <div class="play-card-media">
+              <span class="play-card-tag">User Interactions</span>
+              <img src="/assets/figma/1ee71db6ac809222102a5f90bb63603fbbdcb08f.png" alt="Zucchini Food Carousel mockup" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Zucchini Food Carousel</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Dream Buddy -->
+          <article class="play-card" data-name="Dream Buddy" data-category="interactions">
+            <div class="play-card-media" style="background:#e8e0ff;">
+              <span class="play-card-tag">Interactions</span>
+              <img src="/assets/figma/292e1469c323e1fb0db7c47cf29e03cf9d1b2a3b.png" alt="Dream Buddy" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Dream Buddy</h3>
+              <button class="play-card-btn" type="button">Engage</button>
+            </div>
+          </article>
+
+          <!-- Battery Charging Status -->
+          <article class="play-card" data-name="Battery Charging Status" data-category="effects">
+            <div class="play-card-media">
+              <span class="play-card-tag">Visual Effects</span>
+              <img src="/assets/figma/b16174b9b9d31569486f8b8a1bb3f8e0468893b2.png" alt="Battery Charging Status" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Battery Charging Status</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Expressive Character Sheet -->
+          <article class="play-card size-wide" data-name="Expressive Character Sheet" data-category="artworks">
+            <div class="play-card-media">
+              <span class="play-card-tag">Artworks</span>
+              <img src="/assets/figma/27eca32b84e1898f2365bce9fbf7dbc86de08bfe.png" alt="Expressive Character Sheet" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Expressive Character Sheet</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Custom Dessert Selector -->
+          <article class="play-card" data-name="Custom Dessert Selector" data-category="interactions">
+            <div class="play-card-media" style="background:#fffcf0;">
+              <span class="play-card-tag">Interactions</span>
+              <img src="/assets/figma/316fc73faf5a63c12c64c709b8becc45b4d1460a.png" alt="Custom Dessert Selector" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Custom Dessert Selector</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Navigation Image reveal -->
+          <article class="play-card" data-name="Navigation Image reveal" data-category="effects">
+            <div class="play-card-media">
+              <span class="play-card-tag">Visual Effects</span>
+              <img src="/assets/figma/062e42fc656bb9eb84bcb34c99f896eb7b760ef2.png" alt="Navigation Image reveal" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Navigation Image reveal</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Book3d cover rotation -->
+          <article class="play-card" data-name="Book3d cover rotation" data-category="effects">
+            <div class="play-card-media" style="background:#eaeaea;">
+              <span class="play-card-tag">Visual Effects</span>
+              <img src="/assets/figma/e942ad15b7cec5068b22494754e808b99e019394.png" alt="Book3D cover rotation" loading="lazy" />
+            </div>
+            <div class="play-card-body">
+              <h3>Book3d cover rotation</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Crying Character -->
+          <article class="play-card" data-name="Crying Character" data-category="artworks">
+            <div class="play-card-media" style="background:#fce7f3; display:grid; place-items:center;">
+              <span class="play-card-tag">Artworks</span>
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d21fae" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 14.5s2.5 1.5 4 1.5 4-1.5 4-1.5"/><circle cx="9" cy="9" r="1.5" fill="currentColor"/><circle cx="15" cy="9" r="1.5" fill="currentColor"/><path d="M9 11v3m6-3v3" stroke-width="1"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Crying Character</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Space ticker -->
+          <article class="play-card" data-name="Space ticker" data-category="interactions">
+            <div class="play-card-media" style="background:#1e1b4b; display:grid; place-items:center;">
+              <span class="play-card-tag">Interactions</span>
+              <div style="color:#818cf8; font-family:monospace; font-size:12px; letter-spacing:0.15em;">SPACE // TICKER</div>
+            </div>
+            <div class="play-card-body">
+              <h3>Space ticker</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Data Insight Card Flip -->
+          <article class="play-card" data-name="Data Insight Card Flip" data-category="effects">
+            <div class="play-card-media" style="background:#f1f5f9; display:grid; place-items:center;">
+              <span class="play-card-tag">Visual Effects</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 10h10M7 14h6"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Data Insight Card Flip</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Music control & Slider Widget -->
+          <article class="play-card" data-name="Music control &amp; Slider Widget" data-category="designs">
+            <div class="play-card-media" style="background:#1e293b; display:grid; place-items:center;">
+              <span class="play-card-tag">UI Designs</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Music control &amp; Slider Widget</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Landing Page Chat card -->
+          <article class="play-card" data-name="Landing Page Chat card" data-category="designs">
+            <div class="play-card-media" style="background:#eff6ff; display:grid; place-items:center;">
+              <span class="play-card-tag">UI Designs</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Landing Page Chat card</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Nirvana -->
+          <article class="play-card" data-name="Nirvana" data-category="artworks">
+            <div class="play-card-media" style="background:#faf5ff; display:grid; place-items:center;">
+              <span class="play-card-tag">Artworks</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v12M6 12h12"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Nirvana</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Green Landing Page -->
+          <article class="play-card" data-name="Green Landing Page" data-category="designs">
+            <div class="play-card-media" style="background:#f0fdf4; display:grid; place-items:center;">
+              <span class="play-card-tag">UI Designs</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Green Landing Page</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- File reveal -->
+          <article class="play-card" data-name="File reveal" data-category="interactions">
+            <div class="play-card-media" style="background:#fff7ed; display:grid; place-items:center;">
+              <span class="play-card-tag">Interactions</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>File reveal</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Pink Car Landing Page -->
+          <article class="play-card" data-name="Pink Car Landing Page" data-category="designs">
+            <div class="play-card-media" style="background:#fdf2f8; display:grid; place-items:center;">
+              <span class="play-card-tag">UI Designs</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Pink Car Landing Page</h3>
+              <button class="play-card-btn" type="button">Interact</button>
+            </div>
+          </article>
+
+          <!-- Interactive Game: Simon Says -->
+          <article class="play-card" data-name="Simon Says Game" data-category="games">
+            <div class="play-card-media" style="background:#fffbeb; display:grid; place-items:center;">
+              <span class="play-card-tag">Interactive Games</span>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M21 12H3M12 3v18"/></svg>
+            </div>
+            <div class="play-card-body">
+              <h3>Simon Says Game</h3>
+              <button class="play-card-btn" type="button">Play Game</button>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="play-footer-actions">
+          <button class="button button-outline" id="play-see-all" type="button">See all</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-card-blue">
+          <div class="footer-logo-wrap"><span class="footer-logo-glyph">ayo.</span><span class="footer-logo-sub">dsgn</span></div>
+        </div>
+        <div class="footer-card-white">
+          <div class="footer-card-content">
+            <div class="footer-cta-col">
+              <h2>Take your project to the next level. Let's talk!</h2>
+              <div class="footer-cta-actions">
+                <a class="button button-pink" href="/contact/">Book a discovery call</a>
+                <a class="button-arrow" href="/contact/"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+              </div>
+            </div>
+            <div class="footer-nav-col">
+              <h3>Navigation</h3>
+              <div class="footer-nav-links">
+                <a href="/projects/">Projects</a><a href="/services/">Services</a><a href="/playground/">Playground</a>
+                <a href="/#process">Process</a><a href="/#testimonials">Testimonials</a><a href="/#faq">FAQs</a><a href="/about/">About</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-card-bottom">
+            <div class="footer-social-section">
+              <h4>Stay in touch!</h4>
+              <div class="footer-social-links">
+                <a href="https://www.behance.net/">Behance</a><span class="divider"></span><a href="https://dribbble.com/">Dribbble</a><span class="divider"></span>
+                <a href="https://github.com/">GitHub</a><span class="divider"></span><a href="https://x.com/">X</a><span class="divider"></span><a href="https://linkedin.com/">LinkedIn</a>
+              </div>
+            </div>
+            <div class="footer-copyright">&copy; <span data-year></span> Ayo. All rights reserved.</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/site.js?v=1.4"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('playground-search');
+        const tabs = document.querySelectorAll('.play-tab');
+        const resetButton = document.getElementById('play-reset');
+        const seeAllButton = document.getElementById('play-see-all');
+        const grid = document.getElementById('playground-grid');
+        const cards = Array.from(grid.querySelectorAll('.play-card'));
+
+        let activeCategory = 'all';
+        let searchQuery = '';
+
+        function updateFilters() {
+          let visibleCount = 0;
+          
+          // Remove no results banner if it exists
+          const existingNoResults = grid.querySelector('.no-results');
+          if (existingNoResults) existingNoResults.remove();
+
+          cards.forEach(card => {
+            const cardName = card.getAttribute('data-name').toLowerCase();
+            const cardCat = card.getAttribute('data-category');
+            
+            const matchesSearch = cardName.includes(searchQuery);
+            const matchesCategory = activeCategory === 'all' || cardCat === activeCategory;
+
+            if (matchesSearch && matchesCategory) {
+              card.style.display = 'flex';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (visibleCount === 0) {
+            const noResultsHTML = `
+              <div class="no-results">
+                <h4>No explorations found</h4>
+                <p>Try refining your search query or choosing another category tab.</p>
+              </div>
+            `;
+            grid.insertAdjacentHTML('beforeend', noResultsHTML);
+          }
+        }
+
+        searchInput.addEventListener('input', (e) => {
+          searchQuery = e.target.value.toLowerCase().trim();
+          updateFilters();
+        });
+
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            tabs.forEach(t => {
+              t.classList.remove('is-active');
+              t.setAttribute('aria-selected', 'false');
+            });
+            tab.classList.add('is-active');
+            tab.setAttribute('aria-selected', 'true');
+            activeCategory = tab.getAttribute('data-category');
+            updateFilters();
+          });
+        });
+
+        resetButton.addEventListener('click', () => {
+          searchInput.value = '';
+          searchQuery = '';
+          tabs.forEach(t => {
+            t.classList.remove('is-active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tabs[0].classList.add('is-active');
+          tabs[0].setAttribute('aria-selected', 'true');
+          activeCategory = 'all';
+          updateFilters();
+        });
+
+        if (seeAllButton) {
+          seeAllButton.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            tabs.forEach(t => {
+              t.classList.remove('is-active');
+              t.setAttribute('aria-selected', 'false');
+            });
+            tabs[0].classList.add('is-active');
+            tabs[0].setAttribute('aria-selected', 'true');
+            activeCategory = 'all';
+            updateFilters();
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

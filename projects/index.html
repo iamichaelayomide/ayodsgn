@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Projects That Show the Work — selected product design, UI/UX, web, mobile, and visual design case studies by Michael Ayomide." />
+    <title>ayo.dsgn | All Projects</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/site.css?v=1.4" />
+    <style>
+      .projects-page { background: #f0f0f0; min-height: 100vh; }
+
+      /* ─── Hero ─── */
+      .proj-page-hero {
+        padding: 150px 0 0;
+        width: min(calc(100% - 48px), 1436px);
+        margin: 0 auto;
+      }
+      .proj-page-hero-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 40px;
+        flex-wrap: wrap;
+        padding-bottom: 40px;
+      }
+      .proj-page-hero h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(44px, 5.5vw, 72px);
+        font-weight: 400;
+        line-height: 1;
+        color: #010101;
+      }
+      .proj-page-hero h1 em { font-style: italic; }
+      .proj-page-hero-desc {
+        margin: 20px 0 0;
+        max-width: 760px;
+        color: #483f3f;
+        font-size: 16px;
+        line-height: 1.65;
+      }
+      .proj-page-hero-ctas {
+        display: flex;
+        gap: 12px;
+        flex-shrink: 0;
+        align-self: flex-end;
+      }
+
+      /* ─── Masonry / Grid layout ─── */
+      .proj-grid-section {
+        width: min(calc(100% - 48px), 1436px);
+        margin: 40px auto 0;
+        padding-bottom: 60px;
+      }
+      .proj-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .proj-grid-card {
+        background: #ffffff;
+        border: 0.3px solid #f8f1f1;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 280ms cubic-bezier(.22,.68,0,1.2), box-shadow 280ms ease;
+      }
+      .proj-grid-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 52px rgba(0,0,0,0.1);
+      }
+      .proj-grid-card.card-tall { grid-row: span 2; }
+      .proj-grid-card.card-wide { grid-column: span 2; }
+      .proj-card-media {
+        height: 280px;
+        overflow: hidden;
+        background: #eaeaea;
+      }
+      .card-tall .proj-card-media { height: 100%; min-height: 480px; }
+      .card-wide .proj-card-media { height: 340px; }
+      .proj-card-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 500ms ease;
+      }
+      .proj-grid-card:hover .proj-card-media img { transform: scale(1.04); }
+      .proj-card-info {
+        padding: 20px 22px 24px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        border-top: 1px solid rgba(5,5,5,0.07);
+      }
+      .proj-card-info h3 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(20px, 2.2vw, 34px);
+        font-weight: 400;
+        line-height: 1;
+        color: #483f3f;
+      }
+      .proj-card-info p {
+        margin: 8px 0 0;
+        color: #767373;
+        font-size: 13px;
+      }
+      .proj-card-btn {
+        flex-shrink: 0;
+        padding: 10px 16px;
+        border-radius: 8px;
+        background: #f0f0f0;
+        color: #483f3f;
+        font-family: var(--serif);
+        font-size: 13px;
+        white-space: nowrap;
+        transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+        align-self: flex-end;
+      }
+      .proj-card-btn:hover {
+        background: var(--blue);
+        color: #fff;
+        transform: translateY(-2px);
+      }
+
+      /* ─── Services (swipable) ─── */
+      .proj-services-section {
+        padding: 100px 0;
+        background: #f0f0f0;
+      }
+
+      /* ─── Process Section ─── */
+      .proj-process-section {
+        padding: 100px 0;
+        background: #f0f0f0;
+      }
+      .proj-process-inner {
+        width: min(calc(100% - 48px), 1436px);
+        margin: 0 auto;
+      }
+      .proj-process-inner > h2 {
+        font-family: var(--serif);
+        font-size: clamp(36px, 4vw, 60px);
+        font-weight: 400;
+        line-height: 1;
+        margin: 12px 0 60px;
+        color: #010101;
+      }
+      .proj-process-inner > h2 em { font-style: italic; }
+      .process-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 28px;
+      }
+      .process-col {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .process-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 12px;
+        background: var(--blue);
+        display: grid;
+        place-items: center;
+        color: #fff;
+      }
+      .process-icon svg { width: 40px; height: 40px; }
+      .process-col h4 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 24px;
+        font-weight: 400;
+        color: #010101;
+      }
+      .process-col p {
+        margin: 0;
+        color: #483f3f;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      .process-cta-row {
+        margin-top: 60px;
+        padding: 32px 40px;
+        border-radius: 8px;
+        background: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        flex-wrap: wrap;
+      }
+      .process-cta-row p {
+        margin: 0;
+        color: #fff;
+        font-family: var(--display);
+        font-size: 16px;
+        max-width: 700px;
+        line-height: 1.55;
+      }
+
+      /* ─── Testimonials ─── */
+      .proj-testimonials-section {
+        padding: 100px 0;
+        background: #f0f0f0;
+      }
+      .proj-testimonials-inner {
+        width: min(calc(100% - 48px), 1436px);
+        margin: 0 auto;
+      }
+      .proj-testimonials-inner .section-top { margin-bottom: 60px; }
+      .proj-testimonials-inner h2 {
+        font-family: var(--serif);
+        font-size: clamp(40px, 4vw, 60px);
+        font-weight: 400;
+        line-height: 1;
+        margin: 0;
+        color: #010101;
+      }
+      .testimonials-bg-section {
+        background: #1f46d2;
+        border-radius: 10px;
+        padding: 60px;
+        position: relative;
+        overflow: hidden;
+      }
+      .testimonials-bg-section::before {
+        content: 'ayo. dsgn';
+        position: absolute;
+        left: -80px;
+        top: 40px;
+        font-family: var(--display);
+        font-size: 200px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.06);
+        white-space: nowrap;
+        pointer-events: none;
+        letter-spacing: -4px;
+        line-height: 1;
+      }
+      .testimonials-bg-section::after {
+        content: 'dsgn';
+        position: absolute;
+        right: -40px;
+        bottom: 40px;
+        font-family: var(--display);
+        font-size: 200px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.06);
+        white-space: nowrap;
+        pointer-events: none;
+        letter-spacing: -4px;
+        line-height: 1;
+      }
+      .testi-cards {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        cursor: grab;
+        padding-bottom: 8px;
+      }
+      .testi-cards::-webkit-scrollbar { display: none; }
+      .testi-cards.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+      .testi-card {
+        flex: 0 0 clamp(280px, 30vw, 420px);
+        background: #fff;
+        border-radius: 10px;
+        padding: 28px;
+        scroll-snap-align: start;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+      }
+      .testi-quote {
+        font-family: var(--serif);
+        font-size: 80px;
+        line-height: 0.6;
+        color: #1f46d2;
+        opacity: 0.3;
+        font-style: italic;
+      }
+      .testi-rating {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .testi-stars {
+        display: flex;
+        gap: 2px;
+        color: #f5a623;
+      }
+      .testi-stars svg { width: 14px; height: 14px; fill: currentColor; }
+      .testi-score {
+        font-family: var(--serif);
+        font-size: 14px;
+        font-style: italic;
+        color: #483f3f;
+      }
+      .testi-text {
+        color: #483f3f;
+        font-size: 14px;
+        line-height: 1.7;
+        flex: 1;
+      }
+      .testi-author {
+        margin-top: 8px;
+      }
+      .testi-author strong {
+        display: block;
+        font-family: var(--serif);
+        font-size: 17px;
+        font-weight: 400;
+        color: #010101;
+      }
+      .testi-author span {
+        font-size: 12px;
+        color: #767373;
+        line-height: 1.4;
+        display: block;
+        margin-top: 4px;
+      }
+      .testi-meta-row {
+        margin-top: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+      .testi-stats {
+        display: flex;
+        gap: 48px;
+      }
+      .testi-stat strong {
+        display: block;
+        font-family: var(--serif);
+        font-size: 48px;
+        font-style: italic;
+        color: #fff;
+        line-height: 1;
+      }
+      .testi-stat span {
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+      }
+      .trusted-logos {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+      .trusted-logos span {
+        color: rgba(255,255,255,0.5);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .trusted-logo-img {
+        height: 32px;
+        width: auto;
+        opacity: 0.6;
+        filter: brightness(0) invert(1);
+        object-fit: contain;
+      }
+
+      /* ─── FAQ section ─── */
+      .proj-faq-section {
+        padding: 100px 0;
+        background: #f0f0f0;
+      }
+      .proj-faq-inner {
+        width: min(calc(100% - 48px), 1436px);
+        margin: 0 auto;
+      }
+      .faq-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+        margin-top: 48px;
+      }
+      .faq-image-col img {
+        width: 100%;
+        border-radius: 10px;
+        display: block;
+      }
+      .faq-list { display: flex; flex-direction: column; gap: 0; }
+      .faq-item {
+        border-bottom: 1px solid rgba(72,63,63,0.12);
+        overflow: hidden;
+      }
+      .faq-item:first-child { border-top: 1px solid rgba(72,63,63,0.12); }
+      .faq-item summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 0;
+        cursor: pointer;
+        list-style: none;
+        font-family: var(--display);
+        font-size: 16px;
+        font-weight: 600;
+        color: #483f3f;
+        user-select: none;
+        transition: color 180ms ease;
+      }
+      .faq-item summary::-webkit-details-marker { display: none; }
+      .faq-toggle {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid rgba(72,63,63,0.2);
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        font-weight: 300;
+        transition: transform 280ms ease, background 180ms ease;
+        color: #483f3f;
+      }
+      .faq-item[open] summary { color: #010101; }
+      .faq-item[open] .faq-toggle {
+        transform: rotate(45deg);
+        background: var(--blue);
+        color: #fff;
+        border-color: var(--blue);
+      }
+      .faq-answer {
+        padding: 0 0 20px;
+        max-width: 600px;
+      }
+      .faq-answer p {
+        margin: 0;
+        color: #483f3f;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      /* ─── Blue CTA banner ─── */
+      .proj-cta-banner {
+        margin: 0 auto 0;
+        width: min(calc(100% - 48px), 1436px);
+        background: var(--blue);
+        border-radius: 10px;
+        padding: 60px 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 28px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 60px;
+      }
+      .proj-cta-banner::before {
+        content: 'ayo';
+        position: absolute;
+        left: 100px;
+        top: 20px;
+        font-family: var(--display);
+        font-size: 220px;
+        font-weight: 600;
+        color: transparent;
+        opacity: 0.4;
+        pointer-events: none;
+        letter-spacing: -4px;
+        line-height: 1;
+      }
+      .proj-cta-banner::after {
+        content: 'dsgn';
+        position: absolute;
+        right: 60px;
+        bottom: 20px;
+        font-family: var(--display);
+        font-size: 220px;
+        font-weight: 600;
+        color: transparent;
+        opacity: 0.4;
+        pointer-events: none;
+        letter-spacing: -4px;
+        line-height: 1;
+      }
+      .proj-cta-banner h2 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(28px, 3.5vw, 48px);
+        font-weight: 400;
+        color: #fff;
+        line-height: 1.1;
+        position: relative;
+        z-index: 1;
+        max-width: 600px;
+      }
+      .proj-cta-banner p {
+        margin: 0;
+        color: rgba(255,255,255,0.8);
+        font-size: 15px;
+        position: relative;
+        z-index: 1;
+      }
+      .proj-cta-banner-btns {
+        display: flex;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+      }
+      .button-pink-solid {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 32px;
+        border-radius: 8px;
+        background: #d21fae;
+        color: #fff;
+        font-family: var(--serif);
+        font-size: 16px;
+        transition: background 180ms ease, transform 180ms ease;
+        border: none;
+        cursor: pointer;
+      }
+      .button-pink-solid:hover { background: #b81a97; transform: translateY(-2px); }
+      .button-white-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 32px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.5);
+        color: #fff;
+        font-family: var(--serif);
+        font-size: 16px;
+        transition: border-color 180ms ease, background 180ms ease;
+      }
+      .button-white-outline:hover { border-color: #fff; background: rgba(255,255,255,0.08); }
+
+      @media (max-width: 900px) {
+        .proj-grid { grid-template-columns: 1fr; }
+        .proj-grid-card.card-wide { grid-column: span 1; }
+        .process-row { grid-template-columns: 1fr 1fr; }
+        .faq-layout { grid-template-columns: 1fr; }
+        .faq-image-col { display: none; }
+        .testi-stat strong { font-size: 36px; }
+      }
+    </style>
+  </head>
+  <body class="projects-page">
+    <header class="site-header is-light">
+      <div class="nav-wrap">
+        <a class="brand-mark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="/projects/" aria-current="page">Projects</a>
+          <a href="/services/">Services</a>
+          <a href="/about/">About me</a>
+          <a href="/playground/">Playground</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+        <a class="nav-cta" href="/contact/">Book a call</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- ── Hero ── -->
+      <section class="proj-page-hero" aria-labelledby="proj-h1">
+        <div class="proj-page-hero-row">
+          <div>
+            <h1 id="proj-h1">Projects That <em>Show the Work</em></h1>
+            <p class="proj-page-hero-desc">A look at selected product design, website, UI UX, no-code, AI, and visual design projects. Each one shows the thinking, structure, and design decisions behind the final outcome.</p>
+          </div>
+          <div class="proj-page-hero-ctas">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Project Grid ── -->
+      <section class="proj-grid-section" aria-label="Project showcase">
+        <div class="proj-grid">
+
+          <!-- Slumber Pal — tall main card -->
+          <article class="proj-grid-card card-tall">
+            <div class="proj-card-media" style="background:#d9f0c0;">
+              <img src="/assets/figma/3e5974e834a0aa4b6425e8c4ee805306490e8c27.png" alt="Slumber Pal mobile app" loading="lazy" />
+            </div>
+            <div class="proj-card-info">
+              <div>
+                <h3>Slumber Pal</h3>
+                <p>Full Mobile App Design</p>
+              </div>
+              <a class="proj-card-btn" href="#">See project</a>
+            </div>
+          </article>
+
+          <!-- SPND -->
+          <article class="proj-grid-card">
+            <div class="proj-card-media">
+              <img src="/assets/figma/37b2352dc66365d6ed787d1342787e4138587b3a.png" alt="SPND intentional spending app" loading="lazy" />
+            </div>
+            <div class="proj-card-info">
+              <div>
+                <h3>SPND</h3>
+                <p>Full Mobile App Design</p>
+              </div>
+              <a class="proj-card-btn" href="#">See project</a>
+            </div>
+          </article>
+
+          <!-- Knowlab -->
+          <article class="proj-grid-card">
+            <div class="proj-card-media">
+              <img src="/assets/figma/81fcaefb95dea242921abf0d763f8e13ff129d4f.png" alt="Knowlab SaaS dashboard" loading="lazy" />
+            </div>
+            <div class="proj-card-info">
+              <div>
+                <h3>Knowlab</h3>
+                <p>Full Web App Design</p>
+              </div>
+              <a class="proj-card-btn" href="#">See project</a>
+            </div>
+          </article>
+
+          <!-- Bloodlines -->
+          <article class="proj-grid-card">
+            <div class="proj-card-media">
+              <img src="/assets/figma/0c7c471f4462b69dc0e8f477667eaed5f3931761.png" alt="Bloodlines landing page design" loading="lazy" />
+            </div>
+            <div class="proj-card-info">
+              <div>
+                <h3>Bloodlines</h3>
+                <p>Full Landing &amp; Web App Design</p>
+              </div>
+              <a class="proj-card-btn" href="#">See project</a>
+            </div>
+          </article>
+
+          <!-- Bitzsznn -->
+          <article class="proj-grid-card">
+            <div class="proj-card-media">
+              <img src="/assets/figma/bc833ee86d65f655cba770420f4cc4d1381fa7b1.png" alt="Bitzsznn full website design" loading="lazy" />
+            </div>
+            <div class="proj-card-info">
+              <div>
+                <h3>Bitzsznn</h3>
+                <p>Full Website Design</p>
+              </div>
+              <a class="proj-card-btn" href="#">See project</a>
+            </div>
+          </article>
+
+          <!-- Orca — wide card -->
+          <article class="proj-grid-card card-wide">
+            <div class="proj-card-media">
+              <img src="/assets/figma/806cfb6178eb1eac5761a7d02b64e60a5c8cac92.png" alt="Orca Security website revamp" loading="lazy" />
+            </div>
+            <div class="proj-card-info">
+              <div>
+                <h3>Orca Security Ltd</h3>
+                <p>Website Revamp</p>
+              </div>
+              <a class="proj-card-btn" href="#">See project</a>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ── All Services (swipable) ── -->
+      <section class="proj-services-section services-section" id="services" aria-labelledby="proj-services-h2" style="padding:100px 0;">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">Capabilities</p>
+            <h2 id="proj-services-h2">All <em>Services</em></h2>
+            <p class="section-desc" style="max-width:570px;margin-top:18px;color:var(--muted);font-size:17px;line-height:1.55;">
+              I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.
+            </p>
+          </div>
+          <div class="section-actions">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+            <a class="button button-outline" href="/services/">See all services</a>
+          </div>
+        </div>
+        <div class="services-layout">
+          <div class="service-rail" tabindex="0" aria-label="Swipe or scroll services">
+            <button class="service-card is-selected" type="button" data-service="strategy" aria-pressed="true"><span>01</span><strong>Product Design &amp; UI/UX</strong></button>
+            <button class="service-card" type="button" data-service="design" aria-pressed="false"><span>02</span><strong>Mobile App Design</strong></button>
+            <button class="service-card" type="button" data-service="development" aria-pressed="false"><span>03</span><strong>SaaS Dashboard &amp; Web App</strong></button>
+            <button class="service-card" type="button" data-service="testing" aria-pressed="false"><span>04</span><strong>UX Audit &amp; Redesign</strong></button>
+            <button class="service-card" type="button" data-service="launch" aria-pressed="false"><span>05</span><strong>Landing Page Design</strong></button>
+            <button class="service-card" type="button" data-service="support" aria-pressed="false"><span>06</span><strong>No-Code Development</strong></button>
+            <button class="service-card" type="button" data-service="ai" aria-pressed="false"><span>07</span><strong>AI Product Design</strong></button>
+            <button class="service-card" type="button" data-service="illustration" aria-pressed="false"><span>08</span><strong>Vector Illustration</strong></button>
+          </div>
+          <article class="service-detail" aria-live="polite">
+            <p class="detail-number">01</p>
+            <div>
+              <h3 data-service-title>Product Design &amp; UI/UX Design</h3>
+              <p data-service-body>End-to-end product design across web and mobile, from early wireframes to polished Figma interfaces ready for engineering handoff.</p>
+            </div>
+            <ul data-service-list>
+              <li>User research &amp; flows</li>
+              <li>Wireframes &amp; prototypes</li>
+              <li>Design system creation</li>
+            </ul>
+            <a class="button button-soft" href="/contact/">Book a call</a>
+          </article>
+        </div>
+        <div class="center-action">
+          <a class="text-link-button" href="/services/">See all services</a>
+        </div>
+      </section>
+
+      <!-- ── My Process ── -->
+      <section class="proj-process-section" id="process" aria-labelledby="proj-process-h2">
+        <div class="proj-process-inner">
+          <p class="section-kicker">How I work</p>
+          <h2 id="proj-process-h2"><em>My process</em></h2>
+          <div class="process-row">
+            <div class="process-col">
+              <div class="process-icon">
+                <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 30V14l10-8 10 8v16"/><rect x="15" y="20" width="10" height="10"/></svg>
+              </div>
+              <h4>Discover</h4>
+              <p>Understand the product, users, business goals, competitors, and key problems to solve.</p>
+            </div>
+            <div class="process-col">
+              <div class="process-icon">
+                <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="10"/><line x1="20" y1="4" x2="20" y2="10"/><line x1="20" y1="30" x2="20" y2="36"/><line x1="4" y1="20" x2="10" y2="20"/><line x1="30" y1="20" x2="36" y2="20"/></svg>
+              </div>
+              <h4>Strategy</h4>
+              <p>Map the flow, content, layout, user journey, and product logic for a clear direction.</p>
+            </div>
+            <div class="process-col">
+              <div class="process-icon">
+                <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 32l6-6 16-16-6-6L8 20z"/><line x1="22" y1="10" x2="30" y2="18"/></svg>
+              </div>
+              <h4>Design</h4>
+              <p>Create polished UI screens, prototypes, visuals, and responsive layouts.</p>
+            </div>
+            <div class="process-col">
+              <div class="process-icon">
+                <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="28" height="28" rx="4"/><path d="M14 20h12M20 14v12"/></svg>
+              </div>
+              <h4>Deliver &amp; Build</h4>
+              <p>Prepare clean handoff files, design systems, no-code builds, and AI-assisted prototypes ready for development or launch.</p>
+            </div>
+          </div>
+          <div class="process-cta-row">
+            <p>Discover an easy way to achieve real results! My collaborative, data-driven approach is customized for your business, guaranteeing you get impactful outcomes. Book a call today to learn how I can help you succeed!</p>
+            <a class="button button-primary" href="/contact/" style="background:#fff;color:var(--blue);flex-shrink:0;">Book a call</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── What Clients Say ── -->
+      <section class="proj-testimonials-section" id="testimonials" aria-labelledby="proj-testi-h2">
+        <div class="proj-testimonials-inner">
+          <div class="section-top">
+            <div>
+              <p class="section-kicker">Social proof</p>
+              <h2 id="proj-testi-h2">What <em>clients say</em></h2>
+            </div>
+            <div class="section-actions">
+              <a class="button button-primary" href="/contact/">Book a call</a>
+              <a class="button button-outline" href="/projects/">See all projects</a>
+            </div>
+          </div>
+
+          <div class="testimonials-bg-section">
+            <div class="testi-cards" id="testi-carousel">
+              <article class="testi-card">
+                <div class="testi-quote">"</div>
+                <div class="testi-rating">
+                  <div class="testi-stars">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span class="testi-score">4.2/5</span>
+                </div>
+                <p class="testi-text">The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs, and research publications across Nigeria. Getting all of that into one website without losing clarity was the challenge. Ayo thought through the structure and the experience, and what came out was more professional and functional than anything we had imagined. He's the person for it.</p>
+                <div class="testi-author">
+                  <strong>Ayo Bankole</strong>
+                  <span>Co-founder Caladium Foundation, Convener Caladium SME Bootcamp</span>
+                </div>
+              </article>
+
+              <article class="testi-card">
+                <div class="testi-quote">"</div>
+                <div class="testi-rating">
+                  <div class="testi-stars">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span class="testi-score">4.2/5</span>
+                </div>
+                <p class="testi-text">Working with Ayo was a great experience. He pays attention to details and just by listening to what I was trying to describe, he came up with something even better than I envisioned. He works fast, proffers solutions to every problem that pops up, and the quality of his work has a very classy vibe to it. It is both creative and functional.</p>
+                <div class="testi-author">
+                  <strong>Founder, Hay_artz stores</strong>
+                  <span>E-commerce fashion brand</span>
+                </div>
+              </article>
+
+              <article class="testi-card">
+                <div class="testi-quote">"</div>
+                <div class="testi-rating">
+                  <div class="testi-stars">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span class="testi-score">4.2/5</span>
+                </div>
+                <p class="testi-text">I needed an ecommerce website for my fashion brand, and Ayo worked on it. I was already in love with the prototype version from the first look. The design is clean, the execution was smooth, and he delivered exactly what I had in mind. Good job.</p>
+                <div class="testi-author">
+                  <strong>Kingsley Inyang</strong>
+                  <span>Chief executive officer, Delluxe Vogue</span>
+                </div>
+              </article>
+
+              <article class="testi-card">
+                <div class="testi-quote">"</div>
+                <div class="testi-rating">
+                  <div class="testi-stars">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span class="testi-score">4.2/5</span>
+                </div>
+                <p class="testi-text">I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. His work is neat, he pays attention to details, and he executed everything I asked for without me having to do follow-up reviews. Turnaround was timely and communication was smooth. I'd hire him again without hesitation.</p>
+                <div class="testi-author">
+                  <strong>Olumide Adepoju</strong>
+                  <span>Chief executive officer, Orca Securities Ltd</span>
+                </div>
+              </article>
+
+              <article class="testi-card">
+                <div class="testi-quote">"</div>
+                <div class="testi-rating">
+                  <div class="testi-stars">
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span class="testi-score">4.2/5</span>
+                </div>
+                <p class="testi-text">I needed a website for Bitzsznn that captures the energy and also lets me collect payments directly. Ayo delivered. The site looks premium, ticketing flows smoothly, and my audience can visit the gallery to see past events. The brand finally has a proper digital home.</p>
+                <div class="testi-author">
+                  <strong>Yungbitz</strong>
+                  <span>Chief executive officer, Bitzsznn Entertainment</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="testi-meta-row">
+              <div class="testi-stats">
+                <div class="testi-stat">
+                  <strong>2+</strong>
+                  <span>years of design experience</span>
+                </div>
+                <div class="testi-stat">
+                  <strong>97%</strong>
+                  <span>customer satisfaction</span>
+                </div>
+              </div>
+            </div>
+            <p class="trusted-logos" style="color:rgba(255,255,255,0.5);font-size:13px;margin-top:24px;position:relative;z-index:1;">Trusted by several teams &amp; organizations</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── What People Are Asking ── -->
+      <section class="proj-faq-section" id="faq" aria-labelledby="proj-faq-h2">
+        <div class="proj-faq-inner">
+          <h2 id="proj-faq-h2">What people are <em>asking</em></h2>
+          <div class="faq-layout">
+            <div class="faq-image-col">
+              <!-- Pink speech bubbles / illustration placeholder -->
+              <div style="background:#f7f7f7;border-radius:12px;height:460px;display:grid;place-items:center;">
+                <svg width="200" height="180" viewBox="0 0 200 180" fill="none">
+                  <rect x="20" y="40" width="110" height="80" rx="16" fill="#f8b4e0"/>
+                  <rect x="50" y="10" width="130" height="90" rx="16" fill="#d21fae" opacity="0.8"/>
+                  <circle cx="160" cy="130" r="24" fill="#d21fae" opacity="0.5"/>
+                  <path d="M62 94 L50 110 L78 100Z" fill="#f8b4e0"/>
+                </svg>
+              </div>
+            </div>
+            <div class="faq-list">
+              <details class="faq-item" open>
+                <summary>What services are available from you? <span class="faq-toggle">+</span></summary>
+                <div class="faq-answer"><p>I help teams and businesses create websites and mobile apps that improve their strategic goals. I work across product design, brand strategy, development, and launch support.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>Can you tell me about the services you provide? <span class="faq-toggle">+</span></summary>
+                <div class="faq-answer"><p>I offer product design, UI/UX, mobile app design, SaaS dashboard design, landing pages, no-code builds, AI prototyping, and custom vector illustration.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>What kind of services do you provide? <span class="faq-toggle">+</span></summary>
+                <div class="faq-answer"><p>From early strategy and wireframes all the way through polished UI, development, and launch — I cover the full design and build cycle for digital products.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>Could you explain the services you offer? <span class="faq-toggle">+</span></summary>
+                <div class="faq-answer"><p>Each engagement is scoped based on what stage you are at. Whether you need a full product designed from scratch, a revamp of an existing product, or just a section built and launched, I can cover it.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>What services do you provide? <span class="faq-toggle">+</span></summary>
+                <div class="faq-answer"><p>Core services: product design &amp; UI/UX, mobile app design, SaaS &amp; web app design, UX audits, landing pages, no-code development, AI prototyping, and illustration.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>What services do you offer? <span class="faq-toggle">+</span></summary>
+                <div class="faq-answer"><p>A full-stack design service: from brand strategy and information architecture through to Figma designs, responsive builds, and post-launch support.</p></div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blue CTA within FAQ section -->
+        <div style="width:min(calc(100% - 48px), 1436px);margin:60px auto 0;">
+          <div class="proj-cta-banner">
+            <h2>Curious about what we can create together?</h2>
+            <p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p>
+            <div class="proj-cta-banner-btns">
+              <a class="button-pink-solid" href="/contact/">Book a call</a>
+              <a class="button-white-outline" href="/projects/">See all projects</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-card-blue">
+          <div class="footer-logo-wrap">
+            <span class="footer-logo-glyph">ayo.</span>
+            <span class="footer-logo-sub">dsgn</span>
+          </div>
+        </div>
+        <div class="footer-card-white">
+          <div class="footer-card-content">
+            <div class="footer-cta-col">
+              <h2>Take your project to the next level. Let's talk!</h2>
+              <div class="footer-cta-actions">
+                <a class="button button-pink" href="/contact/">Book a discovery call</a>
+                <a class="button-arrow" href="/contact/">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                </a>
+              </div>
+            </div>
+            <div class="footer-nav-col">
+              <h3>Navigation</h3>
+              <div class="footer-nav-links">
+                <a href="/projects/">Projects</a>
+                <a href="/services/">Services</a>
+                <a href="/playground/">Playground</a>
+                <a href="/#process">Process</a>
+                <a href="/#testimonials">Testimonials</a>
+                <a href="/#faq">FAQs</a>
+                <a href="/about/">About</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-card-bottom">
+            <div class="footer-social-section">
+              <h4>Stay in touch!</h4>
+              <div class="footer-social-links">
+                <a href="https://www.behance.net/">Behance</a><span class="divider"></span>
+                <a href="https://dribbble.com/">Dribbble</a><span class="divider"></span>
+                <a href="https://github.com/">GitHub</a><span class="divider"></span>
+                <a href="https://x.com/">X</a><span class="divider"></span>
+                <a href="https://linkedin.com/">LinkedIn</a>
+              </div>
+            </div>
+            <div class="footer-copyright">&copy; <span data-year></span> Ayo. All rights reserved.</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/site.js?v=1.4"></script>
+    <script>
+      // Extra services for projects page
+      const extraServices = {
+        ai: { number: '07', title: 'AI Product Design & Prototyping', body: 'Rapid AI-assisted prototyping using modern tools to explore ideas and validate concepts before full development.', list: ['AI-assisted wireframing', 'Rapid prototypes', 'Concept validation'] },
+        illustration: { number: '08', title: 'Custom Vector Illustration & Brand Assets', body: 'Custom vector illustrations, icons, and brand assets tailored to your visual identity and product needs.', list: ['Custom illustrations', 'Icon systems', 'Brand asset creation'] }
+      };
+      // Merge with existing services from site.js
+      window.addEventListener('DOMContentLoaded', () => {
+        // Testimonials carousel drag
+        const tc = document.getElementById('testi-carousel');
+        if (tc) {
+          let down = false, sx = 0, ss = 0;
+          tc.addEventListener('pointerdown', e => { down = true; sx = e.clientX; ss = tc.scrollLeft; tc.classList.add('is-dragging'); tc.setPointerCapture(e.pointerId); });
+          tc.addEventListener('pointermove', e => { if (!down) return; tc.scrollLeft = ss - (e.clientX - sx); });
+          const end = () => { down = false; tc.classList.remove('is-dragging'); };
+          tc.addEventListener('pointerup', end);
+          tc.addEventListener('pointercancel', end);
+        }
+      });
+    </script>
+  </body>
+</html>

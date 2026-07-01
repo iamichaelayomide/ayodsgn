@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="About Michael Ayomide (ayo.dsgn) — product designer helping teams build websites and mobile apps with clear strategy and tasteful design." />
+    <title>ayo.dsgn | About me</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/site.css?v=1.4" />
+    <style>
+      .about-page { background: #f0f0f0; min-height: 100vh; }
+
+      /* ─── Hero ─── */
+      .about-hero {
+        padding: 140px 0 0;
+      }
+      .about-hero-inner {
+        width: min(calc(100% - 48px), 1436px);
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+        min-height: calc(100vh - 140px);
+        padding-bottom: 80px;
+      }
+      .about-hero-left { display: flex; flex-direction: column; gap: 36px; }
+
+      .about-h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(52px, 5.5vw, 72px);
+        font-weight: 400;
+        line-height: 1;
+        color: #010101;
+      }
+      .about-h1 em { font-style: italic; }
+
+      .about-tagline {
+        margin: 0;
+        font-family: var(--display);
+        font-size: clamp(18px, 2vw, 24px);
+        font-weight: 500;
+        color: #141414;
+        line-height: 1;
+      }
+
+      .about-body {
+        margin: 0;
+        color: #483f3f;
+        font-size: 15px;
+        line-height: 1.7;
+        max-width: 440px;
+      }
+
+      /* Skill chips */
+      .about-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .about-skills li {
+        padding: 9px 16px;
+        border: 1px solid #767373;
+        border-radius: 100px;
+        color: #767373;
+        font-family: var(--display);
+        font-size: 13px;
+        font-weight: 500;
+        transition: border-color 200ms, color 200ms, transform 200ms;
+      }
+      .about-skills li:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); }
+
+      /* Social row */
+      .about-socials {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .about-socials li { display: flex; align-items: center; }
+      .about-socials a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        color: #483f3f;
+        transition: color 200ms, transform 200ms;
+      }
+      .about-socials a:hover { color: var(--blue); transform: translateY(-3px); }
+      .social-sep { width: 2px; height: 22px; background: rgba(72,63,63,0.18); border-radius: 1px; margin: 0 8px; }
+
+      .about-hero-ctas { display: flex; gap: 12px; }
+
+      /* ─── Photo stack ─── */
+      .about-photo-stack {
+        position: relative;
+        height: 580px;
+        align-self: center;
+      }
+      .photo-layer {
+        position: absolute;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #f7e1e1;
+        background: #f0f0f0;
+        transition: transform 400ms cubic-bezier(.22,.68,0,1.2);
+      }
+      .photo-layer:nth-child(1) { width: 82%; height: 80%; right: 0; top: 2%; transform: rotate(2.5deg); z-index: 1; }
+      .photo-layer:nth-child(2) { width: 82%; height: 80%; right: 4%; top: 6%; transform: rotate(0.8deg); z-index: 2; }
+      .photo-layer:nth-child(3) { width: 82%; height: 80%; right: 8%; top: 10%; transform: rotate(-1deg); z-index: 3; }
+      .about-photo-stack:hover .photo-layer:nth-child(1) { transform: rotate(5deg) translateY(-12px); }
+      .about-photo-stack:hover .photo-layer:nth-child(2) { transform: rotate(1.5deg) translateX(-10px); }
+      .about-photo-stack:hover .photo-layer:nth-child(3) { transform: rotate(-2deg); }
+      .photo-layer img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .photo-layer-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #e8e0ff 0%, #c4b5fd 50%, #a78bfa 100%);
+        display: grid;
+        place-items: center;
+        color: #6d28d9;
+        font-family: var(--serif);
+        font-size: 60px;
+        font-style: italic;
+      }
+
+      /* ─── Divider ─── */
+      .pg-divider { width: min(calc(100% - 48px), 1436px); margin: 0 auto; height: 1px; background: rgba(72,63,63,0.12); }
+
+      /* ─── Process Section ─── */
+      .about-process { padding: 100px 0; }
+      .about-process-inner { width: min(calc(100% - 48px), 1436px); margin: 0 auto; }
+      .about-process-inner > h2 {
+        font-family: var(--serif);
+        font-size: clamp(36px, 4vw, 56px);
+        font-weight: 400;
+        line-height: 1;
+        margin: 12px 0 64px;
+        color: #010101;
+      }
+      .about-process-inner > h2 em { font-style: italic; }
+      .process-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+      .process-left h3 { margin: 0 0 20px; font-family: var(--serif); font-size: 26px; font-weight: 400; line-height: 1.25; }
+      .process-left p { margin: 0; color: #483f3f; font-size: 15px; line-height: 1.7; }
+      .process-steps { display: flex; flex-direction: column; gap: 0; }
+      .process-step {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 20px;
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(72,63,63,0.12);
+        transition: background 200ms;
+      }
+      .process-step:first-child { border-top: 1px solid rgba(72,63,63,0.12); }
+      .step-badge {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: var(--blue);
+        color: #fff;
+        font-family: var(--serif);
+        font-size: 16px;
+        font-style: italic;
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .process-step h4 { margin: 0 0 8px; font-family: var(--serif); font-size: 21px; font-weight: 400; color: #010101; }
+      .process-step p { margin: 0; color: #483f3f; font-size: 14px; line-height: 1.65; }
+
+      /* ─── Services Section (swipable) ─── */
+      .about-services { padding: 100px 0; }
+
+      /* ─── Testimonials ─── */
+      .about-testi { padding: 100px 0; }
+      .about-testi-inner { width: min(calc(100% - 48px), 1436px); margin: 0 auto; }
+      .about-testi-inner h2 {
+        font-family: var(--serif);
+        font-size: clamp(40px, 4vw, 60px);
+        font-weight: 400;
+        line-height: 1;
+        margin: 0 0 60px;
+      }
+      .about-testi-inner h2 em { font-style: italic; }
+      .testi-bg {
+        background: #1f46d2;
+        border-radius: 10px;
+        padding: 52px;
+        position: relative;
+        overflow: hidden;
+      }
+      .testi-bg::before {
+        content: 'Ayo. dsgn';
+        position: absolute;
+        left: -80px;
+        top: 30px;
+        font-family: var(--display);
+        font-size: 180px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.06);
+        white-space: nowrap;
+        pointer-events: none;
+        letter-spacing: -4px;
+      }
+      .testi-bg::after {
+        content: 'dsgn';
+        position: absolute;
+        right: -40px;
+        bottom: 20px;
+        font-family: var(--display);
+        font-size: 180px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.06);
+        white-space: nowrap;
+        pointer-events: none;
+        letter-spacing: -4px;
+      }
+      .testi-scroll {
+        display: flex;
+        gap: 18px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        cursor: grab;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 6px;
+      }
+      .testi-scroll::-webkit-scrollbar { display: none; }
+      .testi-scroll.is-dragging { cursor: grabbing; scroll-snap-type: none; }
+      .testi-c {
+        flex: 0 0 clamp(260px, 28vw, 380px);
+        background: #fff;
+        border-radius: 10px;
+        padding: 26px;
+        scroll-snap-align: start;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .testi-qmark { font-family: var(--serif); font-size: 60px; line-height: 0.6; color: #1f46d2; opacity: 0.25; font-style: italic; }
+      .stars { display: flex; gap: 2px; color: #f5a623; }
+      .stars svg { width: 13px; height: 13px; fill: currentColor; }
+      .testi-body { color: #483f3f; font-size: 13px; line-height: 1.7; flex: 1; }
+      .testi-who strong { display: block; font-family: var(--serif); font-size: 16px; font-weight: 400; color: #010101; }
+      .testi-who span { font-size: 11px; color: #767373; display: block; margin-top: 3px; }
+      .testi-footer-row {
+        margin-top: 36px;
+        display: flex;
+        align-items: center;
+        gap: 48px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+      }
+      .testi-footer-stat strong { display: block; font-family: var(--serif); font-size: 44px; font-style: italic; color: #fff; line-height: 1; }
+      .testi-footer-stat span { color: rgba(255,255,255,0.6); font-size: 12px; }
+      .trusted-by { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 20px; position: relative; z-index: 1; }
+
+      /* ─── FAQ ─── */
+      .about-faq { padding: 100px 0; }
+      .about-faq-inner { width: min(calc(100% - 48px), 1436px); margin: 0 auto; }
+      .about-faq-inner h2 { font-family: var(--serif); font-size: clamp(36px, 4vw, 56px); font-weight: 400; line-height: 1; margin: 0 0 48px; }
+      .about-faq-inner h2 em { font-style: italic; }
+      .about-faq-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+        margin-top: 0;
+      }
+      .about-faq-image { background: #f7f7f7; border-radius: 12px; height: 440px; display: grid; place-items: center; }
+      .faq-qa { display: flex; flex-direction: column; gap: 0; }
+      .fqa-item { border-bottom: 1px solid rgba(72,63,63,0.12); overflow: hidden; }
+      .fqa-item:first-child { border-top: 1px solid rgba(72,63,63,0.12); }
+      .fqa-item summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 20px 0;
+        cursor: pointer;
+        list-style: none;
+        font-family: var(--display);
+        font-size: 16px;
+        font-weight: 600;
+        color: #483f3f;
+        user-select: none;
+        transition: color 180ms;
+      }
+      .fqa-item summary::-webkit-details-marker { display: none; }
+      .fqa-toggle { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(72,63,63,0.2); display: grid; place-items: center; font-size: 16px; font-weight: 300; transition: transform 280ms, background 180ms; color: #483f3f; }
+      .fqa-item[open] summary { color: #010101; }
+      .fqa-item[open] .fqa-toggle { transform: rotate(45deg); background: var(--blue); color: #fff; border-color: var(--blue); }
+      .fqa-ans { padding: 0 0 20px; }
+      .fqa-ans p { margin: 0; color: #483f3f; font-size: 14px; line-height: 1.7; }
+
+      /* ─── Blue CTA banner ─── */
+      .about-cta-banner {
+        margin: 0 auto 60px;
+        width: min(calc(100% - 48px), 1436px);
+        background: var(--blue);
+        border-radius: 10px;
+        padding: 60px 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 24px;
+        position: relative;
+        overflow: hidden;
+      }
+      .about-cta-banner::before {
+        content: 'ayo';
+        position: absolute; left: 80px; top: 20px;
+        font-family: var(--display); font-size: 220px; font-weight: 600;
+        color: transparent; opacity: 0.3; pointer-events: none;
+        letter-spacing: -4px; line-height: 1;
+      }
+      .about-cta-banner::after {
+        content: 'dsgn';
+        position: absolute; right: 60px; bottom: 10px;
+        font-family: var(--display); font-size: 220px; font-weight: 600;
+        color: transparent; opacity: 0.3; pointer-events: none;
+        letter-spacing: -4px; line-height: 1;
+      }
+      .about-cta-banner h2 { margin: 0; font-family: var(--serif); font-size: clamp(28px, 3.5vw, 48px); font-weight: 400; color: #fff; line-height: 1.1; position: relative; z-index: 1; max-width: 600px; }
+      .about-cta-banner p { margin: 0; color: rgba(255,255,255,0.8); font-size: 15px; position: relative; z-index: 1; }
+      .about-cta-banner-btns { display: flex; gap: 12px; position: relative; z-index: 1; }
+      .btn-pink { display: inline-flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; background: #d21fae; color: #fff; font-family: var(--serif); font-size: 16px; transition: background 180ms, transform 180ms; }
+      .btn-pink:hover { background: #b81a97; transform: translateY(-2px); }
+      .btn-wht-outline { display: inline-flex; align-items: center; justify-content: center; padding: 16px 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.5); color: #fff; font-family: var(--serif); font-size: 16px; transition: border-color 180ms; }
+      .btn-wht-outline:hover { border-color: #fff; }
+
+      @media (max-width: 900px) {
+        .about-hero-inner { grid-template-columns: 1fr; gap: 48px; }
+        .about-photo-stack { height: 380px; order: -1; }
+        .process-two-col { grid-template-columns: 1fr; gap: 48px; }
+        .about-faq-layout { grid-template-columns: 1fr; }
+        .about-faq-image { display: none; }
+      }
+    </style>
+  </head>
+  <body class="about-page">
+    <header class="site-header is-light">
+      <div class="nav-wrap">
+        <a class="brand-mark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="/projects/">Projects</a>
+          <a href="/services/">Services</a>
+          <a href="/about/" aria-current="page">About me</a>
+          <a href="/playground/">Playground</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+        <a class="nav-cta" href="/contact/">Book a call</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- ── Hero ── -->
+      <section class="about-hero" id="about-top">
+        <div class="about-hero-inner">
+          <div class="about-hero-left">
+            <div>
+              <h1 class="about-h1">About <em>me</em></h1>
+              <p class="about-tagline">Hi, I am Michael Ayomide,</p>
+            </div>
+            <p class="about-body">I help teams, businesses and companies build websites and mobile apps, that helps build business strategies.</p>
+
+            <ul class="about-skills" aria-label="Core skills">
+              <li>Brand strategy</li>
+              <li>Product design</li>
+              <li>Brand strategy</li>
+              <li>Brand strategy</li>
+              <li>Brand strategy</li>
+              <li>Brand strategy</li>
+              <li>Brand strategy</li>
+              <li>Brand strategy</li>
+            </ul>
+
+            <ul class="about-socials" aria-label="Social links">
+              <li>
+                <a href="https://www.behance.net/" aria-label="Behance" target="_blank" rel="noopener">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="7" width="9" height="10" rx="2"/><rect x="12" y="7" width="11" height="10" rx="2"/></svg>
+                </a>
+              </li>
+              <li><span class="social-sep"></span></li>
+              <li>
+                <a href="https://dribbble.com/" aria-label="Dribbble" target="_blank" rel="noopener">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
+                </a>
+              </li>
+              <li><span class="social-sep"></span></li>
+              <li>
+                <a href="https://github.com/" aria-label="GitHub" target="_blank" rel="noopener">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                </a>
+              </li>
+              <li><span class="social-sep"></span></li>
+              <li>
+                <a href="https://x.com/" aria-label="X" target="_blank" rel="noopener">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+              </li>
+              <li><span class="social-sep"></span></li>
+              <li>
+                <a href="https://linkedin.com/" aria-label="LinkedIn" target="_blank" rel="noopener">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                </a>
+              </li>
+              <li><span class="social-sep"></span></li>
+            </ul>
+
+            <div class="about-hero-ctas">
+              <a class="button button-primary" href="/contact/">Book a call</a>
+              <a class="button button-outline" href="#">Download CV</a>
+            </div>
+          </div>
+
+          <!-- Photo Stack -->
+          <div class="about-photo-stack" aria-hidden="true">
+            <div class="photo-layer">
+              <div class="photo-layer-placeholder">ayo</div>
+            </div>
+            <div class="photo-layer">
+              <div class="photo-layer-placeholder">.</div>
+            </div>
+            <div class="photo-layer">
+              <div class="photo-layer-placeholder" style="background:linear-gradient(135deg,#c4b5fd,#818cf8);">dsgn</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="pg-divider"></div>
+
+      <!-- ── My Process ── -->
+      <section class="about-process" id="process" aria-labelledby="about-process-h2">
+        <div class="about-process-inner">
+          <p class="section-kicker">How I work</p>
+          <h2 id="about-process-h2"><em>My process</em></h2>
+          <div class="process-two-col">
+            <div class="process-left">
+              <h3>A Practical Approach. Proven Results. Tailored for You.</h3>
+              <p>Discover an easy way to achieve real results! My collaborative, data-driven approach is customized for your business, guaranteeing you get impactful outcomes every time.</p>
+            </div>
+            <div class="process-steps">
+              <article class="process-step">
+                <div class="step-badge">01</div>
+                <div>
+                  <h4>Discover</h4>
+                  <p>Understand the product, users, business goals, competitors, and key problems to solve.</p>
+                </div>
+              </article>
+              <article class="process-step">
+                <div class="step-badge">02</div>
+                <div>
+                  <h4>Strategy</h4>
+                  <p>Map the flow, content, layout, user journey, and product logic for a clear direction.</p>
+                </div>
+              </article>
+              <article class="process-step">
+                <div class="step-badge">03</div>
+                <div>
+                  <h4>Design</h4>
+                  <p>Create polished UI screens, prototypes, visuals, and responsive layouts.</p>
+                </div>
+              </article>
+              <article class="process-step">
+                <div class="step-badge">04</div>
+                <div>
+                  <h4>Deliver &amp; Build</h4>
+                  <p>Prepare clean handoff files, design systems, no-code builds, and AI-assisted prototypes ready for development or launch.</p>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="pg-divider"></div>
+
+      <!-- ── All Services (swipable) ── -->
+      <section class="about-services services-section" id="services" aria-labelledby="about-services-h2" style="padding:100px 0;">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">Capabilities</p>
+            <h2 id="about-services-h2">All <em>Services</em></h2>
+            <p class="section-desc" style="max-width:570px;margin-top:18px;color:var(--muted);font-size:17px;line-height:1.55;">
+              Practical, end-to-end design support for teams that need useful strategy, clean visuals, and a launch-ready build.
+            </p>
+          </div>
+          <div class="section-actions">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+            <a class="button button-outline" href="/services/">See all services</a>
+          </div>
+        </div>
+        <div class="services-layout">
+          <div class="service-rail" tabindex="0" aria-label="Swipe or scroll services">
+            <button class="service-card is-selected" type="button" data-service="strategy" aria-pressed="true"><span>01</span><strong>Strategy</strong></button>
+            <button class="service-card" type="button" data-service="design" aria-pressed="false"><span>02</span><strong>Design</strong></button>
+            <button class="service-card" type="button" data-service="development" aria-pressed="false"><span>03</span><strong>Development</strong></button>
+            <button class="service-card" type="button" data-service="testing" aria-pressed="false"><span>04</span><strong>Testing</strong></button>
+            <button class="service-card" type="button" data-service="launch" aria-pressed="false"><span>05</span><strong>Launch</strong></button>
+            <button class="service-card" type="button" data-service="support" aria-pressed="false"><span>06</span><strong>Support</strong></button>
+          </div>
+          <article class="service-detail" aria-live="polite">
+            <p class="detail-number">01</p>
+            <div>
+              <h3 data-service-title>Strategy</h3>
+              <p data-service-body>I help teams, businesses and companies shape websites and mobile apps around clear business strategy, audience needs, and launch goals.</p>
+            </div>
+            <ul data-service-list>
+              <li>Offer positioning</li>
+              <li>Page architecture</li>
+              <li>Conversion paths</li>
+            </ul>
+            <a class="button button-soft" href="/contact/">Book a call</a>
+          </article>
+        </div>
+        <div class="center-action">
+          <a class="text-link-button" href="/services/">See all services</a>
+        </div>
+      </section>
+
+      <div class="pg-divider"></div>
+
+      <!-- ── What Clients Say ── -->
+      <section class="about-testi" id="testimonials" aria-labelledby="about-testi-h2">
+        <div class="about-testi-inner">
+          <h2 id="about-testi-h2">What <em>clients say</em></h2>
+          <div class="testi-bg">
+            <div class="testi-scroll" id="about-testi-scroll">
+              <article class="testi-c">
+                <div class="testi-qmark">"</div>
+                <div class="stars">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <p class="testi-body">The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs, and research publications across Nigeria. What came out was more professional and functional than anything we had imagined.</p>
+                <div class="testi-who"><strong>Ayo Bankole</strong><span>Co-founder Caladium Foundation</span></div>
+              </article>
+              <article class="testi-c">
+                <div class="testi-qmark">"</div>
+                <div class="stars">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <p class="testi-body">He pays attention to details and came up with something even better than I envisioned. He works fast, proffers solutions to every problem that pops up. The quality of his work has a very classy vibe — both creative and functional.</p>
+                <div class="testi-who"><strong>Founder, Hay_artz stores</strong><span>E-commerce fashion brand</span></div>
+              </article>
+              <article class="testi-c">
+                <div class="testi-qmark">"</div>
+                <div class="stars">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <p class="testi-body">I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. Turnaround was timely and communication was smooth. I'd hire him again without hesitation.</p>
+                <div class="testi-who"><strong>Olumide Adepoju</strong><span>CEO, Orca Securities Ltd</span></div>
+              </article>
+              <article class="testi-c">
+                <div class="testi-qmark">"</div>
+                <div class="stars">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <p class="testi-body">I needed a website for Bitzsznn that captures the energy. Ayo delivered. The site looks premium, ticketing flows smoothly. The brand finally has a proper digital home.</p>
+                <div class="testi-who"><strong>Yungbitz</strong><span>CEO, Bitzsznn Entertainment</span></div>
+              </article>
+            </div>
+            <div class="testi-footer-row">
+              <div class="testi-footer-stat"><strong>2+</strong><span>years of design experience</span></div>
+              <div class="testi-footer-stat"><strong>97%</strong><span>customer satisfaction</span></div>
+            </div>
+            <p class="trusted-by">Trusted by several teams &amp; organizations</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="pg-divider"></div>
+
+      <!-- ── What People Are Asking (FAQ) ── -->
+      <section class="about-faq" id="faq" aria-labelledby="about-faq-h2">
+        <div class="about-faq-inner">
+          <h2 id="about-faq-h2">What people are <em>asking</em></h2>
+          <div class="about-faq-layout">
+            <div class="about-faq-image">
+              <svg width="180" height="160" viewBox="0 0 200 180" fill="none">
+                <rect x="20" y="40" width="110" height="80" rx="16" fill="#f8b4e0"/>
+                <rect x="50" y="10" width="130" height="90" rx="16" fill="#d21fae" opacity="0.8"/>
+                <circle cx="160" cy="130" r="24" fill="#d21fae" opacity="0.5"/>
+                <path d="M62 94 L50 110 L78 100Z" fill="#f8b4e0"/>
+              </svg>
+            </div>
+            <div class="faq-qa">
+              <details class="fqa-item" open>
+                <summary>What services are available from you? <span class="fqa-toggle">+</span></summary>
+                <div class="fqa-ans"><p>I help teams and businesses create websites and mobile apps that improve their strategic goals. I offer product design, UI/UX, mobile design, landing pages, no-code builds, and more.</p></div>
+              </details>
+              <details class="fqa-item">
+                <summary>Can you tell me about the services you provide? <span class="fqa-toggle">+</span></summary>
+                <div class="fqa-ans"><p>I offer product design, UI/UX, mobile app design, SaaS dashboards, landing pages, no-code builds, AI prototyping, and custom vector illustration.</p></div>
+              </details>
+              <details class="fqa-item">
+                <summary>What kind of services do you provide? <span class="fqa-toggle">+</span></summary>
+                <div class="fqa-ans"><p>From early strategy and wireframes through polished UI, development, and launch — I cover the full design and build cycle for digital products.</p></div>
+              </details>
+              <details class="fqa-item">
+                <summary>Could you explain the services you offer? <span class="fqa-toggle">+</span></summary>
+                <div class="fqa-ans"><p>Each engagement is scoped based on your stage. Whether you need a product designed from scratch, a revamp, or a section built and launched — I can cover it.</p></div>
+              </details>
+              <details class="fqa-item">
+                <summary>What services do you provide? <span class="fqa-toggle">+</span></summary>
+                <div class="fqa-ans"><p>Core: product design &amp; UI/UX, mobile app design, SaaS &amp; web app design, UX audits, landing pages, no-code development, AI prototyping, and illustration.</p></div>
+              </details>
+              <details class="fqa-item">
+                <summary>What services do you offer? <span class="fqa-toggle">+</span></summary>
+                <div class="fqa-ans"><p>A full-stack design service: brand strategy, information architecture, Figma designs, responsive builds, and post-launch support.</p></div>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blue CTA -->
+        <div class="about-cta-banner" style="margin-top:60px;">
+          <h2>Curious about what we can create together?</h2>
+          <p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p>
+          <div class="about-cta-banner-btns">
+            <a class="btn-pink" href="/contact/">Book a call</a>
+            <a class="btn-wht-outline" href="/projects/">See all projects</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-card-blue">
+          <div class="footer-logo-wrap"><span class="footer-logo-glyph">ayo.</span><span class="footer-logo-sub">dsgn</span></div>
+        </div>
+        <div class="footer-card-white">
+          <div class="footer-card-content">
+            <div class="footer-cta-col">
+              <h2>Take your project to the next level. Let's talk!</h2>
+              <div class="footer-cta-actions">
+                <a class="button button-pink" href="/contact/">Book a discovery call</a>
+                <a class="button-arrow" href="/contact/"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>
+              </div>
+            </div>
+            <div class="footer-nav-col">
+              <h3>Navigation</h3>
+              <div class="footer-nav-links">
+                <a href="/projects/">Projects</a><a href="/services/">Services</a><a href="/playground/">Playground</a>
+                <a href="/#process">Process</a><a href="/#testimonials">Testimonials</a><a href="/#faq">FAQs</a><a href="/about/">About</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-card-bottom">
+            <div class="footer-social-section">
+              <h4>Stay in touch!</h4>
+              <div class="footer-social-links">
+                <a href="https://www.behance.net/">Behance</a><span class="divider"></span><a href="https://dribbble.com/">Dribbble</a><span class="divider"></span>
+                <a href="https://github.com/">GitHub</a><span class="divider"></span><a href="https://x.com/">X</a><span class="divider"></span><a href="https://linkedin.com/">LinkedIn</a>
+              </div>
+            </div>
+            <div class="footer-copyright">&copy; <span data-year></span> Ayo. All rights reserved.</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/site.js?v=1.4"></script>
+    <script>
+      const ts = document.getElementById('about-testi-scroll');
+      if (ts) {
+        let d = false, sx = 0, ss = 0;
+        ts.addEventListener('pointerdown', e => { d = true; sx = e.clientX; ss = ts.scrollLeft; ts.classList.add('is-dragging'); ts.setPointerCapture(e.pointerId); });
+        ts.addEventListener('pointermove', e => { if (!d) return; ts.scrollLeft = ss - (e.clientX - sx); });
+        const end = () => { d = false; ts.classList.remove('is-dragging'); };
+        ts.addEventListener('pointerup', end);
+        ts.addEventListener('pointercancel', end);
+      }
+    </script>
+  </body>
+</html>

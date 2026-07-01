@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Product design, mobile app design, SaaS dashboards, UX audits, landing pages, and ecommerce design from ayo.dsgn — end-to-end creative & development services." />
+    <title>ayo.dsgn | Services — Design & Build Work</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/site.css?v=1.3" />
+    <style>
+      /* ===========================
+         SERVICES PAGE STYLES
+         (matching Figma node 99:6139)
+         =========================== */
+
+      /* ---- Hero ---- */
+      .srv-hero {
+        padding: 200px 24px 100px;
+        background: var(--paper);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .srv-hero::after {
+        content: "Services";
+        position: absolute;
+        right: -40px;
+        top: 40px;
+        font-family: var(--display);
+        font-size: clamp(80px, 12vw, 200px);
+        font-weight: 700;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(31, 70, 210, 0.07);
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+        line-height: 1;
+      }
+
+      .srv-hero-inner {
+        width: min(100%, var(--max));
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr min(480px, 40%);
+        gap: 80px;
+        align-items: end;
+      }
+
+      .srv-hero h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(64px, 8vw, 110px);
+        font-weight: 400;
+        line-height: 0.94;
+        color: var(--black);
+      }
+
+      .srv-hero h1 em {
+        font-style: italic;
+        color: var(--pink);
+      }
+
+      .srv-hero-aside {
+        padding-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .srv-hero-aside p {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--ink);
+      }
+
+      .srv-hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      /* ---- Services Detail (alternating image + copy rows) ---- */
+      .srv-detail-section {
+        padding: 0 24px 120px;
+        background: var(--paper);
+      }
+
+      .srv-detail-inner {
+        width: min(100%, var(--max));
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      /* Row: image left, copy right */
+      .srv-row {
+        display: grid;
+        grid-template-columns: minmax(300px, 498px) 1fr;
+        gap: 56px;
+        align-items: center;
+        padding: 80px 0;
+        border-top: 1px solid rgba(72, 63, 63, 0.1);
+      }
+
+      /* Row: copy left, image right (alternating) */
+      .srv-row.srv-row-flip {
+        grid-template-columns: 1fr minmax(300px, 498px);
+      }
+
+      .srv-row.srv-row-flip .srv-row-image {
+        order: 2;
+      }
+
+      .srv-row.srv-row-flip .srv-row-copy {
+        order: 1;
+      }
+
+      .srv-row-image {
+        position: relative;
+        aspect-ratio: 1.3 / 1;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid rgba(72, 63, 63, 0.08);
+        box-shadow: 0 8px 32px rgba(1, 1, 1, 0.05);
+      }
+
+      .srv-row-image-inner {
+        position: absolute;
+        inset: 8px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f7f2f2;
+      }
+
+      /* Placeholder visual for service images */
+      .srv-visual-1 { background: linear-gradient(135deg, #f0e8ff 0%, #e0d0ff 50%, #d5b8ff 100%); }
+      .srv-visual-2 { background: linear-gradient(135deg, #fce4f0 0%, #f9c9e2 50%, #f5a8d0 100%); }
+      .srv-visual-3 { background: linear-gradient(135deg, #e0e8ff 0%, #c8d4ff 50%, #b0beff 100%); }
+      .srv-visual-4 { background: linear-gradient(135deg, #ffeee0 0%, #ffd9c0 50%, #ffc4a0 100%); }
+      .srv-visual-5 { background: linear-gradient(135deg, #e0f5e8 0%, #c0eacf 50%, #a0dfb5 100%); }
+      .srv-visual-6 { background: linear-gradient(135deg, #fff0e0 0%, #ffe0c0 50%, #ffd0a0 100%); }
+
+      .srv-visual-pattern {
+        position: absolute;
+        inset: 0;
+        opacity: 0.4;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+
+      .srv-visual-label {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        font-family: var(--serif);
+        font-size: 22px;
+        font-weight: 400;
+        color: rgba(72, 63, 63, 0.5);
+        font-style: italic;
+      }
+
+      .srv-row-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .srv-row-kicker {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--blue);
+      }
+
+      .srv-row-copy h2 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: clamp(32px, 3.5vw, 48px);
+        font-weight: 400;
+        line-height: 1.05;
+        color: var(--black);
+      }
+
+      .srv-row-copy > p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.65;
+        color: var(--ink);
+      }
+
+      .srv-what-i-do {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .srv-what-i-do-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--muted);
+        margin-bottom: 10px;
+        margin-top: 4px;
+      }
+
+      .srv-what-i-do li {
+        padding: 9px 0;
+        border-bottom: 1px solid rgba(72, 63, 63, 0.1);
+        font-size: 14px;
+        color: var(--ink);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .srv-what-i-do li::before {
+        content: "";
+        flex: 0 0 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--pink);
+      }
+
+      .srv-best-for {
+        padding: 16px 20px;
+        border-radius: 8px;
+        background: rgba(31, 70, 210, 0.04);
+        border: 1px solid rgba(31, 70, 210, 0.12);
+        font-size: 13px;
+        line-height: 1.55;
+        color: var(--ink);
+      }
+
+      .srv-best-for strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--blue);
+      }
+
+      .srv-row-action {
+        margin-top: 4px;
+      }
+
+      .srv-row-action .button {
+        min-height: 54px;
+        font-size: 16px;
+      }
+
+      /* ---- What people are asking (FAQ) ---- */
+      .srv-faq-section {
+        padding: 120px 24px;
+        background: #ffffff;
+      }
+
+      .srv-faq-inner {
+        width: min(100%, var(--max));
+        margin: 0 auto;
+      }
+
+      .srv-faq-heading {
+        margin-bottom: 52px;
+      }
+
+      .srv-faq-heading h2 {
+        margin: 8px 0 0;
+        font-family: var(--serif);
+        font-size: clamp(50px, 5vw, 72px);
+        font-weight: 400;
+        line-height: 1.02;
+      }
+
+      .srv-faq-layout {
+        display: grid;
+        grid-template-columns: 1fr minmax(320px, 600px);
+        gap: 60px;
+        align-items: start;
+      }
+
+      /* FAQ image panel */
+      .srv-faq-image-panel {
+        position: sticky;
+        top: 100px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid #f7e1e1;
+        aspect-ratio: 1.15 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .srv-faq-image-inner {
+        padding: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Chat bubble illustration for FAQ */
+      .faq-illustration {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        position: relative;
+        padding: 20px;
+      }
+
+      .faq-bubble {
+        border-radius: 18px;
+        border-bottom-left-radius: 4px;
+        padding: 14px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        background: #f4f0ff;
+        max-width: 300px;
+        line-height: 1.4;
+        position: relative;
+      }
+
+      .faq-bubble.is-question {
+        border-radius: 18px;
+        border-bottom-right-radius: 4px;
+        align-self: flex-end;
+        background: var(--blue);
+        color: #ffffff;
+      }
+
+      .faq-bubble.is-answer {
+        background: #f7f7f7;
+        border: 1px solid #f0e8e8;
+      }
+
+      .faq-bubble .faq-icon {
+        display: inline-block;
+        margin-right: 6px;
+        font-size: 16px;
+      }
+
+      /* ---- Process section ---- */
+      .srv-process-section {
+        padding: 120px 24px;
+        background: var(--paper);
+      }
+
+      /* ---- CTA Banner ---- */
+      .srv-cta-section {
+        padding: 0 24px 120px;
+        background: var(--paper);
+      }
+
+      .srv-cta-inner {
+        width: min(100%, var(--max));
+        margin: 0 auto;
+        background: var(--blue);
+        border-radius: 16px;
+        padding: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 60px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .srv-cta-inner::before {
+        content: "ayo";
+        position: absolute;
+        left: -30px;
+        top: -20px;
+        font-family: var(--display);
+        font-size: 280px;
+        font-weight: 700;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.07);
+        pointer-events: none;
+        user-select: none;
+        line-height: 1;
+      }
+
+      .srv-cta-inner::after {
+        content: "dsgn";
+        position: absolute;
+        right: -20px;
+        bottom: -30px;
+        font-family: var(--display);
+        font-size: 220px;
+        font-weight: 700;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.07);
+        pointer-events: none;
+        user-select: none;
+        line-height: 1;
+      }
+
+      .srv-cta-copy {
+        position: relative;
+        z-index: 2;
+        flex: 1 1 auto;
+        max-width: 590px;
+      }
+
+      .srv-cta-copy h2 {
+        margin: 0 0 12px;
+        font-family: var(--serif);
+        font-size: clamp(32px, 3.8vw, 52px);
+        font-weight: 400;
+        color: #ffffff;
+        line-height: 1.1;
+      }
+
+      .srv-cta-copy p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.55;
+        color: rgba(255,255,255,0.78);
+      }
+
+      .srv-cta-actions {
+        position: relative;
+        z-index: 2;
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 230px;
+      }
+
+      .button-ghost-white {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 58px;
+        padding: 0 38px;
+        border: 1px solid rgba(255,255,255,0.45);
+        border-radius: 8px;
+        color: #ffffff;
+        font-family: var(--serif);
+        font-size: 18px;
+        transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+
+      .button-ghost-white:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.7);
+        transform: translateY(-2px);
+      }
+
+      /* ---- Responsive ---- */
+      @media (max-width: 1024px) {
+        .srv-hero-inner { grid-template-columns: 1fr; gap: 40px; }
+        .srv-hero::after { display: none; }
+        .srv-row,
+        .srv-row.srv-row-flip { grid-template-columns: 1fr; }
+        .srv-row.srv-row-flip .srv-row-image { order: 0; }
+        .srv-row.srv-row-flip .srv-row-copy { order: 0; }
+        .srv-faq-layout { grid-template-columns: 1fr; }
+        .srv-faq-image-panel { position: static; aspect-ratio: unset; min-height: 300px; }
+        .srv-cta-inner { flex-direction: column; padding: 56px 40px; gap: 36px; }
+        .srv-cta-inner::before, .srv-cta-inner::after { display: none; }
+      }
+
+      @media (max-width: 768px) {
+        .srv-hero { padding: 160px 24px 80px; }
+        .srv-cta-inner { padding: 48px 32px; }
+      }
+    </style>
+  </head>
+  <body class="services-page">
+    <header class="site-header is-light">
+      <div class="nav-wrap">
+        <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="/projects/">Projects</a>
+          <a href="/services/" aria-current="page">Services</a>
+          <a href="/about/">About me</a>
+          <a href="/playground/">Playground</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+        <a class="nav-cta" href="/contact/">Book a call</a>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- HERO -->
+      <section class="srv-hero" aria-labelledby="srv-h1">
+        <div class="srv-hero-inner">
+          <div>
+            <p class="section-kicker">Capabilities</p>
+            <h1 id="srv-h1">All <em>Services</em></h1>
+          </div>
+          <div class="srv-hero-aside">
+            <p>End-to-end design support for teams that need clear strategy, polished visuals, and a launch-ready build. I handle every phase so you don't need five different vendors.</p>
+            <div class="srv-hero-actions">
+              <a class="button button-primary" href="/contact/">Book a call</a>
+              <a class="button button-outline" href="/projects/">See all projects</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICES DETAIL ROWS (Figma 99:6463 — alternating image+text for each service) -->
+      <section class="srv-detail-section" id="services" aria-label="Service detail list">
+        <div class="srv-detail-inner">
+
+          <!-- 01 · Product Design & UI/UX -->
+          <div class="srv-row">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-1">
+                <div class="srv-visual-pattern"></div>
+                <span class="srv-visual-label">UI/UX</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">01 — Product Design</span>
+              <h2>Product Design and UI/UX Design</h2>
+              <p>I design digital products that are clear, useful, and easy to move through. This covers the structure, screens, flows, and interface decisions that shape how people experience your product.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>Product flows &amp; user journeys</li>
+                  <li>Wireframes and screen structure</li>
+                  <li>High-fidelity UI design</li>
+                  <li>Responsive interface design</li>
+                  <li>Clickable prototype</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                Startups, founders, small businesses, product teams, and anyone building a new digital product or improving an existing one.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Start a product project</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 02 · Mobile App Design -->
+          <div class="srv-row srv-row-flip">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-2">
+                <div class="srv-visual-pattern"></div>
+                <span class="srv-visual-label">Mobile App</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">02 — Mobile</span>
+              <h2>Mobile App Design</h2>
+              <p>I design mobile app experiences for iOS and Android, from early product flow to polished app screens. The focus is on making the app feel clean, natural, and easy to use on small screens.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>App onboarding &amp; home screens</li>
+                  <li>Booking &amp; payment flows</li>
+                  <li>User profiles &amp; dashboards</li>
+                  <li>Forms, settings &amp; empty states</li>
+                  <li>Clickable mobile prototypes</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                Mobile-first startups, service apps, marketplace apps, healthtech, fintech, creator tools, and community platforms.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Design my app</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 03 · SaaS Dashboard & Web App -->
+          <div class="srv-row">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-3">
+                <div class="srv-visual-pattern"></div>
+                <span class="srv-visual-label">Dashboard</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">03 — SaaS & Web Apps</span>
+              <h2>SaaS Dashboard and Web App Design</h2>
+              <p>I design dashboards, admin panels, portals, and web app interfaces that make complex information easier to understand and act on.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>SaaS dashboards &amp; admin panels</li>
+                  <li>Analytics pages &amp; data tables</li>
+                  <li>CRM &amp; user management screens</li>
+                  <li>Internal tools &amp; workflow screens</li>
+                  <li>Reports &amp; filter interfaces</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                SaaS products, B2B platforms, internal business tools, analytics products, operations tools, and admin-heavy products.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Design my dashboard</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 04 · UX Audit & Redesign -->
+          <div class="srv-row srv-row-flip">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-4">
+                <div class="srv-visual-pattern"></div>
+                <span class="srv-visual-label">UX Audit</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">04 — UX Audit</span>
+              <h2>UX Audit and Product Redesign</h2>
+              <p>I review existing products, find what is confusing or slowing users down, and redesign the experience to make it clearer, cleaner, and easier to use.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>UX audit reports</li>
+                  <li>Homepage &amp; app reviews</li>
+                  <li>User flow analysis &amp; navigation cleanup</li>
+                  <li>Screen redesign &amp; conversion improvements</li>
+                  <li>Before and after redesigns</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                Products that already exist but feel outdated, confusing, hard to use, or visually weak.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Audit my product</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 05 · Landing Page & Website Design -->
+          <div class="srv-row">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-5">
+                <div class="srv-visual-pattern"></div>
+                <span class="srv-visual-label">Landing Pages</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">05 — Websites</span>
+              <h2>Landing Page and Website Design</h2>
+              <p>I design websites and landing pages that explain what you offer, build trust quickly, and guide visitors toward taking action.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>Portfolio &amp; business websites</li>
+                  <li>Startup &amp; SaaS landing pages</li>
+                  <li>Service pages &amp; case study pages</li>
+                  <li>Pricing sections</li>
+                  <li>Responsive website design</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                Founders, creatives, startups, service businesses, personal brands, and companies that need a strong digital presence fast.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Build my website</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 06 · Ecommerce Design -->
+          <div class="srv-row srv-row-flip">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-6">
+                <div class="srv-visual-pattern"></div>
+                <span class="srv-visual-label">Ecommerce</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">06 — Ecommerce</span>
+              <h2>Ecommerce and Brand Design</h2>
+              <p>I design ecommerce stores and brand identities that help businesses sell online, present their products clearly, and build customer trust from first click to checkout.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>Product listing &amp; collection pages</li>
+                  <li>Cart, checkout &amp; payment flows</li>
+                  <li>Brand identity &amp; visual systems</li>
+                  <li>Email &amp; social assets</li>
+                  <li>Shopify &amp; custom store design</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                Fashion, beauty, lifestyle brands, independent sellers, and businesses building an online store for the first time.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Design my store</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- WHAT PEOPLE ARE ASKING (Figma 99:6407 — FAQ with image panel) -->
+      <section class="srv-faq-section" id="faq" aria-labelledby="srv-faq-heading">
+        <div class="srv-faq-inner">
+          <div class="srv-faq-heading">
+            <p class="section-kicker">FAQ</p>
+            <h2 id="srv-faq-heading">What people are <em style="font-style:italic;">asking</em></h2>
+          </div>
+          <div class="srv-faq-layout">
+
+            <!-- Illustration panel (left) -->
+            <div class="srv-faq-image-panel" aria-hidden="true">
+              <div class="srv-faq-image-inner">
+                <div class="faq-illustration">
+                  <div class="faq-bubble is-question">What services are available from you? 💬</div>
+                  <div class="faq-bubble is-answer">I offer product design, mobile app design, web apps, landing pages, ecommerce, UX audits and full build support.</div>
+                  <div class="faq-bubble is-question">Can you also build it? 🔨</div>
+                  <div class="faq-bubble is-answer">Yes — I design and build in HTML, CSS, and JavaScript.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- FAQ accordion (right) -->
+            <div class="faq-list" role="list">
+              <details class="faq-item" open>
+                <summary>What services are available from you?</summary>
+                <div class="faq-answer">
+                  <p>I help teams and businesses create websites and mobile apps that improve their strategic goals. Services include product design, mobile app design, SaaS dashboards, UX audits, landing pages, ecommerce, and full-stack frontend builds.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>Can you tell me about the services you provide?</summary>
+                <div class="faq-answer">
+                  <p>I work across the full lifecycle of a digital product — from defining the right structure and offer positioning, to building the UI and shipping it live. Each engagement is scoped around your specific launch goals.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>What kind of services do you provide?</summary>
+                <div class="faq-answer">
+                  <p>Strategy, visual design, responsive frontend development, QA testing, deployment, and post-launch support. I focus on delivering polished, launch-ready products that hold up after handoff.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>Could you explain the services you offer?</summary>
+                <div class="faq-answer">
+                  <p>Think of it as an integrated design studio. I work across the full stack of a digital product — from defining the right offer positioning and page flow, to building the UI and shipping it live on Vercel or Netlify.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>What services do you provide?</summary>
+                <div class="faq-answer">
+                  <p>Product &amp; UI/UX design, mobile app design, SaaS dashboard and web app design, UX audits and redesign, landing page and website design, and ecommerce and brand design.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>What services do you offer?</summary>
+                <div class="faq-answer">
+                  <p>Everything from initial discovery and strategy through design, development, and post-launch support. I can work across all phases or a specific part of the journey depending on where you are.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>Do you also build the websites you design?</summary>
+                <div class="faq-answer">
+                  <p>Yes. I build lightweight, production-ready static pages, frontend components, and CMS integrations. For complex apps, I hand over clean design tokens and CSS specs to engineering teams.</p>
+                </div>
+              </details>
+              <details class="faq-item">
+                <summary>How do we get started?</summary>
+                <div class="faq-answer">
+                  <p>Book a brief call through the contact form. We'll review your project goals, scope, and timeline — then outline the next steps.</p>
+                </div>
+              </details>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- MY PROCESS (Figma 99:6367) -->
+      <section class="process-section srv-process-section" id="process" aria-labelledby="srv-process-heading">
+        <div class="process-inner">
+          <h2 id="srv-process-heading">My <em>process</em></h2>
+          <div class="process-steps" aria-label="Project process steps">
+            <article class="process-step process-step-large">
+              <div class="process-icon">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="10" y="6" width="36" height="46" rx="4" stroke="#1f46d2" stroke-width="2.5" fill="none"/>
+                  <line x1="18" y1="20" x2="38" y2="20" stroke="#1f46d2" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="18" y1="28" x2="34" y2="28" stroke="#1f46d2" stroke-width="2" stroke-linecap="round"/>
+                  <line x1="18" y1="36" x2="30" y2="36" stroke="#1f46d2" stroke-width="2" stroke-linecap="round"/>
+                  <circle cx="50" cy="50" r="10" fill="#d21fae" stroke="none"/>
+                  <path d="M46 50l3 3 5-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3>Discover</h3>
+              <p>Understand the product, users, business goals, competitors, and key problems.</p>
+            </article>
+            <article class="process-step">
+              <div class="process-icon">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="8" y="8" width="48" height="32" rx="4" stroke="#1f46d2" stroke-width="2.5" fill="none"/>
+                  <line x1="8" y1="22" x2="56" y2="22" stroke="#1f46d2" stroke-width="1.5" stroke-dasharray="3 3"/>
+                  <rect x="14" y="30" width="12" height="4" rx="2" fill="#1f46d2"/>
+                  <rect x="32" y="30" width="8" height="4" rx="2" fill="#d21fae"/>
+                  <path d="M24 52 L32 40 L40 52" stroke="#1f46d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3>Strategy</h3>
+              <p>Map the flow, content, layout, user journey, and product logic.</p>
+            </article>
+            <article class="process-step">
+              <div class="process-icon">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="8" y="8" width="20" height="28" rx="3" stroke="#1f46d2" stroke-width="2.5" fill="none"/>
+                  <rect x="36" y="8" width="20" height="12" rx="3" stroke="#1f46d2" stroke-width="2.5" fill="none"/>
+                  <rect x="36" y="26" width="20" height="10" rx="3" fill="#d21fae"/>
+                  <rect x="8" y="44" width="48" height="12" rx="3" stroke="#1f46d2" stroke-width="2.5" fill="none"/>
+                </svg>
+              </div>
+              <h3>Design</h3>
+              <p>Create polished UI screens, prototypes, visuals, and responsive layouts.</p>
+            </article>
+            <article class="process-step">
+              <div class="process-icon">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <rect x="8" y="16" width="32" height="36" rx="4" stroke="#1f46d2" stroke-width="2.5" fill="none"/>
+                  <path d="M40 24 L56 24 L56 52 L40 52" stroke="#1f46d2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                  <path d="M32 36 L48 36" stroke="#d21fae" stroke-width="2.5" stroke-linecap="round"/>
+                  <path d="M44 32 L48 36 L44 40" stroke="#d21fae" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3>Deliver &amp; Build</h3>
+              <p>Prepare clean handoff files, design systems, no-code builds, and AI-assisted prototypes ready for development or launch.</p>
+            </article>
+          </div>
+          <div class="process-cta">
+            <p>Discover an easy way to achieve real results! My collaborative, data-driven approach is customised for your business, guaranteeing you get impactful outcomes. Book a call today to learn how I can help you succeed!</p>
+            <a class="button button-primary" href="/contact/">Book a call</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- CURIOUS CTA BANNER (Figma 99:6451 — blue block) -->
+      <section class="srv-cta-section" aria-label="Call to action">
+        <div class="srv-cta-inner">
+          <div class="srv-cta-copy">
+            <h2>Curious about what we can create together?</h2>
+            <p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea. No strings, no pressure — just a focused conversation about your goals.</p>
+          </div>
+          <div class="srv-cta-actions">
+            <a class="button button-pink" href="/contact/">Book a call</a>
+            <a class="button-ghost-white" href="/projects/">See all projects</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS (Figma 154:3475) -->
+      <section class="testimonials-section" id="testimonials" aria-labelledby="srv-testimonials-heading">
+        <p class="testimonial-watermark watermark-one" aria-hidden="true">ayo.<br />dsgn</p>
+        <p class="testimonial-watermark watermark-two" aria-hidden="true">dsgn</p>
+        <div class="testimonials-top">
+          <h2 id="srv-testimonials-heading">What clients say</h2>
+          <div class="section-actions">
+            <a class="button button-pink" href="/contact/">Book a call</a>
+            <a class="button button-ghost-light" href="/projects/">See all projects</a>
+          </div>
+        </div>
+
+        <div class="testimonial-ticker" data-ticker tabindex="0" aria-label="Client testimonials ticker — click to pause">
+          <div class="testimonial-track">
+            <article class="testimonial-card tiny tilt-left">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs. Ayo thought through the structure and the experience.</p>
+              <footer><strong>Ayo Bankole</strong><span>Co-founder, Caladium Foundation</span></footer>
+            </article>
+            <article class="testimonial-card small tilt-right">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>Working with Ayo was a great experience. He pays attention to details, listens well, works fast, and the quality of his work has a very classy vibe.</p>
+              <footer><strong>Hay_artz stores</strong><span>Founder</span></footer>
+            </article>
+            <article class="testimonial-card medium tilt-left">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I needed an ecommerce website for my fashion brand. The design is clean, the execution was smooth, and he delivered exactly what I had in mind.</p>
+              <footer><strong>Kingsley Inyang</strong><span>CEO, Delluxe Vogue</span></footer>
+            </article>
+            <article class="testimonial-card large tilt-soft">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. His work is neat, he pays attention to details, and communication was smooth.</p>
+              <footer><strong>Olumide Adepoju</strong><span>CEO, Orca Securities Ltd</span></footer>
+            </article>
+            <article class="testimonial-card medium tilt-right">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I needed a website for Bitzsznn that captures the energy and lets me collect payments directly. The site looks premium and ticketing flows smoothly.</p>
+              <footer><strong>Yungbitz</strong><span>CEO, Bitzsznn Entertainment</span></footer>
+            </article>
+            <!-- Duplicates for loop -->
+            <article class="testimonial-card tiny tilt-left" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs. Ayo thought through the structure and the experience.</p>
+              <footer><strong>Ayo Bankole</strong><span>Co-founder, Caladium Foundation</span></footer>
+            </article>
+            <article class="testimonial-card small tilt-right" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>Working with Ayo was a great experience. He pays attention to details, listens well, works fast, and the quality of his work has a very classy vibe.</p>
+              <footer><strong>Hay_artz stores</strong><span>Founder</span></footer>
+            </article>
+            <article class="testimonial-card medium tilt-left" aria-hidden="true">
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
+              <p>I needed an ecommerce website for my fashion brand. The design is clean, the execution was smooth, and he delivered exactly what I had in mind.</p>
+              <footer><strong>Kingsley Inyang</strong><span>CEO, Delluxe Vogue</span></footer>
+            </article>
+          </div>
+        </div>
+
+        <div class="testimonial-meta">
+          <p>I help teams, businesses and companies build websites and mobile apps that help build business strategies.</p>
+          <div class="proof-stats">
+            <span><strong>2+ years</strong>of design experience</span>
+            <span><strong>97%</strong>customer satisfaction</span>
+          </div>
+        </div>
+        <p class="trusted-note">Trusted by several teams &amp; organisations</p>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-card-blue">
+          <div class="footer-logo-wrap">
+            <span class="footer-logo-glyph">ayo.</span>
+            <span class="footer-logo-sub">dsgn</span>
+          </div>
+        </div>
+        <div class="footer-card-white">
+          <div class="footer-card-content">
+            <div class="footer-cta-col">
+              <h2>Take your project to the next level. Let's talk!</h2>
+              <div class="footer-cta-actions">
+                <a class="button button-pink" href="/contact/">Book a discovery call</a>
+                <a class="button-arrow" href="/contact/">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7"></line>
+                    <polyline points="7 7 17 7 17 17"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div class="footer-nav-col">
+              <h3>Navigation</h3>
+              <div class="footer-nav-links">
+                <a href="/projects/">Projects</a>
+                <a href="/services/">Services</a>
+                <a href="/playground/">Playground</a>
+                <a href="/#process">Process</a>
+                <a href="/#testimonials">Testimonials</a>
+                <a href="#faq">FAQs</a>
+                <a href="/about/">About</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-card-bottom">
+            <div class="footer-social-section">
+              <h4>Stay in touch!</h4>
+              <div class="footer-social-links">
+                <a href="https://www.behance.net/">Behance</a>
+                <span class="divider"></span>
+                <a href="https://dribbble.com/">Dribbble</a>
+                <span class="divider"></span>
+                <a href="https://github.com/">GitHub</a>
+                <span class="divider"></span>
+                <a href="https://x.com/">X</a>
+                <span class="divider"></span>
+                <a href="https://linkedin.com/">LinkedIn</a>
+              </div>
+            </div>
+            <div class="footer-copyright">
+              &copy; <span data-year></span> Ayo. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/assets/site.js?v=1.3"></script>
+  </body>
+</html>
