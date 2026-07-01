@@ -30,7 +30,7 @@
       .proj-home-carousel.is-dragging { cursor: grabbing; }
       .home-proj-card {
         position: absolute;
-        left: 34%;
+        left: 58%;
         top: 50%;
         width: clamp(260px, 31vw, 540px);
         background: #ffffff;
@@ -728,8 +728,13 @@
         hpc.addEventListener('pointercancel', endDrag);
 
         hpc.addEventListener('wheel', (event) => {
+          const absX = Math.abs(event.deltaX);
+          const absY = Math.abs(event.deltaY);
+          const shouldDriveCarousel = absX > absY || event.shiftKey;
+          if (!shouldDriveCarousel) return;
+
           event.preventDefault();
-          const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+          const delta = event.shiftKey && absX <= absY ? event.deltaY : event.deltaX;
           progress += delta / (cardWidth() * 0.9);
           target = progress;
           render();
