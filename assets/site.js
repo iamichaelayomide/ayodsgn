@@ -346,6 +346,10 @@ if (playgroundContainer) {
   let lightboxIndex = -1;
   let lastFocusedCard = null;
   let isDraggingCanvas = false;
+  let wallDidDrag = false;
+  let wallPointerStart = null;
+  let wallStart = { rx: -8, ry: 0, x: 0, y: 0 };
+  let wallState = { rx: -8, ry: 0, x: 0, y: 0 };
   let helperTimer = 0;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -397,6 +401,35 @@ if (playgroundContainer) {
   function settleHelper() {
     window.clearTimeout(helperTimer);
     helperTimer = window.setTimeout(() => setHelperState('quiet'), 1800);
+  }
+
+  function applyWallTransform() {
+    if (!canvasCardsContainer) return;
+    canvasCardsContainer.style.setProperty('--wall-rx', `${wallState.rx}deg`);
+    canvasCardsContainer.style.setProperty('--wall-ry', `${wallState.ry}deg`);
+    canvasCardsContainer.style.setProperty('--wall-x', `${wallState.x}px`);
+    canvasCardsContainer.style.setProperty('--wall-y', `${wallState.y}px`);
+  }
+
+  function getCanvasCardTransform(index, count, item) {
+    const columns = Math.ceil(Math.sqrt(count));
+    const row = Math.floor(index / columns);
+    const col = index % columns;
+    const rowCount = Math.ceil(count / columns);
+    const normalizedX = columns <= 1 ? 0 : (col / (columns - 1)) * 2 - 1;
+    const normalizedY = rowCount <= 1 ? 0 : (row / (rowCount - 1)) * 2 - 1;
+    const stagger = row % 2 ? 0.34 : 0;
+    const curve = Math.sin((normalizedX + stagger) * Math.PI * 0.55);
+    const spreadX = Math.min(470, Math.max(250, canvasView.clientWidth * 0.34));
+    const spreadY = Math.min(250, Math.max(170, canvasView.clientHeight * 0.28));
+    const tx = normalizedX * spreadX + (row % 2 ? spreadX * 0.17 : 0);
+    const ty = normalizedY * spreadY;
+    const tz = -Math.abs(curve) * 190 + (item.featured ? 170 : 0) + ((index % 3) - 1) * 36;
+    const ry = -normalizedX * 24;
+    const rx = normalizedY * 8;
+    const rz = normalizedX * -3;
+    const scale = item.featured ? 1.28 : item.pos.size === 'wide' ? 1.06 : item.pos.size === 'medium' ? 0.98 : 0.84;
+    return { tx, ty, tz, rx, ry, rz, scale };
   }
 
   function createStillMedia(item, className = '') {
@@ -463,6 +496,11 @@ if (playgroundContainer) {
 
   function renderFeaturedItem(item) {
     if (!featureMediaContainer) return;
+    if (window.getComputedStyle(featureMediaContainer.closest('.canvas-feature')).display === 'none') {
+      featureMediaContainer.innerHTML = '';
+      if (featureTitle) featureTitle.textContent = '';
+      return;
+    }
     featureMediaContainer.innerHTML = '';
     if (!item) {
       if (featureTitle) featureTitle.textContent = 'No item selected';
@@ -592,12 +630,18 @@ if (playgroundContainer) {
     renderFeaturedItem(items[activeCanvasIndex]);
 
     items.forEach((item, index) => {
+      const transform = getCanvasCardTransform(index, items.length, item);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = `canvas-card canvas-${item.pos.size}`;
       if (index === activeCanvasIndex) btn.classList.add('selected');
-      btn.style.setProperty('--x', `${item.pos.x}%`);
-      btn.style.setProperty('--y', `${item.pos.y}%`);
+      btn.style.setProperty('--tx', `${transform.tx}px`);
+      btn.style.setProperty('--ty', `${transform.ty}px`);
+      btn.style.setProperty('--tz', `${transform.tz}px`);
+      btn.style.setProperty('--rx', `${transform.rx}deg`);
+      btn.style.setProperty('--ry', `${transform.ry}deg`);
+      btn.style.setProperty('--rz', `${transform.rz}deg`);
+      btn.style.setProperty('--scale', transform.scale);
       btn.setAttribute('aria-label', `Open ${item.title}`);
 
       const thumb = document.createElement('span');
@@ -647,7 +691,7 @@ if (playgroundContainer) {
         if (thumbMedia.tagName === 'VIDEO') pausePreview(thumbMedia);
       });
       btn.addEventListener('click', (event) => {
-        if (didDrag) {
+        if (didDrag || wallDidDrag) {
           event.preventDefault();
           didDrag = false;
           return;
@@ -657,6 +701,7 @@ if (playgroundContainer) {
 
       canvasCardsContainer.appendChild(btn);
     });
+    applyWallTransform();
   }
 
   function renderListView() {
@@ -708,15 +753,37 @@ if (playgroundContainer) {
   }
 
   if (canvasView) {
-    canvasView.addEventListener('pointerdown', () => {
+    canvasView.addEventListener('pointerdown', (event) => {
       isDraggingCanvas = true;
+      wallDidDrag = false;
+      wallPointerStart = { x: event.clientX, y: event.clientY };
+      wallStart = { ...wallState };
+      canvasView.classList.add('is-dragging');
+      canvasView.setPointerCapture?.(event.pointerId);
       setHelperState('dragging');
     });
-    window.addEventListener('pointerup', () => {
+    canvasView.addEventListener('pointermove', (event) => {
+      if (!isDraggingCanvas || !wallPointerStart) return;
+      const dx = event.clientX - wallPointerStart.x;
+      const dy = event.clientY - wallPointerStart.y;
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) wallDidDrag = true;
+      wallState.ry = wallStart.ry + dx * 0.12;
+      wallState.rx = Math.max(-28, Math.min(18, wallStart.rx - dy * 0.08));
+      wallState.x = Math.max(-180, Math.min(180, wallStart.x + dx * 0.18));
+      wallState.y = Math.max(-110, Math.min(110, wallStart.y + dy * 0.12));
+      applyWallTransform();
+    });
+    window.addEventListener('pointerup', (event) => {
       if (!isDraggingCanvas) return;
       isDraggingCanvas = false;
+      wallPointerStart = null;
+      canvasView.classList.remove('is-dragging');
+      canvasView.releasePointerCapture?.(event.pointerId);
       setHelperState();
       settleHelper();
+      window.setTimeout(() => {
+        wallDidDrag = false;
+      }, 120);
     });
   }
 
@@ -809,5 +876,6 @@ if (playgroundContainer) {
   });
 
   setHelperState();
+  applyWallTransform();
   updateViews();
 }
