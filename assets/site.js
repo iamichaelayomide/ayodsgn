@@ -22,86 +22,112 @@ document.querySelectorAll("[data-year]").forEach((node) => {
 });
 
 const services = {
-  strategy: {
+  product: {
     number: "01",
-    title: "Strategy",
-    body: "I help teams, businesses and companies shape websites and mobile apps around clear business strategy, audience needs, and launch goals.",
-    list: ["Offer positioning", "Page architecture", "Conversion paths"]
+    title: "Product/UI",
+    body: "I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.",
+    list: ["Product flows", "Wireframes", "High-fidelity UI"]
   },
-  design: {
+  mobile: {
     number: "02",
-    title: "Design",
-    body: "I turn direction into clean, responsive interfaces with strong hierarchy, brand character, and polished interaction states.",
-    list: ["Visual systems", "Responsive layouts", "Prototype direction"]
+    title: "Mobile App",
+    body: "I design mobile app screens, user flows, onboarding, dashboards, profiles, forms, and interaction states for iOS and Android products.",
+    list: ["Onboarding flows", "App screens", "Mobile prototypes"]
   },
-  development: {
+  saas: {
     number: "03",
-    title: "Development",
-    body: "I build lightweight, production-ready pages that preserve the design details and stay easy to maintain after launch.",
-    list: ["Static websites", "Frontend components", "CMS-ready structure"]
+    title: "SaaS/Web App",
+    body: "I design dashboards, admin panels, portals, CRMs, analytics pages, internal tools, and complex web app interfaces.",
+    list: ["Dashboards", "Admin panels", "Data-heavy UI"]
   },
-  testing: {
+  audit: {
     number: "04",
-    title: "Testing",
-    body: "I review the site across devices, browsers, content states, and interaction paths before it goes live.",
-    list: ["Responsive QA", "Interaction checks", "Performance pass"]
+    title: "UX Audit",
+    body: "I review existing products, identify friction, improve weak flows, and redesign screens for better usability and clarity.",
+    list: ["UX reviews", "Flow cleanup", "Screen redesigns"]
   },
-  launch: {
+  websites: {
     number: "05",
-    title: "Launch",
-    body: "I prepare the final pages, deployment setup, and launch details so the site can go live without loose ends.",
-    list: ["Vercel deployment", "Domain setup", "Launch checklist"]
+    title: "Websites",
+    body: "I design clean, responsive websites and landing pages for startups, SaaS products, portfolios, campaigns, and digital services.",
+    list: ["Landing pages", "Portfolio sites", "Responsive design"]
   },
-  support: {
+  ai: {
     number: "06",
-    title: "Support",
-    body: "I keep the system useful after launch with focused updates, new sections, and improvements based on real use.",
-    list: ["Content updates", "New sections", "Iteration support"]
+    title: "AI Product",
+    body: "I design AI-powered product experiences, AI assistants, prompt-based flows, chatbot interfaces, agent workflows, and AI-assisted prototypes.",
+    list: ["AI assistants", "Prompt flows", "Agent workflows"]
+  },
+  illustration: {
+    number: "07",
+    title: "Illustration",
+    body: "I create custom vector illustrations, icons, empty states, onboarding visuals, hero graphics, and product visuals for apps and websites.",
+    list: ["Custom icons", "Empty states", "Hero graphics"]
   }
 };
 
-const serviceCards = [...document.querySelectorAll(".service-card")];
-const detailNumber = document.querySelector(".detail-number");
-const detailTitle = document.querySelector("[data-service-title]");
-const detailBody = document.querySelector("[data-service-body]");
-const detailList = document.querySelector("[data-service-list]");
+document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
+  const serviceCards = [...serviceLayout.querySelectorAll(".service-card")];
+  const rail = serviceLayout.querySelector(".service-rail");
+  const detailNumber = serviceLayout.querySelector(".detail-number");
+  const detailTitle = serviceLayout.querySelector("[data-service-title]");
+  const detailBody = serviceLayout.querySelector("[data-service-body]");
+  const detailList = serviceLayout.querySelector("[data-service-list]");
 
-function selectService(key) {
-  const data = services[key];
-  if (!data || !detailNumber || !detailTitle || !detailBody || !detailList) return;
+  function selectService(key, shouldScroll = true) {
+    const data = services[key];
+    if (!data || !detailNumber || !detailTitle || !detailBody || !detailList) return;
+
+    serviceCards.forEach((card) => {
+      const selected = card.dataset.service === key;
+      card.classList.toggle("is-selected", selected);
+      card.setAttribute("aria-pressed", String(selected));
+      if (selected && shouldScroll) {
+        card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    });
+
+    detailNumber.textContent = data.number;
+    detailTitle.textContent = data.title;
+    detailBody.textContent = data.body;
+    detailList.replaceChildren(...data.list.map((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      return li;
+    }));
+  }
+
+  function getSelectedIndex() {
+    return Math.max(0, serviceCards.findIndex((card) => card.classList.contains("is-selected")));
+  }
+
+  function selectByOffset(offset) {
+    const nextIndex = Math.max(0, Math.min(serviceCards.length - 1, getSelectedIndex() + offset));
+    const nextCard = serviceCards[nextIndex];
+    if (nextCard) selectService(nextCard.dataset.service);
+  }
 
   serviceCards.forEach((card) => {
-    const selected = card.dataset.service === key;
-    card.classList.toggle("is-selected", selected);
-    card.setAttribute("aria-pressed", String(selected));
+    card.addEventListener("click", (event) => {
+      if (rail?.dataset.suppressClick === "true") {
+        event.preventDefault();
+        return;
+      }
+      selectService(card.dataset.service);
+    });
   });
 
-  detailNumber.textContent = data.number;
-  detailTitle.textContent = data.title;
-  detailBody.textContent = data.body;
-  detailList.replaceChildren(...data.list.map((item) => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    return li;
-  }));
-}
+  if (!rail) return;
 
-serviceCards.forEach((card) => {
-  card.addEventListener("click", () => {
-    selectService(card.dataset.service);
-    card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  });
-});
-
-const rail = document.querySelector(".service-rail");
-
-if (rail) {
   let isDown = false;
+  let didMove = false;
   let startX = 0;
   let startScroll = 0;
+  let wheelTimer = 0;
 
   rail.addEventListener("pointerdown", (event) => {
     isDown = true;
+    didMove = false;
     startX = event.clientX;
     startScroll = rail.scrollLeft;
     rail.classList.add("is-dragging");
@@ -110,17 +136,56 @@ if (rail) {
 
   rail.addEventListener("pointermove", (event) => {
     if (!isDown) return;
+    if (Math.abs(event.clientX - startX) > 8) didMove = true;
     rail.scrollLeft = startScroll - (event.clientX - startX);
   });
 
-  const stopDrag = () => {
+  const syncToNearestCard = () => {
+    const railCenter = rail.getBoundingClientRect().left + rail.clientWidth / 2;
+    const nearest = serviceCards.reduce((best, card) => {
+      const rect = card.getBoundingClientRect();
+      const distance = Math.abs(rect.left + rect.width / 2 - railCenter);
+      return distance < best.distance ? { card, distance } : best;
+    }, { card: serviceCards[getSelectedIndex()], distance: Infinity }).card;
+    if (nearest) selectService(nearest.dataset.service, false);
+  };
+
+  const stopDrag = (event) => {
     isDown = false;
     rail.classList.remove("is-dragging");
+    rail.releasePointerCapture?.(event.pointerId);
+    if (didMove) {
+      rail.dataset.suppressClick = "true";
+      syncToNearestCard();
+      window.setTimeout(() => {
+        delete rail.dataset.suppressClick;
+      }, 0);
+    }
   };
 
   rail.addEventListener("pointerup", stopDrag);
   rail.addEventListener("pointercancel", stopDrag);
-}
+
+  rail.addEventListener("wheel", (event) => {
+    if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    window.clearTimeout(wheelTimer);
+    wheelTimer = window.setTimeout(syncToNearestCard, 160);
+  }, { passive: true });
+
+  rail.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      selectByOffset(1);
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      selectByOffset(-1);
+    }
+  });
+
+  const initialCard = serviceCards.find((card) => card.classList.contains("is-selected")) || serviceCards[0];
+  if (initialCard) selectService(initialCard.dataset.service, false);
+});
 
 document.querySelectorAll("[data-ticker]").forEach((ticker) => {
   ticker.addEventListener("click", () => {
@@ -208,8 +273,9 @@ if (playgroundContainer) {
       category: "Interactive Games",
       tags: ["games"],
       mediaType: "video",
-      thumbnail: "/assets/work/Car Selection Gallery Interaction.mp4",
+      thumbnail: "/assets/figma/48c889d92e4272c4996f05d5eee3e4c330381403.png",
       videoSrc: "/assets/work/Car Selection Gallery Interaction.mp4",
+      poster: "/assets/figma/48c889d92e4272c4996f05d5eee3e4c330381403.png",
       alt: "Car selection gallery interaction",
       pos: { x: 10, y: 22, size: "small" }
     },
@@ -255,8 +321,9 @@ if (playgroundContainer) {
       category: "Visual Effects",
       tags: ["effects"],
       mediaType: "video",
-      thumbnail: "/assets/work/Data Insight Card Flip Interaction.mp4",
+      thumbnail: "/assets/figma/37b2352dc66365d6ed787d1342787e4138587b3a.png",
       videoSrc: "/assets/work/Data Insight Card Flip Interaction.mp4",
+      poster: "/assets/figma/37b2352dc66365d6ed787d1342787e4138587b3a.png",
       alt: "Data Insight Card Flip interaction",
       pos: { x: 65, y: 60, size: "small" }
     },
@@ -266,8 +333,9 @@ if (playgroundContainer) {
       category: "UI Designs",
       tags: ["designs"],
       mediaType: "video",
-      thumbnail: "/assets/work/Ayoverse Landing Page Chat Card Interaction.mp4",
+      thumbnail: "/assets/figma/806cfb6178eb1eac5761a7d02b64e60a5c8cac92.png",
       videoSrc: "/assets/work/Ayoverse Landing Page Chat Card Interaction.mp4",
+      poster: "/assets/figma/806cfb6178eb1eac5761a7d02b64e60a5c8cac92.png",
       alt: "Landing Page Chat card interaction",
       pos: { x: 79, y: 78, size: "medium" }
     },
@@ -321,8 +389,9 @@ if (playgroundContainer) {
       category: "Visual Effects",
       tags: ["effects"],
       mediaType: "video",
-      thumbnail: "/assets/work/Music Control Slider Widget Interaction.mp4",
+      thumbnail: "/assets/figma/bc833ee86d65f655cba770420f4cc4d1381fa7b1.png",
       videoSrc: "/assets/work/Music Control Slider Widget Interaction.mp4",
+      poster: "/assets/figma/bc833ee86d65f655cba770420f4cc4d1381fa7b1.png",
       alt: "Music control and slider widget",
       pos: { x: 50, y: 82, size: "small" }
     },
@@ -332,8 +401,9 @@ if (playgroundContainer) {
       category: "User Interactions",
       tags: ["interactions"],
       mediaType: "video",
-      thumbnail: "/assets/work/Data Vault Success Modal Interaction.mp4",
+      thumbnail: "/assets/figma/d517d39e4789cebe5f1f9f4fed8c59d2ece45453.png",
       videoSrc: "/assets/work/Data Vault Success Modal Interaction.mp4",
+      poster: "/assets/figma/d517d39e4789cebe5f1f9f4fed8c59d2ece45453.png",
       alt: "File reveal interaction",
       pos: { x: 34, y: 80, size: "medium" }
     }
@@ -351,6 +421,7 @@ if (playgroundContainer) {
   let wallStart = { rx: -8, ry: 0, x: 0, y: 0 };
   let wallState = { rx: -8, ry: 0, x: 0, y: 0 };
   let helperTimer = 0;
+  let previewObserver = null;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const searchInput = document.getElementById('playground-search');
@@ -428,7 +499,7 @@ if (playgroundContainer) {
     const ry = -normalizedX * 24;
     const rx = normalizedY * 8;
     const rz = normalizedX * -3;
-    const scale = item.featured ? 1.28 : item.pos.size === 'wide' ? 1.06 : item.pos.size === 'medium' ? 0.98 : 0.84;
+    const scale = item.featured ? 1.02 : 0.94 + (index % 4) * 0.02;
     return { tx, ty, tz, rx, ry, rz, scale };
   }
 
@@ -440,14 +511,12 @@ if (playgroundContainer) {
       video.loop = true;
       video.playsInline = true;
       video.preload = 'none';
+      video.dataset.previewSrc = item.videoSrc || '';
       video.setAttribute('aria-label', item.alt || item.title);
       if (item.poster) {
         video.poster = item.poster;
       } else if (isImageAsset(item.thumbnail)) {
         video.poster = item.thumbnail;
-      } else if (item.videoSrc) {
-        video.src = item.videoSrc;
-        video.preload = 'metadata';
       }
       return video;
     }
@@ -461,7 +530,7 @@ if (playgroundContainer) {
   }
 
   function hydratePreviewVideo(video, item) {
-    if (!video || item.mediaType !== 'video' || video.src) return;
+    if (!video || item.mediaType !== 'video' || video.currentSrc || video.src || !item.videoSrc) return;
     video.src = item.videoSrc;
     video.preload = 'metadata';
   }
@@ -521,6 +590,24 @@ if (playgroundContainer) {
     document.querySelectorAll('.canvas-thumb video, .canvas-feature-media video, .list-media video').forEach(video => pausePreview(video));
   }
 
+  function observePreview(video, item) {
+    if (!video || item.mediaType !== 'video') return;
+    if (!previewObserver && 'IntersectionObserver' in window) {
+      previewObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          entry.target.dataset.visible = entry.isIntersecting ? 'true' : 'false';
+          if (!entry.isIntersecting) pausePreview(entry.target);
+        });
+      }, { root: canvasView || null, threshold: 0.18 });
+    }
+    if (previewObserver) previewObserver.observe(video);
+  }
+
+  function getFocusableElements(root) {
+    return Array.from(root.querySelectorAll('button, [href], video[controls], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter(element => !element.disabled && element.offsetParent !== null);
+  }
+
   function openLightbox(index, sourceButton) {
     const items = getFilteredItems();
     if (!items.length) return;
@@ -530,7 +617,8 @@ if (playgroundContainer) {
     renderLightbox(items);
   }
 
-  function closeLightbox() {
+  function closeLightbox(options = {}) {
+    const { restoreFocus = true } = options;
     const overlay = document.querySelector('.media-lightbox');
     if (!overlay) return;
     overlay.querySelectorAll('video').forEach(video => {
@@ -540,11 +628,11 @@ if (playgroundContainer) {
     });
     overlay.remove();
     document.body.classList.remove('lightbox-open');
-    if (lastFocusedCard && typeof lastFocusedCard.focus === 'function') lastFocusedCard.focus();
+    if (restoreFocus && lastFocusedCard && typeof lastFocusedCard.focus === 'function') lastFocusedCard.focus();
   }
 
   function renderLightbox(items) {
-    closeLightbox();
+    closeLightbox({ restoreFocus: false });
     const item = items[lightboxIndex];
     const overlay = document.createElement('div');
     overlay.className = 'media-lightbox';
@@ -608,6 +696,20 @@ if (playgroundContainer) {
       renderLightbox(items);
     };
 
+    overlay.addEventListener('keydown', (event) => {
+      if (event.key !== 'Tab') return;
+      const focusable = getFocusableElements(overlay);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
     closeButton.addEventListener('click', closeLightbox);
     previousButton.addEventListener('click', () => showOffset(-1));
     nextButton.addEventListener('click', () => showOffset(1));
@@ -621,6 +723,11 @@ if (playgroundContainer) {
     canvasCardsContainer.innerHTML = '';
     const items = getFilteredItems();
 
+    if (previewObserver) {
+      previewObserver.disconnect();
+      previewObserver = null;
+    }
+
     if (!items.length) {
       renderFeaturedItem(null);
       return;
@@ -633,7 +740,7 @@ if (playgroundContainer) {
       const transform = getCanvasCardTransform(index, items.length, item);
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = `canvas-card canvas-${item.pos.size}`;
+      btn.className = 'canvas-card';
       if (index === activeCanvasIndex) btn.classList.add('selected');
       btn.style.setProperty('--tx', `${transform.tx}px`);
       btn.style.setProperty('--ty', `${transform.ty}px`);
@@ -647,6 +754,7 @@ if (playgroundContainer) {
       const thumb = document.createElement('span');
       thumb.className = 'canvas-thumb';
       const thumbMedia = createStillMedia(item);
+      observePreview(thumbMedia, item);
       thumb.appendChild(thumbMedia);
       btn.appendChild(thumb);
 
@@ -666,15 +774,26 @@ if (playgroundContainer) {
       btn.addEventListener('pointerdown', (event) => {
         pointerStart = { x: event.clientX, y: event.clientY };
         didDrag = false;
+        wallDidDrag = false;
+        btn.setPointerCapture?.(event.pointerId);
       });
       btn.addEventListener('pointermove', (event) => {
         if (!pointerStart) return;
         const dx = Math.abs(event.clientX - pointerStart.x);
         const dy = Math.abs(event.clientY - pointerStart.y);
-        if (dx > 7 || dy > 7) didDrag = true;
+        if (dx > 7 || dy > 7) {
+          didDrag = true;
+          stopAllPreviews();
+        }
       });
-      btn.addEventListener('pointerup', () => {
+      btn.addEventListener('pointerup', (event) => {
         pointerStart = null;
+        btn.releasePointerCapture?.(event.pointerId);
+      });
+      btn.addEventListener('pointercancel', (event) => {
+        pointerStart = null;
+        didDrag = false;
+        btn.releasePointerCapture?.(event.pointerId);
       });
       btn.addEventListener('mouseenter', () => {
         activate();
@@ -718,7 +837,8 @@ if (playgroundContainer) {
       mediaDiv.className = 'list-media';
       mediaDiv.type = 'button';
       mediaDiv.setAttribute('aria-label', `Open ${item.title}`);
-      mediaDiv.appendChild(createStillMedia(item));
+      const listMedia = createStillMedia(item);
+      mediaDiv.appendChild(listMedia);
       mediaDiv.addEventListener('click', () => openLightbox(index, mediaDiv));
       row.appendChild(mediaDiv);
 
@@ -754,12 +874,14 @@ if (playgroundContainer) {
 
   if (canvasView) {
     canvasView.addEventListener('pointerdown', (event) => {
+      if (event.target.closest('.canvas-card')) return;
       isDraggingCanvas = true;
       wallDidDrag = false;
       wallPointerStart = { x: event.clientX, y: event.clientY };
       wallStart = { ...wallState };
       canvasView.classList.add('is-dragging');
       canvasView.setPointerCapture?.(event.pointerId);
+      stopAllPreviews();
       setHelperState('dragging');
     });
     canvasView.addEventListener('pointermove', (event) => {

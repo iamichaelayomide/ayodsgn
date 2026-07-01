@@ -518,6 +518,69 @@
       </section>
 
       <!-- SERVICES DETAIL ROWS (Figma 99:6463 — alternating image+text for each service) -->
+      <section class="services-section srv-motion-section" aria-labelledby="srv-motion-heading">
+        <div class="section-top">
+          <div>
+            <p class="section-kicker">Swipe services</p>
+            <h2 id="srv-motion-heading">Service <em>motion</em></h2>
+            <p class="section-desc" style="max-width: 570px; margin-top: 18px; color: var(--muted); font-size: 18px; line-height: 1.55;">
+              Swipe through the main service areas and see the active card expand into focus.
+            </p>
+          </div>
+          <div class="section-actions">
+            <a class="button button-primary" href="/contact/">Book a call</a>
+            <a class="button button-outline" href="/projects/">See all projects</a>
+          </div>
+        </div>
+
+        <div class="services-layout">
+          <div class="service-rail" tabindex="0" aria-label="Swipe or scroll services">
+            <button class="service-card is-selected" type="button" data-service="product" aria-pressed="true">
+              <span>01</span>
+              <strong>Product/UI</strong>
+            </button>
+            <button class="service-card" type="button" data-service="mobile" aria-pressed="false">
+              <span>02</span>
+              <strong>Mobile App</strong>
+            </button>
+            <button class="service-card" type="button" data-service="saas" aria-pressed="false">
+              <span>03</span>
+              <strong>SaaS/Web App</strong>
+            </button>
+            <button class="service-card" type="button" data-service="audit" aria-pressed="false">
+              <span>04</span>
+              <strong>UX Audit</strong>
+            </button>
+            <button class="service-card" type="button" data-service="websites" aria-pressed="false">
+              <span>05</span>
+              <strong>Websites</strong>
+            </button>
+            <button class="service-card" type="button" data-service="ai" aria-pressed="false">
+              <span>06</span>
+              <strong>AI Product</strong>
+            </button>
+            <button class="service-card" type="button" data-service="illustration" aria-pressed="false">
+              <span>07</span>
+              <strong>Illustration</strong>
+            </button>
+          </div>
+
+          <article class="service-detail" aria-live="polite">
+            <p class="detail-number">01</p>
+            <div>
+              <h3 data-service-title>Product/UI</h3>
+              <p data-service-body>I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.</p>
+            </div>
+            <ul data-service-list>
+              <li>Product flows</li>
+              <li>Wireframes</li>
+              <li>High-fidelity UI</li>
+            </ul>
+            <a class="button button-soft" href="/contact/">Book a call</a>
+          </article>
+        </div>
+      </section>
+
       <section class="srv-detail-section" id="services" aria-label="Service detail list">
         <div class="srv-detail-inner">
 
