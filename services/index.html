@@ -82,33 +82,55 @@
         flex-wrap: wrap;
       }
 
-      /* ---- Services Detail (alternating image + copy rows) ---- */
+      /* ---- Services Detail (Figma 99:6463 timeline rows) ---- */
       .srv-detail-section {
-        padding: 0 24px 120px;
+        padding: 18px 24px 132px;
         background: var(--paper);
       }
 
       .srv-detail-inner {
         width: min(100%, var(--max));
         margin: 0 auto;
+        position: relative;
         display: flex;
         flex-direction: column;
-        gap: 0;
+        gap: 18px;
       }
 
-      /* Row: image left, copy right */
+      .srv-detail-inner::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        border-left: 1px dashed rgba(72, 63, 63, 0.72);
+        transform: translateX(-50%);
+        pointer-events: none;
+      }
+
       .srv-row {
+        --marker-fill: var(--paper);
+        --marker-color: var(--ink);
+        --marker-border: rgba(72, 63, 63, 0.7);
+        position: relative;
         display: grid;
-        grid-template-columns: minmax(300px, 498px) 1fr;
-        gap: 56px;
+        grid-template-columns: minmax(280px, 498px) minmax(320px, 498px);
+        justify-content: space-between;
+        gap: clamp(88px, 13vw, 250px);
         align-items: center;
-        padding: 80px 0;
-        border-top: 1px solid rgba(72, 63, 63, 0.1);
+        min-height: 352px;
+        padding: 24px 0;
+        border-top: 0;
       }
 
-      /* Row: copy left, image right (alternating) */
+      .srv-row:first-child {
+        --marker-fill: var(--blue);
+        --marker-color: #ffffff;
+        --marker-border: var(--blue);
+      }
+
       .srv-row.srv-row-flip {
-        grid-template-columns: 1fr minmax(300px, 498px);
+        grid-template-columns: minmax(320px, 498px) minmax(280px, 498px);
       }
 
       .srv-row.srv-row-flip .srv-row-image {
@@ -119,14 +141,35 @@
         order: 1;
       }
 
+      .srv-row::after {
+        content: attr(data-step);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        z-index: 2;
+        width: 86px;
+        height: 74px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        border: 1px solid var(--marker-border);
+        background: var(--marker-fill);
+        color: var(--marker-color);
+        font-family: var(--serif);
+        font-size: 24px;
+        font-style: italic;
+        transform: translate(-50%, -50%);
+      }
+
       .srv-row-image {
         position: relative;
-        aspect-ratio: 1.3 / 1;
-        border-radius: 12px;
+        width: min(100%, 498px);
+        height: 352px;
+        border-radius: 8px;
         overflow: hidden;
         background: #ffffff;
-        border: 1px solid rgba(72, 63, 63, 0.08);
-        box-shadow: 0 8px 32px rgba(1, 1, 1, 0.05);
+        border: 1px solid #f8f1f1;
+        box-shadow: 0 18px 50px rgba(72, 63, 63, 0.06);
       }
 
       .srv-row-image-inner {
@@ -134,34 +177,37 @@
         inset: 8px;
         border-radius: 8px;
         overflow: hidden;
-        background: #f7f2f2;
+        background: #f0f0f0;
+        display: grid;
+        place-items: center;
       }
-
-      /* Placeholder visual for service images */
-      .srv-visual-1 { background: linear-gradient(135deg, #f0e8ff 0%, #e0d0ff 50%, #d5b8ff 100%); }
-      .srv-visual-2 { background: linear-gradient(135deg, #fce4f0 0%, #f9c9e2 50%, #f5a8d0 100%); }
-      .srv-visual-3 { background: linear-gradient(135deg, #e0e8ff 0%, #c8d4ff 50%, #b0beff 100%); }
-      .srv-visual-4 { background: linear-gradient(135deg, #ffeee0 0%, #ffd9c0 50%, #ffc4a0 100%); }
-      .srv-visual-5 { background: linear-gradient(135deg, #e0f5e8 0%, #c0eacf 50%, #a0dfb5 100%); }
-      .srv-visual-6 { background: linear-gradient(135deg, #fff0e0 0%, #ffe0c0 50%, #ffd0a0 100%); }
 
       .srv-visual-pattern {
         position: absolute;
         inset: 0;
-        opacity: 0.4;
-        background-image: radial-gradient(circle, rgba(255,255,255,0.6) 1px, transparent 1px);
-        background-size: 20px 20px;
+        opacity: 0.55;
+        background-image: radial-gradient(circle, rgba(31, 70, 210, 0.12) 1px, transparent 1px);
+        background-size: 18px 18px;
+      }
+
+      .srv-row-icon {
+        width: 92px;
+        height: 92px;
+        object-fit: contain;
+        position: relative;
+        z-index: 1;
       }
 
       .srv-visual-label {
         position: absolute;
-        bottom: 20px;
-        left: 20px;
+        bottom: 28px;
+        left: 32px;
+        right: 32px;
+        text-align: center;
         font-family: var(--serif);
-        font-size: 22px;
+        font-size: 34px;
         font-weight: 400;
-        color: rgba(72, 63, 63, 0.5);
-        font-style: italic;
+        color: rgba(72, 63, 63, 0.72);
       }
 
       .srv-row-copy {
@@ -466,8 +512,11 @@
       @media (max-width: 1024px) {
         .srv-hero-inner { grid-template-columns: 1fr; gap: 40px; }
         .srv-hero::after { display: none; }
+        .srv-detail-inner::before { display: none; }
         .srv-row,
         .srv-row.srv-row-flip { grid-template-columns: 1fr; }
+        .srv-row { gap: 28px; padding-left: 78px; }
+        .srv-row::after { left: 0; top: 24px; transform: none; width: 54px; height: 48px; font-size: 18px; }
         .srv-row.srv-row-flip .srv-row-image { order: 0; }
         .srv-row.srv-row-flip .srv-row-copy { order: 0; }
         .srv-faq-layout { grid-template-columns: 1fr; }
@@ -603,10 +652,11 @@
         <div class="srv-detail-inner">
 
           <!-- 01 · Product Design & UI/UX -->
-          <div class="srv-row">
+          <div class="srv-row" data-step="01">
             <div class="srv-row-image" aria-hidden="true">
               <div class="srv-row-image-inner srv-visual-1">
                 <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-figma.svg" alt="" />
                 <span class="srv-visual-label">UI/UX</span>
               </div>
             </div>
@@ -635,10 +685,11 @@
           </div>
 
           <!-- 02 · Mobile App Design -->
-          <div class="srv-row srv-row-flip">
+          <div class="srv-row srv-row-flip" data-step="02">
             <div class="srv-row-image" aria-hidden="true">
               <div class="srv-row-image-inner srv-visual-2">
                 <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-pen-tool.svg" alt="" />
                 <span class="srv-visual-label">Mobile App</span>
               </div>
             </div>
@@ -667,10 +718,11 @@
           </div>
 
           <!-- 03 · SaaS Dashboard & Web App -->
-          <div class="srv-row">
+          <div class="srv-row" data-step="03">
             <div class="srv-row-image" aria-hidden="true">
               <div class="srv-row-image-inner srv-visual-3">
                 <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-layer.svg" alt="" />
                 <span class="srv-visual-label">Dashboard</span>
               </div>
             </div>
@@ -699,10 +751,11 @@
           </div>
 
           <!-- 04 · UX Audit & Redesign -->
-          <div class="srv-row srv-row-flip">
+          <div class="srv-row srv-row-flip" data-step="04">
             <div class="srv-row-image" aria-hidden="true">
               <div class="srv-row-image-inner srv-visual-4">
                 <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-convert-3d-cube.svg" alt="" />
                 <span class="srv-visual-label">UX Audit</span>
               </div>
             </div>
@@ -731,10 +784,11 @@
           </div>
 
           <!-- 05 · Landing Page & Website Design -->
-          <div class="srv-row">
+          <div class="srv-row" data-step="05">
             <div class="srv-row-image" aria-hidden="true">
               <div class="srv-row-image-inner srv-visual-5">
                 <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-global.svg" alt="" />
                 <span class="srv-visual-label">Landing Pages</span>
               </div>
             </div>
@@ -762,34 +816,101 @@
             </div>
           </div>
 
-          <!-- 06 · Ecommerce Design -->
-          <div class="srv-row srv-row-flip">
+          <!-- 06 - No Code Website Development -->
+          <div class="srv-row srv-row-flip" data-step="06">
             <div class="srv-row-image" aria-hidden="true">
               <div class="srv-row-image-inner srv-visual-6">
                 <div class="srv-visual-pattern"></div>
-                <span class="srv-visual-label">Ecommerce</span>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-framer.svg" alt="" />
+                <span class="srv-visual-label">No Code</span>
               </div>
             </div>
             <div class="srv-row-copy">
-              <span class="srv-row-kicker">06 — Ecommerce</span>
-              <h2>Ecommerce and Brand Design</h2>
-              <p>I design ecommerce stores and brand identities that help businesses sell online, present their products clearly, and build customer trust from first click to checkout.</p>
+              <span class="srv-row-kicker">06 - No Code</span>
+              <h2>No Code Website Development</h2>
+              <p>I build responsive no-code websites that keep the design details intact and make it simple for your team to update pages after launch.</p>
               <div>
                 <p class="srv-what-i-do-label">What I can help with</p>
                 <ul class="srv-what-i-do">
-                  <li>Product listing &amp; collection pages</li>
-                  <li>Cart, checkout &amp; payment flows</li>
-                  <li>Brand identity &amp; visual systems</li>
-                  <li>Email &amp; social assets</li>
-                  <li>Shopify &amp; custom store design</li>
+                  <li>Framer and no-code builds</li>
+                  <li>Responsive page implementation</li>
+                  <li>CMS-ready layouts</li>
+                  <li>Animation and interaction polish</li>
+                  <li>Launch QA and handoff</li>
                 </ul>
               </div>
               <div class="srv-best-for">
                 <strong>Best for</strong>
-                Fashion, beauty, lifestyle brands, independent sellers, and businesses building an online store for the first time.
+                Founders, creative teams, service businesses, and startups that need a polished site live without a heavy engineering cycle.
               </div>
               <div class="srv-row-action">
-                <a class="button button-primary" href="/contact/">Design my store</a>
+                <a class="button button-primary" href="/contact/">Build my no-code site</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 07 - AI Product Design -->
+          <div class="srv-row" data-step="07">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-7">
+                <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-password-check.svg" alt="" />
+                <span class="srv-visual-label">AI Product</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">07 - AI Product</span>
+              <h2>AI Product Design and Prototyping</h2>
+              <p>I design AI-powered product experiences, assistant interfaces, prompt-based flows, and lightweight prototypes that make the intelligence feel usable.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>AI assistant interfaces</li>
+                  <li>Prompt and agent workflows</li>
+                  <li>Chatbot product flows</li>
+                  <li>AI onboarding and trust states</li>
+                  <li>Clickable AI prototypes</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                AI startups, internal tool teams, workflow automation products, and founders testing AI product ideas.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Prototype my AI idea</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 08 - Illustration -->
+          <div class="srv-row srv-row-flip" data-step="08">
+            <div class="srv-row-image" aria-hidden="true">
+              <div class="srv-row-image-inner srv-visual-8">
+                <div class="srv-visual-pattern"></div>
+                <img class="srv-row-icon" src="/assets/figma/service-iconsax-illustration-pen-tool.svg" alt="" />
+                <span class="srv-visual-label">Illustration</span>
+              </div>
+            </div>
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">08 - Illustration</span>
+              <h2>Custom Vector Illustration and Brand Assets</h2>
+              <p>I create custom vector illustrations, icons, empty states, hero graphics, and product visuals that make digital products feel more ownable.</p>
+              <div>
+                <p class="srv-what-i-do-label">What I can help with</p>
+                <ul class="srv-what-i-do">
+                  <li>Custom icons and illustration sets</li>
+                  <li>Empty states and onboarding visuals</li>
+                  <li>Hero graphics</li>
+                  <li>Product storytelling assets</li>
+                  <li>Brand-supporting visual systems</li>
+                </ul>
+              </div>
+              <div class="srv-best-for">
+                <strong>Best for</strong>
+                Products, websites, and brands that need custom visuals instead of generic stock-style graphics.
+              </div>
+              <div class="srv-row-action">
+                <a class="button button-primary" href="/contact/">Create my visuals</a>
               </div>
             </div>
           </div>
@@ -797,7 +918,6 @@
         </div>
       </section>
 
-      <!-- WHAT PEOPLE ARE ASKING (Figma 99:6407 — FAQ with image panel) -->
       <section class="portfolio-faq-section" id="faq" aria-labelledby="srv-faq-heading">
         <div class="portfolio-faq-inner">
           <h2 id="srv-faq-heading">What people are <em>asking</em></h2>

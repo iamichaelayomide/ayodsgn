@@ -240,6 +240,36 @@ document.querySelectorAll("[data-process-set]").forEach((processSet) => {
   });
 });
 
+document.querySelectorAll("[data-swipe-stack]").forEach((stack) => {
+  let cards = Array.from(stack.querySelectorAll("[data-stack-card]"));
+  const positions = ["is-front", "is-middle", "is-back"];
+
+  function syncStack() {
+    cards.forEach((card, index) => {
+      card.classList.remove(...positions);
+      card.classList.add(positions[Math.min(index, positions.length - 1)]);
+      card.tabIndex = index === 0 ? 0 : -1;
+      card.setAttribute("aria-pressed", String(index === 0));
+    });
+  }
+
+  function bringToFront(card) {
+    cards = [card, ...cards.filter((item) => item !== card)];
+    syncStack();
+  }
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => bringToFront(card));
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      bringToFront(card);
+    });
+  });
+
+  syncStack();
+});
+
 // Playground Board Interactivity
 const playgroundContainer = document.querySelector('.playground-section');
 if (playgroundContainer) {
