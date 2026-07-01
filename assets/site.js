@@ -73,6 +73,18 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   const detailTitle = serviceLayout.querySelector("[data-service-title]");
   const detailBody = serviceLayout.querySelector("[data-service-body]");
   const detailList = serviceLayout.querySelector("[data-service-list]");
+  const prevButton = serviceLayout.querySelector("[data-service-prev]");
+  const nextButton = serviceLayout.querySelector("[data-service-next]");
+
+  function getSelectedIndex() {
+    return Math.max(0, serviceCards.findIndex((card) => card.classList.contains("is-selected")));
+  }
+
+  function syncArrowState() {
+    const selectedIndex = getSelectedIndex();
+    if (prevButton) prevButton.disabled = selectedIndex <= 0;
+    if (nextButton) nextButton.disabled = selectedIndex >= serviceCards.length - 1;
+  }
 
   function selectService(key, shouldScroll = true) {
     const data = services[key];
@@ -83,7 +95,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
       card.classList.toggle("is-selected", selected);
       card.setAttribute("aria-pressed", String(selected));
       if (selected && shouldScroll) {
-        card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        card.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
       }
     });
 
@@ -95,10 +107,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
       li.textContent = item;
       return li;
     }));
-  }
-
-  function getSelectedIndex() {
-    return Math.max(0, serviceCards.findIndex((card) => card.classList.contains("is-selected")));
+    syncArrowState();
   }
 
   function selectByOffset(offset) {
@@ -182,6 +191,9 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
       selectByOffset(-1);
     }
   });
+
+  prevButton?.addEventListener("click", () => selectByOffset(-1));
+  nextButton?.addEventListener("click", () => selectByOffset(1));
 
   const initialCard = serviceCards.find((card) => card.classList.contains("is-selected")) || serviceCards[0];
   if (initialCard) selectService(initialCard.dataset.service, false);

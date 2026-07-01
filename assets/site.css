@@ -461,21 +461,69 @@ h2,
   padding-top: 76px;
 }
 
+.service-carousel {
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+
 .service-rail {
   display: flex;
   align-items: center;
   gap: 20px;
   min-width: 0;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
-  padding: 18px 4px 32px;
+  scrollbar-width: none;
+  padding: 18px 4px 32px 0;
   cursor: grab;
+}
+
+.service-rail::-webkit-scrollbar {
+  display: none;
 }
 
 .service-rail.is-dragging {
   cursor: grabbing;
   scroll-snap-type: none;
+}
+
+.service-arrows {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.service-arrow {
+  width: 46px;
+  height: 46px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(1, 1, 1, 0.16);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 160ms ease, color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.service-arrow:hover,
+.service-arrow:focus-visible {
+  color: #ffffff;
+  border-color: var(--blue);
+  background: var(--blue);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.service-arrow:disabled {
+  opacity: 0.34;
+  cursor: default;
+  transform: none;
 }
 
 .service-card {
@@ -2575,7 +2623,7 @@ body.lightbox-open {
   }
 
   .service-card.is-selected {
-    flex-basis: 84vw;
+    flex-basis: 82vw;
     height: 360px;
   }
 
@@ -2586,6 +2634,10 @@ body.lightbox-open {
   .service-detail {
     padding: 26px 0 0;
     border-left: 0;
+  }
+
+  .service-arrows {
+    justify-content: center;
   }
 
   .project-copy {
