@@ -134,6 +134,22 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
   });
 });
 
+document.querySelectorAll("[data-process-set]").forEach((processSet) => {
+  const cards = Array.from(processSet.querySelectorAll(".process-step, .process-col"));
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      cards.forEach((item) => item.classList.remove("is-selected"));
+      card.classList.add("is-selected");
+    });
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      cards.forEach((item) => item.classList.remove("is-selected"));
+      card.classList.add("is-selected");
+    });
+  });
+});
+
 // Playground Board Interactivity
 const playgroundContainer = document.querySelector('.playground-section');
 if (playgroundContainer) {
