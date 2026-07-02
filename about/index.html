@@ -93,10 +93,25 @@
         width: 40px;
         height: 40px;
         color: #483f3f;
-        transition: color 200ms, transform 200ms;
+        border-radius: 50%;
+        transition: color 200ms, transform 200ms, background 200ms;
       }
-      .about-socials a:hover { color: var(--blue); transform: translateY(-3px); }
+      .about-socials a svg { display: none; }
+      .about-socials a::before {
+        content: "";
+        width: 21px;
+        height: 21px;
+        display: block;
+        background: currentColor;
+      }
+      .about-socials a[aria-label="Behance"]::before { width: 24px; height: 24px; -webkit-mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat; }
+      .about-socials a[aria-label="Dribbble"]::before { -webkit-mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat; }
+      .about-socials a[aria-label="GitHub"]::before { -webkit-mask: url("/assets/figma/footer/footer-github.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-github.svg") center / contain no-repeat; }
+      .about-socials a[aria-label="X"]::before { -webkit-mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat; }
+      .about-socials a[aria-label="LinkedIn"]::before { -webkit-mask: url("/assets/figma/footer/footer-linkedin.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-linkedin.svg") center / contain no-repeat; }
+      .about-socials a:hover { color: var(--blue); background: rgba(31, 70, 210, 0.06); transform: translateY(-2px); }
       .social-sep { width: 2px; height: 22px; background: rgba(72,63,63,0.18); border-radius: 1px; margin: 0 8px; }
+      .about-socials li:last-child .social-sep { display: none; }
 
       .about-hero-ctas { display: flex; gap: 12px; }
 
