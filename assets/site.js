@@ -371,7 +371,8 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
 
   const makeItems = (files, category, mediaType, basePath, tags) => files.map((file) => {
     const id = file.replace(/\.[^.]+$/, '');
-    const src = `${basePath}/${file}`;
+    const mediaSrc = `${basePath}/${id}${mediaType === 'video' ? '.mp4' : '.webp'}`;
+    const thumbSrc = `${basePath}/${id}${mediaType === 'video' ? '-poster.webp' : '-thumb.webp'}`;
     return {
       id,
       title: titleCase(id),
@@ -379,7 +380,8 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       tags,
       mediaType,
       alt: titleCase(id),
-      ...(mediaType === 'video' ? { videoSrc: src } : { thumbnail: src, imageSrc: src })
+      thumbnail: thumbSrc,
+      ...(mediaType === 'video' ? { videoSrc: mediaSrc } : { imageSrc: mediaSrc })
     };
   });
 
@@ -551,16 +553,12 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
 
   function createMedia(item, className = '') {
     if (item.mediaType === 'video') {
-      const video = document.createElement('video');
-      video.className = className;
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.preload = 'metadata';
-      video.src = item.videoSrc;
-      video.dataset.src = item.videoSrc;
-      video.setAttribute('aria-label', item.alt || item.title);
-      return video;
+      const img = document.createElement('img');
+      img.src = item.thumbnail;
+      img.alt = item.alt || item.title;
+      img.className = className;
+      img.loading = 'lazy';
+      return img;
     }
     const img = document.createElement('img');
     img.src = item.imageSrc || item.thumbnail;
