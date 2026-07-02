@@ -65,21 +65,21 @@
         border: 0.3px solid #f8f1f1;
         border-radius: 10px;
         overflow: hidden;
-        transition: transform 280ms cubic-bezier(.22,.68,0,1.2), box-shadow 280ms ease;
+        transition: transform 280ms ease, box-shadow 280ms ease;
       }
       .proj-grid-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 52px rgba(0,0,0,0.1);
+        transform: translateY(-4px);
+        box-shadow: 0 18px 46px rgba(0,0,0,0.08);
       }
       .proj-grid-card.card-tall { grid-row: span 2; }
-      .proj-grid-card.card-wide { grid-column: span 2; }
+      .proj-grid-card.card-wide { grid-column: span 1; }
       .proj-card-media {
         height: 280px;
         overflow: hidden;
         background: #eaeaea;
       }
       .card-tall .proj-card-media { height: 100%; min-height: 480px; }
-      .card-wide .proj-card-media { height: 340px; }
+      .card-wide .proj-card-media { height: 280px; }
       .proj-card-media img {
         width: 100%;
         height: 100%;
@@ -87,7 +87,7 @@
         display: block;
         transition: transform 500ms ease;
       }
-      .proj-grid-card:hover .proj-card-media img { transform: scale(1.04); }
+      .proj-grid-card:hover .proj-card-media img { transform: scale(1.02); }
       .proj-card-info {
         padding: 20px 22px 24px;
         display: flex;
@@ -163,15 +163,15 @@
         gap: 16px;
         color: #483f3f;
         cursor: pointer;
-        transition: transform 220ms ease, opacity 220ms ease;
+        transition: transform 320ms ease, opacity 320ms ease;
       }
       .process-row:hover .process-col,
-      .process-row:focus-within .process-col { opacity: 0.72; }
+      .process-row:focus-within .process-col { opacity: 0.78; }
       .process-col:hover,
       .process-col:focus-within,
       .process-col.is-selected {
         opacity: 1;
-        transform: translateY(-8px);
+        transform: translateY(-4px);
       }
       .process-icon {
         width: 126px;
@@ -179,13 +179,12 @@
         border-radius: 5px;
         display: grid;
         place-items: center;
-        transition: width 220ms ease, height 220ms ease;
+        transition: transform 320ms ease, filter 320ms ease;
       }
       .process-col:hover .process-icon,
       .process-col:focus-within .process-icon,
       .process-col.is-selected .process-icon {
-        width: 199px;
-        height: 172px;
+        transform: translateY(-3px);
       }
       .process-icon img {
         width: 100%;
@@ -199,21 +198,13 @@
         font-weight: 400;
         color: #010101;
         line-height: 0.92;
-        transition: font-size 220ms ease;
       }
-      .process-col:hover h4,
-      .process-col:focus-within h4,
-      .process-col.is-selected h4 { font-size: 45px; }
       .process-col p {
         margin: 0;
         color: #483f3f;
         font-size: 14px;
         line-height: 1.35;
-        transition: font-size 220ms ease;
       }
-      .process-col:hover p,
-      .process-col:focus-within p,
-      .process-col.is-selected p { font-size: 18px; }
       .process-cta-row {
         margin-top: 60px;
         padding: 32px 40px;
@@ -593,7 +584,7 @@
   <body class="projects-page">
     <header class="site-header is-light">
       <div class="nav-wrap">
-        <a class="brand-mark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <a class="brand-mark brand-wordmark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
         <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
         <nav class="main-nav" aria-label="Main navigation">
           <a href="/projects/" aria-current="page">Projects</a>
@@ -694,8 +685,8 @@
             </div>
           </article>
 
-          <!-- Orca — wide card -->
-          <article class="proj-grid-card card-wide">
+          <!-- Orca -->
+          <article class="proj-grid-card">
             <div class="proj-card-media">
               <img src="/assets/figma/806cfb6178eb1eac5761a7d02b64e60a5c8cac92.png" alt="Orca Security website revamp" loading="lazy" />
             </div>
@@ -728,28 +719,15 @@
         </div>
         <div class="services-layout">
           <div class="service-rail" tabindex="0" aria-label="Swipe or scroll services">
-            <button class="service-card is-selected" type="button" data-service="strategy" aria-pressed="true"><span>01</span><strong>Product Design &amp; UI/UX</strong></button>
-            <button class="service-card" type="button" data-service="design" aria-pressed="false"><span>02</span><strong>Mobile App Design</strong></button>
-            <button class="service-card" type="button" data-service="development" aria-pressed="false"><span>03</span><strong>SaaS Dashboard &amp; Web App</strong></button>
-            <button class="service-card" type="button" data-service="testing" aria-pressed="false"><span>04</span><strong>UX Audit &amp; Redesign</strong></button>
-            <button class="service-card" type="button" data-service="launch" aria-pressed="false"><span>05</span><strong>Landing Page Design</strong></button>
-            <button class="service-card" type="button" data-service="support" aria-pressed="false"><span>06</span><strong>No-Code Development</strong></button>
-            <button class="service-card" type="button" data-service="ai" aria-pressed="false"><span>07</span><strong>AI Product Design</strong></button>
-            <button class="service-card" type="button" data-service="illustration" aria-pressed="false"><span>08</span><strong>Vector Illustration</strong></button>
+            <button class="service-card is-selected" type="button" data-service="product" aria-pressed="true"><span>01</span><img class="service-card-icon" src="/assets/figma/service-iconsax-figma.svg" alt="" /><strong>Product Design &amp; UI/UX Design</strong></button>
+            <button class="service-card" type="button" data-service="mobile" aria-pressed="false"><span>02</span><img class="service-card-icon" src="/assets/figma/service-iconsax-pen-tool.svg" alt="" /><strong>Mobile App Design</strong></button>
+            <button class="service-card" type="button" data-service="saas" aria-pressed="false"><span>03</span><img class="service-card-icon" src="/assets/figma/service-iconsax-layer.svg" alt="" /><strong>SaaS Dashboard &amp; Web App Design</strong></button>
+            <button class="service-card" type="button" data-service="audit" aria-pressed="false"><span>04</span><img class="service-card-icon" src="/assets/figma/service-iconsax-convert-3d-cube.svg" alt="" /><strong>UX Audit &amp; Redesign</strong></button>
+            <button class="service-card" type="button" data-service="websites" aria-pressed="false"><span>05</span><img class="service-card-icon" src="/assets/figma/service-iconsax-global.svg" alt="" /><strong>Landing Page &amp; Website Design</strong></button>
+            <button class="service-card" type="button" data-service="nocode" aria-pressed="false"><span>06</span><img class="service-card-icon" src="/assets/figma/service-iconsax-framer.svg" alt="" /><strong>No Code Website Development</strong></button>
+            <button class="service-card" type="button" data-service="ai" aria-pressed="false"><span>07</span><img class="service-card-icon" src="/assets/figma/service-iconsax-password-check.svg" alt="" /><strong>AI Product Design &amp; Prototyping</strong></button>
+            <button class="service-card" type="button" data-service="illustration" aria-pressed="false"><span>08</span><img class="service-card-icon" src="/assets/figma/service-iconsax-illustration-pen-tool.svg" alt="" /><strong>Custom Vector Illustration &amp; Brand Assets</strong></button>
           </div>
-          <article class="service-detail" aria-live="polite">
-            <p class="detail-number">01</p>
-            <div>
-              <h3 data-service-title>Product Design &amp; UI/UX Design</h3>
-              <p data-service-body>End-to-end product design across web and mobile, from early wireframes to polished Figma interfaces ready for engineering handoff.</p>
-            </div>
-            <ul data-service-list>
-              <li>User research &amp; flows</li>
-              <li>Wireframes &amp; prototypes</li>
-              <li>Design system creation</li>
-            </ul>
-            <a class="button button-soft" href="/contact/">Book a call</a>
-          </article>
         </div>
         <div class="center-action">
           <a class="text-link-button" href="/services/">See all services</a>
@@ -759,33 +737,32 @@
       <!-- ── My Process ── -->
       <section class="proj-process-section" id="process" aria-labelledby="proj-process-h2">
         <div class="proj-process-inner">
-          <p class="section-kicker">How I work</p>
-          <h2 id="proj-process-h2"><em>My process</em></h2>
+          <h2 id="proj-process-h2">My <em>process</em></h2>
           <div class="process-row" data-process-set>
             <div class="process-col" tabindex="0">
               <div class="process-icon">
-                <img src="/assets/figma/process-discover.svg" alt="" />
+                <img src="/assets/figma/process-iconsax-document-sketch.svg" alt="" />
               </div>
               <h4>Discover</h4>
-              <p>Understand the product, users, business goals, competitors, and key problems to solve.</p>
+              <p>Understand the product, users, business goals, competitors, and key problems.</p>
             </div>
             <div class="process-col" tabindex="0">
               <div class="process-icon">
-                <img src="/assets/figma/process-strategy.svg" alt="" />
+                <img src="/assets/figma/process-iconsax-maximize.svg" alt="" />
               </div>
               <h4>Strategy</h4>
-              <p>Map the flow, content, layout, user journey, and product logic for a clear direction.</p>
+              <p>Map the flow, content, layout, user journey, and product logic.</p>
             </div>
             <div class="process-col" tabindex="0">
               <div class="process-icon">
-                <img src="/assets/figma/process-design.svg" alt="" />
+                <img src="/assets/figma/process-iconsax-ruler-pen.svg" alt="" />
               </div>
               <h4>Design</h4>
               <p>Create polished UI screens, prototypes, visuals, and responsive layouts.</p>
             </div>
             <div class="process-col" tabindex="0">
               <div class="process-icon">
-                <img src="/assets/figma/process-deliver.svg" alt="" />
+                <img src="/assets/figma/process-iconsax-game.svg" alt="" />
               </div>
               <h4>Deliver &amp; Build</h4>
               <p>Prepare clean handoff files, design systems, no-code builds, and AI-assisted prototypes ready for development or launch.</p>
@@ -821,7 +798,40 @@
       </section>
 
       <section class="portfolio-faq-section" id="faq" aria-labelledby="proj-faq-h2">
-        <div class="portfolio-faq-inner"><h2 id="proj-faq-h2">What people are <em>asking</em></h2><div class="portfolio-faq-panel"><div class="portfolio-faq-media" aria-hidden="true"><img src="/assets/figma/27eca32b84e1898f2365bce9fbf7dbc86de08bfe.png" alt="" /></div><div class="portfolio-faq-list"><details class="faq-item" open><summary>What services are available from you?</summary><div class="faq-answer"><p>I help teams and businesses create websites and mobile apps that improve their strategic goals.</p></div></details><details class="faq-item"><summary>Can you tell me about the services you provide?</summary><div class="faq-answer"><p>I offer product design, UI/UX, mobile app design, SaaS dashboard design, landing pages, no-code builds, AI prototyping, and custom vector illustration.</p></div></details><details class="faq-item"><summary>What kind of services do you provide?</summary><div class="faq-answer"><p>From early strategy and wireframes through polished UI, development, and launch, I cover the full design and build cycle for digital products.</p></div></details><details class="faq-item"><summary>Could you explain the services you offer?</summary><div class="faq-answer"><p>Each engagement is scoped based on your stage, whether you need a product designed from scratch, a revamp, or a section built and launched.</p></div></details><details class="faq-item"><summary>What services do you provide?</summary><div class="faq-answer"><p>Core services include product design, mobile app design, SaaS and web app design, UX audits, landing pages, no-code development, AI prototyping, and illustration.</p></div></details><details class="faq-item"><summary>What services do you offer?</summary><div class="faq-answer"><p>A full-stack design service: brand strategy, information architecture, Figma designs, responsive builds, and post-launch support.</p></div></details></div></div></div>
+        <div class="portfolio-faq-inner">
+          <h2 id="proj-faq-h2">What people are <em>asking</em></h2>
+          <div class="portfolio-faq-panel">
+            <div class="portfolio-faq-media" aria-hidden="true">
+              <img src="/assets/figma/27eca32b84e1898f2365bce9fbf7dbc86de08bfe.png" alt="" />
+            </div>
+            <div class="portfolio-faq-list">
+              <details class="faq-item" open>
+                <summary>What kind of projects do you take on?</summary>
+                <div class="faq-answer"><p>I work on product design, mobile apps, SaaS dashboards, websites, landing pages, no-code builds, AI prototypes, and product visuals.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>Can you redesign an existing website or product?</summary>
+                <div class="faq-answer"><p>Yes. I can audit what exists, identify weak points, clean up the user flow, and redesign the interface so it feels clearer and more premium.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>Do you only design, or can you also build?</summary>
+                <div class="faq-answer"><p>I can support both. Depending on the project, I can deliver Figma designs, no-code builds, frontend-ready sections, design systems, and launch support.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>What do you need before starting?</summary>
+                <div class="faq-answer"><p>A clear goal, any existing brand assets, product notes, reference links, and a quick call to understand the audience, scope, and timeline.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>How long does a project usually take?</summary>
+                <div class="faq-answer"><p>Small landing pages can move quickly, while full apps or dashboards need more time for flows, screens, review, and refinement. I scope each timeline before we begin.</p></div>
+              </details>
+              <details class="faq-item">
+                <summary>Can you work with founders and small teams?</summary>
+                <div class="faq-answer"><p>Yes. Most of my process is built for founders, startups, creators, and lean teams that need thoughtful design without unnecessary complexity.</p></div>
+              </details>
+            </div>
+          </div>
+        </div>
         <div class="portfolio-faq-cta"><div class="portfolio-faq-cta-content"><h2>Curious about what we can create together?</h2><p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p><div class="portfolio-faq-cta-actions"><a class="button button-pink" href="/contact/">Book a call</a><a class="button button-ghost-light" href="/projects/">See all projects</a></div></div></div>
       </section>
 

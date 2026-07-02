@@ -21,6 +21,53 @@ document.querySelectorAll("[data-year]").forEach((node) => {
   node.textContent = new Date().getFullYear();
 });
 
+const portfolioFaqs = [
+  {
+    question: "What kind of projects do you take on?",
+    answer: "I work on product design, mobile apps, SaaS dashboards, websites, landing pages, no-code builds, AI prototypes, and custom product visuals."
+  },
+  {
+    question: "Can you redesign an existing website or product?",
+    answer: "Yes. I can audit what exists, identify weak points, clean up the user flow, and redesign the interface so it feels clearer and more premium."
+  },
+  {
+    question: "Do you only design, or can you also build?",
+    answer: "I can support both. Depending on the project, I can deliver Figma designs, no-code builds, frontend-ready sections, design systems, and launch support."
+  },
+  {
+    question: "What do you need before starting?",
+    answer: "A clear goal, any existing brand assets, product notes, reference links, and a quick call to understand the audience, scope, and timeline."
+  },
+  {
+    question: "How long does a project usually take?",
+    answer: "Small landing pages can move quickly, while full apps or dashboards need more time for flows, screens, review, and refinement. I scope each timeline before we begin."
+  },
+  {
+    question: "Can you work with founders and small teams?",
+    answer: "Yes. Most of my process is built for founders, startups, creators, and lean teams that need thoughtful design without unnecessary complexity."
+  }
+];
+
+document.querySelectorAll(".portfolio-faq-list").forEach((list) => {
+  list.replaceChildren(...portfolioFaqs.map((item, index) => {
+    const details = document.createElement("details");
+    details.className = "faq-item";
+    if (index === 0) details.open = true;
+
+    const summary = document.createElement("summary");
+    summary.textContent = item.question;
+
+    const answer = document.createElement("div");
+    answer.className = "faq-answer";
+    const paragraph = document.createElement("p");
+    paragraph.textContent = item.answer;
+    answer.appendChild(paragraph);
+
+    details.append(summary, answer);
+    return details;
+  }));
+});
+
 const services = {
   product: {
     number: "01",
@@ -75,16 +122,17 @@ const services = {
 document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   const serviceCards = [...serviceLayout.querySelectorAll(".service-card")];
   const rail = serviceLayout.querySelector(".service-rail");
+  const serviceSection = serviceLayout.closest("section") || serviceLayout.parentElement;
   const detailNumber = serviceLayout.querySelector(".detail-number");
   const detailTitle = serviceLayout.querySelector("[data-service-title]");
-  const detailBody = serviceLayout.querySelector("[data-service-body]");
+  const detailBody = serviceLayout.querySelector("[data-service-body]") || serviceSection?.querySelector("[data-service-body]");
   const detailList = serviceLayout.querySelector("[data-service-list]");
   const prevButton = serviceLayout.querySelector("[data-service-prev]");
   const nextButton = serviceLayout.querySelector("[data-service-next]");
 
   function scrollCardIntoView(card, behavior = "smooth") {
     if (!rail || !card) return;
-    const targetLeft = Math.max(0, card.offsetLeft - 18);
+    const targetLeft = Math.max(0, card.offsetLeft - (rail.clientWidth - card.offsetWidth) / 2);
     rail.scrollTo({ left: targetLeft, behavior });
   }
 
@@ -100,7 +148,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
 
   function selectService(key, shouldScroll = true) {
     const data = services[key];
-    if (!data || !detailNumber || !detailTitle || !detailBody || !detailList) return;
+    if (!data) return;
 
     serviceCards.forEach((card) => {
       const selected = card.dataset.service === key;
@@ -108,18 +156,19 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
       card.setAttribute("aria-pressed", String(selected));
       if (selected && shouldScroll) {
         scrollCardIntoView(card);
-        window.setTimeout(() => scrollCardIntoView(card), 280);
       }
     });
 
-    detailNumber.textContent = data.number;
-    detailTitle.textContent = data.title;
-    detailBody.textContent = data.body;
-    detailList.replaceChildren(...data.list.map((item) => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      return li;
-    }));
+    if (detailNumber) detailNumber.textContent = data.number;
+    if (detailTitle) detailTitle.textContent = data.title;
+    if (detailBody) detailBody.textContent = data.body;
+    if (detailList) {
+      detailList.replaceChildren(...data.list.map((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        return li;
+      }));
+    }
     syncArrowState();
   }
 
@@ -130,6 +179,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   }
 
   serviceCards.forEach((card) => {
+    card.addEventListener("focus", () => selectService(card.dataset.service));
     card.addEventListener("click", (event) => {
       if (rail?.dataset.suppressClick === "true") {
         event.preventDefault();
@@ -210,6 +260,48 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
 
   const initialCard = serviceCards.find((card) => card.classList.contains("is-selected")) || serviceCards[0];
   if (initialCard) selectService(initialCard.dataset.service, false);
+});
+
+document.querySelectorAll("[data-service-stack]").forEach((section) => {
+  const cards = Array.from(section.querySelectorAll(".srv-row[data-step]"));
+  const activeStep = section.querySelector("[data-srv-active-step]");
+  const progressLine = section.querySelector(".srv-stack-line span");
+  if (!cards.length || !activeStep || !progressLine) return;
+
+  let ticking = false;
+
+  function syncServiceStack() {
+    ticking = false;
+
+    const viewportAnchor = window.innerHeight * 0.42;
+    const sectionRect = section.getBoundingClientRect();
+    const scrollRange = Math.max(1, sectionRect.height - window.innerHeight);
+    const progress = Math.max(0, Math.min(1, (viewportAnchor - sectionRect.top) / scrollRange));
+
+    section.style.setProperty("--srv-progress", `${Math.round(progress * 100)}%`);
+
+    const activeCard = cards.reduce((best, card) => {
+      const rect = card.getBoundingClientRect();
+      const distance = Math.abs(rect.top - viewportAnchor);
+      return distance < best.distance ? { card, distance } : best;
+    }, { card: cards[0], distance: Infinity }).card;
+
+    cards.forEach((card) => {
+      card.classList.toggle("is-active", card === activeCard);
+    });
+
+    activeStep.textContent = activeCard.dataset.step || "01";
+  }
+
+  function requestSync() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(syncServiceStack);
+  }
+
+  syncServiceStack();
+  window.addEventListener("scroll", requestSync, { passive: true });
+  window.addEventListener("resize", requestSync);
 });
 
 document.querySelectorAll("[data-ticker]").forEach((ticker) => {

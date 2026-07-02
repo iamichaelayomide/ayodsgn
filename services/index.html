@@ -82,89 +82,121 @@
         flex-wrap: wrap;
       }
 
-      /* ---- Services Detail (Figma 99:6463 timeline rows) ---- */
+      /* ---- Services Detail (Figma 99:6463 stacked scroll) ---- */
       .srv-detail-section {
         padding: 18px 24px 132px;
         background: var(--paper);
+        --srv-progress: 0%;
+      }
+
+      .srv-motion-section {
+        display: none;
       }
 
       .srv-detail-inner {
         width: min(100%, var(--max));
         margin: 0 auto;
         position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: clamp(28px, 4vw, 64px);
+        align-items: start;
       }
 
-      .srv-detail-inner::before {
-        content: "";
+      .srv-stack-progress {
+        position: sticky;
+        top: 128px;
+        height: min(64vh, 560px);
+        display: grid;
+        justify-items: center;
+        align-content: start;
+        padding-top: 4px;
+      }
+
+      .srv-stack-line {
         position: absolute;
-        top: 0;
+        top: 96px;
         bottom: 0;
         left: 50%;
-        border-left: 1px dashed rgba(72, 63, 63, 0.72);
+        width: 1px;
+        overflow: hidden;
+        background: rgba(72, 63, 63, 0.2);
         transform: translateX(-50%);
-        pointer-events: none;
       }
 
-      .srv-row {
-        --marker-fill: var(--paper);
-        --marker-color: var(--ink);
-        --marker-border: rgba(72, 63, 63, 0.7);
+      .srv-stack-line span {
+        display: block;
+        width: 100%;
+        height: var(--srv-progress);
+        background: var(--blue);
+        transition: height 120ms linear;
+      }
+
+      .srv-stack-marker {
         position: relative;
-        display: grid;
-        grid-template-columns: minmax(280px, 498px) minmax(320px, 498px);
-        justify-content: space-between;
-        gap: clamp(88px, 13vw, 250px);
-        align-items: center;
-        min-height: 352px;
-        padding: 24px 0;
-        border-top: 0;
-      }
-
-      .srv-row:first-child {
-        --marker-fill: var(--blue);
-        --marker-color: #ffffff;
-        --marker-border: var(--blue);
-      }
-
-      .srv-row.srv-row-flip {
-        grid-template-columns: minmax(320px, 498px) minmax(280px, 498px);
-      }
-
-      .srv-row.srv-row-flip .srv-row-image {
-        order: 2;
-      }
-
-      .srv-row.srv-row-flip .srv-row-copy {
-        order: 1;
-      }
-
-      .srv-row::after {
-        content: attr(data-step);
-        position: absolute;
-        top: 50%;
-        left: 50%;
         z-index: 2;
-        width: 86px;
+        width: 74px;
         height: 74px;
         display: grid;
         place-items: center;
         border-radius: 8px;
-        border: 1px solid var(--marker-border);
-        background: var(--marker-fill);
-        color: var(--marker-color);
+        color: #ffffff;
+        background: var(--blue);
         font-family: var(--serif);
         font-size: 24px;
         font-style: italic;
-        transform: translate(-50%, -50%);
+        box-shadow: 0 18px 44px rgba(31, 70, 210, 0.18);
+        transition: transform 220ms ease, box-shadow 220ms ease;
+      }
+
+      .srv-stack-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 28px;
+      }
+
+      .srv-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(280px, 0.92fr) minmax(340px, 1.08fr);
+        gap: clamp(28px, 5vw, 74px);
+        align-items: center;
+        min-height: min(74vh, 650px);
+        position: sticky;
+        top: 110px;
+        padding: clamp(18px, 2.4vw, 30px);
+        border: 1px solid rgba(72, 63, 63, 0.08);
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 22px 64px rgba(38, 32, 32, 0.055);
+        transform: translateY(calc(var(--stack-offset, 0) * 10px));
+        transition: border-color 220ms ease, box-shadow 220ms ease;
+      }
+
+      .srv-row[data-step="01"] { --stack-offset: 0; z-index: 1; }
+      .srv-row[data-step="02"] { --stack-offset: 1; z-index: 2; }
+      .srv-row[data-step="03"] { --stack-offset: 2; z-index: 3; }
+      .srv-row[data-step="04"] { --stack-offset: 3; z-index: 4; }
+      .srv-row[data-step="05"] { --stack-offset: 4; z-index: 5; }
+      .srv-row[data-step="06"] { --stack-offset: 5; z-index: 6; }
+      .srv-row[data-step="07"] { --stack-offset: 6; z-index: 7; }
+      .srv-row[data-step="08"] { --stack-offset: 7; z-index: 8; }
+
+      .srv-row.is-active {
+        border-color: rgba(31, 70, 210, 0.18);
+        box-shadow: 0 30px 80px rgba(38, 32, 32, 0.08);
+      }
+
+      .srv-row.srv-row-flip .srv-row-image,
+      .srv-row.srv-row-flip .srv-row-copy {
+        order: initial;
       }
 
       .srv-row-image {
         position: relative;
-        width: min(100%, 498px);
-        height: 352px;
+        width: 100%;
+        min-height: 360px;
+        height: clamp(360px, 40vw, 500px);
         border-radius: 8px;
         overflow: hidden;
         background: #ffffff;
@@ -213,7 +245,7 @@
       .srv-row-copy {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 18px;
       }
 
       .srv-row-kicker {
@@ -512,11 +544,12 @@
       @media (max-width: 1024px) {
         .srv-hero-inner { grid-template-columns: 1fr; gap: 40px; }
         .srv-hero::after { display: none; }
-        .srv-detail-inner::before { display: none; }
+        .srv-detail-inner { grid-template-columns: 72px minmax(0, 1fr); gap: 22px; }
+        .srv-stack-marker { width: 58px; height: 58px; font-size: 20px; }
+        .srv-stack-line { top: 76px; }
         .srv-row,
         .srv-row.srv-row-flip { grid-template-columns: 1fr; }
-        .srv-row { gap: 28px; padding-left: 78px; }
-        .srv-row::after { left: 0; top: 24px; transform: none; width: 54px; height: 48px; font-size: 18px; }
+        .srv-row { min-height: auto; gap: 28px; }
         .srv-row.srv-row-flip .srv-row-image { order: 0; }
         .srv-row.srv-row-flip .srv-row-copy { order: 0; }
         .srv-faq-layout { grid-template-columns: 1fr; }
@@ -527,6 +560,11 @@
 
       @media (max-width: 768px) {
         .srv-hero { padding: 160px 24px 80px; }
+        .srv-detail-section { padding-left: 16px; padding-right: 16px; }
+        .srv-detail-inner { grid-template-columns: 1fr; }
+        .srv-stack-progress { display: none; }
+        .srv-row { position: relative; top: auto; transform: none; padding: 18px; }
+        .srv-row-image { min-height: 280px; height: 300px; }
         .srv-cta-inner { padding: 48px 32px; }
       }
     </style>
@@ -534,7 +572,7 @@
   <body class="services-page">
     <header class="site-header is-light">
       <div class="nav-wrap">
-        <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <a class="brand-mark brand-wordmark" href="/" aria-label="ayo.dsgn home"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
         <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
         <nav class="main-nav" aria-label="Main navigation">
           <a href="/projects/">Projects</a>
@@ -632,24 +670,32 @@
             </div>
           </div>
 
-          <article class="service-detail" aria-live="polite">
-            <p class="detail-number">01</p>
-            <div>
-              <h3 data-service-title>Product Design &amp; UI UX Design</h3>
-              <p data-service-body>I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.</p>
-            </div>
-            <ul data-service-list>
-              <li>Product flows</li>
-              <li>Wireframes</li>
-              <li>High-fidelity UI</li>
-            </ul>
-            <a class="button button-soft" href="/contact/">Book a call</a>
-          </article>
+        </div>
+
+        <p class="service-summary" data-service-body aria-live="polite">I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.</p>
+
+        <div class="center-action">
+          <a class="text-link-button" href="#services">See all services</a>
         </div>
       </section>
 
-      <section class="srv-detail-section" id="services" aria-label="Service detail list">
+      <section class="srv-detail-section" id="services" aria-labelledby="srv-services-heading" data-service-stack>
         <div class="srv-detail-inner">
+          <div class="srv-stack-progress" aria-hidden="true">
+            <div class="srv-stack-marker" data-srv-active-step>01</div>
+            <div class="srv-stack-line"><span></span></div>
+          </div>
+
+          <div class="srv-stack-cards">
+            <div class="section-top">
+              <div>
+                <p class="section-kicker">Services</p>
+                <h2 id="srv-services-heading">What I can <em>build</em></h2>
+                <p class="section-desc" style="max-width: 610px; margin-top: 18px; color: var(--muted); font-size: 18px; line-height: 1.55;">
+                  Scroll through the core services. Each card locks into focus while the progress marker follows the section.
+                </p>
+              </div>
+            </div>
 
           <!-- 01 · Product Design & UI/UX -->
           <div class="srv-row" data-step="01">
@@ -915,25 +961,48 @@
             </div>
           </div>
 
+          </div>
         </div>
       </section>
 
-      <section class="portfolio-faq-section" id="faq" aria-labelledby="srv-faq-heading">
-        <div class="portfolio-faq-inner">
-          <h2 id="srv-faq-heading">What people are <em>asking</em></h2>
-          <div class="portfolio-faq-panel">
-            <div class="portfolio-faq-media" aria-hidden="true"><img src="/assets/figma/27eca32b84e1898f2365bce9fbf7dbc86de08bfe.png" alt="" /></div>
-            <div class="portfolio-faq-list">
-              <details class="faq-item" open><summary>What services are available from you?</summary><div class="faq-answer"><p>I help teams and businesses create websites and mobile apps that improve their strategic goals.</p></div></details>
-              <details class="faq-item"><summary>Can you tell me about the services you provide?</summary><div class="faq-answer"><p>I offer product design, UI/UX, mobile app design, SaaS dashboard design, landing pages, no-code builds, AI prototyping, and custom vector illustration.</p></div></details>
-              <details class="faq-item"><summary>What kind of services do you provide?</summary><div class="faq-answer"><p>From early strategy and wireframes through polished UI, development, and launch, I cover the full design and build cycle for digital products.</p></div></details>
-              <details class="faq-item"><summary>Could you explain the services you offer?</summary><div class="faq-answer"><p>Each engagement is scoped based on your stage, whether you need a product designed from scratch, a revamp, or a section built and launched.</p></div></details>
-              <details class="faq-item"><summary>What services do you provide?</summary><div class="faq-answer"><p>Core services include product design, mobile app design, SaaS and web app design, UX audits, landing pages, no-code development, AI prototyping, and illustration.</p></div></details>
-              <details class="faq-item"><summary>What services do you offer?</summary><div class="faq-answer"><p>A full-stack design service: brand strategy, information architecture, Figma designs, responsive builds, and post-launch support.</p></div></details>
-            </div>
+      <section class="process-section" id="process" aria-labelledby="srv-process-heading">
+        <div class="process-inner">
+          <h2 id="srv-process-heading">My <em>process</em></h2>
+          <div class="process-steps" aria-label="Project process" data-process-set>
+            <article class="process-step" tabindex="0">
+              <div class="process-icon">
+                <img src="/assets/figma/process-iconsax-document-sketch.svg" alt="" />
+              </div>
+              <h3>Discover</h3>
+              <p>Understand the product, users, business goals, competitors, and key problems.</p>
+            </article>
+            <article class="process-step" tabindex="0">
+              <div class="process-icon">
+                <img src="/assets/figma/process-iconsax-maximize.svg" alt="" />
+              </div>
+              <h3>Strategy</h3>
+              <p>Map the flow, content, layout, user journey, and product logic.</p>
+            </article>
+            <article class="process-step" tabindex="0">
+              <div class="process-icon">
+                <img src="/assets/figma/process-iconsax-ruler-pen.svg" alt="" />
+              </div>
+              <h3>Design</h3>
+              <p>Create polished UI screens, prototypes, visuals, and responsive layouts.</p>
+            </article>
+            <article class="process-step" tabindex="0">
+              <div class="process-icon">
+                <img src="/assets/figma/process-iconsax-game.svg" alt="" />
+              </div>
+              <h3>Deliver &amp; Build</h3>
+              <p>Prepare clean handoff files, design systems, no-code builds, and AI-assisted prototypes ready for development or launch.</p>
+            </article>
+          </div>
+          <div class="process-cta">
+            <p>Discover an easy way to achieve real results! My collaborative, data-driven approach is customized for your business, guaranteeing you get impactful outcomes.</p>
+            <a class="button button-primary" href="/contact/">Book a call</a>
           </div>
         </div>
-        <div class="portfolio-faq-cta"><div class="portfolio-faq-cta-content"><h2>Curious about what we can create together?</h2><p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p><div class="portfolio-faq-cta-actions"><a class="button button-pink" href="/contact/">Book a call</a><a class="button button-ghost-light" href="/projects/">See all projects</a></div></div></div>
       </section>
 
       <!-- TESTIMONIALS (Figma 154:3475) -->
@@ -1018,6 +1087,24 @@
           <img src="/assets/figma/292e1469c323e1fb0db7c47cf29e03cf9d1b2a3b.png" alt="BloodLines" />
         </div>
         <p class="trusted-note">Trusted by several teams &amp; organizations</p>
+      </section>
+
+      <section class="portfolio-faq-section" id="faq" aria-labelledby="srv-faq-heading">
+        <div class="portfolio-faq-inner">
+          <h2 id="srv-faq-heading">What people are <em>asking</em></h2>
+          <div class="portfolio-faq-panel">
+            <div class="portfolio-faq-media" aria-hidden="true"><img src="/assets/figma/27eca32b84e1898f2365bce9fbf7dbc86de08bfe.png" alt="" /></div>
+            <div class="portfolio-faq-list">
+              <details class="faq-item" open><summary>What kind of projects do you take on?</summary><div class="faq-answer"><p>I work on product design, mobile apps, SaaS dashboards, websites, landing pages, no-code builds, AI prototypes, and custom product visuals.</p></div></details>
+              <details class="faq-item"><summary>Can you redesign an existing website or product?</summary><div class="faq-answer"><p>Yes. I can audit what exists, identify weak points, clean up the user flow, and redesign the interface so it feels clearer and more premium.</p></div></details>
+              <details class="faq-item"><summary>Do you only design, or can you also build?</summary><div class="faq-answer"><p>I can support both. Depending on the project, I can deliver Figma designs, no-code builds, frontend-ready sections, design systems, and launch support.</p></div></details>
+              <details class="faq-item"><summary>What do you need before starting?</summary><div class="faq-answer"><p>A clear goal, any existing brand assets, product notes, reference links, and a quick call to understand the audience, scope, and timeline.</p></div></details>
+              <details class="faq-item"><summary>How long does a project usually take?</summary><div class="faq-answer"><p>Small landing pages can move quickly, while full apps or dashboards need more time for flows, screens, review, and refinement. I scope each timeline before we begin.</p></div></details>
+              <details class="faq-item"><summary>Can you work with founders and small teams?</summary><div class="faq-answer"><p>Yes. Most of my process is built for founders, startups, creators, and lean teams that need thoughtful design without unnecessary complexity.</p></div></details>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-faq-cta"><div class="portfolio-faq-cta-content"><h2>Curious about what we can create together?</h2><p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p><div class="portfolio-faq-cta-actions"><a class="button button-pink" href="/contact/">Book a call</a><a class="button button-ghost-light" href="/projects/">See all projects</a></div></div></div>
       </section>
 
     </main>

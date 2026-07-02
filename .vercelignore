@@ -1,0 +1,11 @@
+.git
+.playwright-cli
+.vercel
+node_modules
+output
+server.err.log
+server.out.log
+delluxe_products_page1.json
+delluxe_products_page2.json
+delluxe_vogue_output
+sample_product_tshirt.html
