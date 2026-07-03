@@ -78,8 +78,8 @@ body:not(.home) .site-header {
 .brand-mark {
   display: block;
   flex: 0 0 auto;
-  width: 46px;
-  height: 45px;
+  width: 52px;
+  height: 52px;
 }
 
 .brand-mark img {
@@ -585,7 +585,7 @@ h2,
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  background: #f0f0f0;
+  background: #f8e1e4;
   content: "";
   transition: background 320ms ease, border-radius 320ms ease, transform 320ms ease;
 }
@@ -1283,9 +1283,13 @@ h2,
   border-top: 0;
   padding-top: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(230px, auto);
-  align-items: end;
+  grid-template-columns: minmax(260px, 1fr) minmax(230px, auto);
+  align-items: start;
   gap: 40px;
+}
+
+.footer-social-section {
+  justify-self: start;
 }
 
 .footer-social-section h4 {
@@ -1300,7 +1304,7 @@ h2,
 .footer-social-links {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
   font-size: 0;
   font-weight: 500;
   color: var(--ink);
@@ -1319,21 +1323,21 @@ h2,
 
 .footer-social-links a::before {
   content: "";
-  width: 22px;
-  height: 22px;
+  width: var(--footer-icon-size, 23px);
+  height: var(--footer-icon-size, 23px);
   display: block;
   background: currentColor;
   transition: transform 220ms ease;
 }
 
 .footer-social-links a[href*="behance"]::before {
-  width: 24px;
-  height: 24px;
+  --footer-icon-size: 34px;
   -webkit-mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat;
   mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat;
 }
 
 .footer-social-links a[href*="dribbble"]::before {
+  --footer-icon-size: 34px;
   -webkit-mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat;
   mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat;
 }
@@ -1344,6 +1348,7 @@ h2,
 }
 
 .footer-social-links a[href*="x.com"]::before {
+  --footer-icon-size: 34px;
   -webkit-mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat;
   mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat;
 }
@@ -1355,7 +1360,7 @@ h2,
 
 .footer-social-links a:hover {
   color: var(--blue);
-  background: rgba(31, 70, 210, 0.06);
+  background: transparent;
   transform: translateY(-2px);
 }
 
@@ -1370,6 +1375,8 @@ h2,
   color: var(--muted);
   font-weight: 500;
   max-width: 280px;
+  justify-self: end;
+  padding-top: 42px;
 }
 
 .process-section,
@@ -1831,8 +1838,41 @@ h2,
   display: grid;
   place-items: center;
   color: var(--ink);
-  font-size: 14px;
+  font-size: 0;
   transition: color 180ms ease, transform 180ms ease;
+}
+
+.social-row a::after {
+  content: "";
+  width: 22px;
+  height: 22px;
+  display: block;
+  background: currentColor;
+}
+
+.social-row a[aria-label="Behance"]::after {
+  -webkit-mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat;
+  mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat;
+}
+
+.social-row a[aria-label="Dribbble"]::after {
+  -webkit-mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat;
+  mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat;
+}
+
+.social-row a[aria-label="GitHub"]::after {
+  -webkit-mask: url("/assets/figma/footer/footer-github.svg") center / contain no-repeat;
+  mask: url("/assets/figma/footer/footer-github.svg") center / contain no-repeat;
+}
+
+.social-row a[aria-label="X"]::after {
+  -webkit-mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat;
+  mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat;
+}
+
+.social-row a[aria-label="LinkedIn"]::after {
+  -webkit-mask: url("/assets/figma/footer/footer-linkedin.svg") center / contain no-repeat;
+  mask: url("/assets/figma/footer/footer-linkedin.svg") center / contain no-repeat;
 }
 
 .social-row a:hover,
@@ -2022,7 +2062,20 @@ h2,
 
 /* Contact Page Styles */
 .contact-page {
-  padding-top: 110px;
+  padding-top: 76px;
+}
+
+.contact-page .page-hero {
+  padding-top: clamp(56px, 7vw, 92px);
+  padding-bottom: clamp(48px, 6vw, 78px);
+}
+
+.contact-page .page-hero p {
+  margin-top: 22px;
+}
+
+.contact-page .contact-section {
+  padding-bottom: 104px !important;
 }
 
 .contact-grid {
@@ -2245,9 +2298,7 @@ h2,
   overflow: hidden;
   border: 1px solid #f1e5e5;
   border-radius: 4px;
-  background-color: #f7f7f7;
-  background-image: radial-gradient(rgba(72, 63, 63, 0.12) 1px, transparent 1px);
-  background-size: 22px 22px;
+  background-color: #ffffff;
 }
 
 .playground-toolbar {
@@ -2400,7 +2451,9 @@ h2,
   overflow: hidden;
   cursor: grab;
   touch-action: none;
-  background: transparent;
+  background-color: #f7f7f7;
+  background-image: radial-gradient(rgba(72, 63, 63, 0.12) 1px, transparent 1px);
+  background-size: 22px 22px;
   overscroll-behavior: contain;
 }
 
@@ -2948,6 +3001,11 @@ body.lightbox-open {
     width: min(calc(100% - 32px), var(--max));
   }
 
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+  }
+
   .hero-section {
     min-height: 780px;
     padding-inline: 16px;
@@ -2977,6 +3035,19 @@ body.lightbox-open {
   .content-section {
     padding-left: 16px;
     padding-right: 16px;
+  }
+
+  .contact-page {
+    padding-top: 76px;
+  }
+
+  .contact-page .page-hero {
+    padding-top: 42px;
+    padding-bottom: 44px;
+  }
+
+  .contact-page .page-hero p {
+    font-size: 16px;
   }
 
   .service-card {
@@ -3125,8 +3196,17 @@ body.lightbox-open {
   }
 
   .footer-card-content {
-    grid-template-columns: 1fr;
-    gap: 48px;
+    grid-template-columns: minmax(160px, 0.8fr) minmax(0, 1fr);
+    gap: 36px;
+  }
+
+  .footer-card-bottom {
+    grid-template-columns: minmax(240px, 1fr) auto;
+    gap: 24px;
+  }
+
+  .footer-copyright {
+    padding-top: 38px;
   }
 
   .footer-cta-col h2 {
@@ -3275,6 +3355,116 @@ body.lightbox-open {
   .media-lightbox-nav.is-next {
     grid-column: 2;
     grid-row: 1;
+  }
+}
+
+@media (max-width: 860px) {
+  .footer-card-content {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
+  .footer-card-bottom {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .footer-social-section,
+  .footer-copyright {
+    justify-self: start;
+  }
+
+  .footer-copyright {
+    padding-top: 0;
+    max-width: none;
+    font-size: 16px;
+  }
+
+  .footer-social-section h4 {
+    margin-bottom: 14px;
+    font-size: 21px;
+  }
+
+  .footer-social-links {
+    gap: 12px;
+  }
+
+  .footer-social-links a {
+    width: 34px;
+    height: 34px;
+  }
+
+  .footer-social-links a::before {
+    width: var(--footer-icon-size, 21px);
+    height: var(--footer-icon-size, 21px);
+  }
+
+  .footer-social-links .divider {
+    height: 22px;
+  }
+}
+
+@media (max-width: 560px) {
+  .process-inner h2,
+  .testimonials-top h2,
+  .about-preview-copy h2 {
+    font-size: clamp(42px, 15vw, 58px);
+  }
+
+  .footer-card-blue,
+  .footer-card-white {
+    border-radius: 14px;
+    min-height: 0;
+  }
+
+  .footer-card-white {
+    padding: 34px 20px 28px;
+  }
+
+  .footer-cta-actions .button-pink {
+    width: calc(100% - 76px);
+    padding-inline: 18px;
+  }
+
+  .button-arrow {
+    flex: 0 0 60px;
+  }
+
+  .playground-toolbar {
+    gap: 12px;
+    padding-top: 16px;
+  }
+
+  .search-box input {
+    min-height: 50px;
+    font-size: 13px;
+  }
+
+  .filter-row {
+    align-items: stretch;
+  }
+
+  .filter-pills button {
+    flex: 1 1 auto;
+    min-width: calc(50% - 6px);
+  }
+
+  .reset-link {
+    align-self: flex-start;
+  }
+
+  .canvas-view {
+    height: 560px;
+  }
+
+  .list-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .list-media {
+    width: 100%;
+    height: 160px;
   }
 }
 

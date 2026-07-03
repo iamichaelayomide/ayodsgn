@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/site.css?v=1.5" />
+    <link rel="stylesheet" href="/assets/site.css?v=2.0" />
     <style>
       /* ===========================
          SERVICES PAGE STYLES
@@ -181,6 +181,7 @@
       .srv-row[data-step="06"] { --stack-offset: 5; z-index: 6; }
       .srv-row[data-step="07"] { --stack-offset: 6; z-index: 7; }
       .srv-row[data-step="08"] { --stack-offset: 7; z-index: 8; }
+      .srv-row[data-step="09"] { --stack-offset: 8; z-index: 9; }
 
       .srv-row.is-active {
         border-color: rgba(31, 70, 210, 0.18);
@@ -209,7 +210,7 @@
         inset: 8px;
         border-radius: 8px;
         overflow: hidden;
-        background: #f0f0f0;
+        background: #f8e1e4;
         display: grid;
         place-items: center;
       }
@@ -228,6 +229,7 @@
         object-fit: contain;
         position: relative;
         z-index: 1;
+        filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(2915%) hue-rotate(298deg) brightness(88%) contrast(94%);
       }
 
       .srv-visual-label {
@@ -331,6 +333,71 @@
 
       .srv-row-action {
         margin-top: 4px;
+      }
+
+      .srv-row-cta {
+        min-height: min(64vh, 560px);
+        grid-template-columns: 1fr;
+        place-items: center;
+        text-align: center;
+        background: var(--blue);
+        color: #ffffff;
+        overflow: hidden;
+      }
+
+      .srv-row-cta::before,
+      .srv-row-cta::after {
+        content: "ayo.dsgn";
+        position: absolute;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+        font-family: var(--display);
+        font-size: clamp(84px, 14vw, 220px);
+        font-weight: 700;
+        line-height: 0.8;
+        pointer-events: none;
+      }
+
+      .srv-row-cta::before {
+        left: -36px;
+        top: 32px;
+      }
+
+      .srv-row-cta::after {
+        right: -42px;
+        bottom: 18px;
+      }
+
+      .srv-row-cta .srv-row-copy {
+        position: relative;
+        z-index: 1;
+        align-items: center;
+        max-width: 720px;
+      }
+
+      .srv-row-cta .srv-row-kicker,
+      .srv-row-cta .srv-row-copy h2,
+      .srv-row-cta .srv-row-copy > p {
+        color: #ffffff;
+      }
+
+      .srv-row-cta .srv-row-copy h2 {
+        font-size: clamp(34px, 4.4vw, 62px);
+      }
+
+      .srv-row-cta .srv-row-copy > p {
+        max-width: 640px;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      .srv-row-cta-actions {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 12px;
       }
 
       .srv-row-action .button {
@@ -550,6 +617,7 @@
         .srv-row,
         .srv-row.srv-row-flip { grid-template-columns: 1fr; }
         .srv-row { min-height: auto; gap: 28px; }
+        .srv-row-cta { min-height: 460px; }
         .srv-row.srv-row-flip .srv-row-image { order: 0; }
         .srv-row.srv-row-flip .srv-row-copy { order: 0; }
         .srv-faq-layout { grid-template-columns: 1fr; }
@@ -560,19 +628,40 @@
 
       @media (max-width: 768px) {
         .srv-hero { padding: 160px 24px 80px; }
+        .srv-hero h1 { font-size: clamp(52px, 16vw, 78px); }
         .srv-detail-section { padding-left: 16px; padding-right: 16px; }
         .srv-detail-inner { grid-template-columns: 1fr; }
         .srv-stack-progress { display: none; }
         .srv-row { position: relative; top: auto; transform: none; padding: 18px; }
         .srv-row-image { min-height: 280px; height: 300px; }
+        .srv-row-copy h2 { font-size: clamp(30px, 10vw, 42px); }
+        .srv-row-cta { min-height: 420px; }
+        .srv-row-cta .srv-row-copy > p { font-size: 15px; }
+        .srv-row-cta-actions { width: 100%; }
         .srv-cta-inner { padding: 48px 32px; }
+      }
+
+      @media (max-width: 560px) {
+        .srv-hero { padding: 136px 16px 64px; }
+        .srv-hero-actions,
+        .srv-row-cta-actions {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .srv-detail-section { padding-left: 12px; padding-right: 12px; padding-bottom: 92px; }
+        .srv-stack-cards { gap: 20px; }
+        .srv-row { padding: 14px; border-radius: 12px; }
+        .srv-row-image { height: 240px; min-height: 240px; }
+        .srv-row-icon { width: 70px; height: 70px; }
+        .srv-visual-label { left: 20px; right: 20px; bottom: 20px; font-size: 27px; }
+        .srv-best-for { padding: 14px 16px; }
       }
     </style>
   </head>
   <body class="services-page">
     <header class="site-header is-light">
       <div class="nav-wrap">
-        <a class="brand-mark brand-wordmark" href="/" aria-label="ayo.dsgn home"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><img src="/assets/figma/footer/footer-logo.svg" alt="ayo.dsgn" /></a>
         <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
         <nav class="main-nav" aria-label="Main navigation">
           <a href="/projects/">Projects</a>
@@ -961,6 +1050,18 @@
             </div>
           </div>
 
+          <div class="srv-row srv-row-cta" data-step="09">
+            <div class="srv-row-copy">
+              <span class="srv-row-kicker">09 - Next step</span>
+              <h2>Curious about what we can create together?</h2>
+              <p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p>
+              <div class="srv-row-cta-actions">
+                <a class="button button-pink" href="/contact/">Book a call</a>
+                <a class="button button-ghost-light" href="/projects/">See all projects</a>
+              </div>
+            </div>
+          </div>
+
           </div>
         </div>
       </section>
@@ -1010,7 +1111,7 @@
         <p class="testimonial-watermark watermark-one" aria-hidden="true">ayo.<br />dsgn</p>
         <p class="testimonial-watermark watermark-two" aria-hidden="true">dsgn</p>
         <div class="testimonials-top">
-          <h2 id="srv-testimonials-heading">What clients say</h2>
+          <h2 id="srv-testimonials-heading">What people are <em>saying</em></h2>
           <div class="section-actions">
             <a class="button button-pink" href="/contact/">Book a call</a>
             <a class="button button-ghost-light" href="/projects/">See all projects</a>
@@ -1104,7 +1205,6 @@
             </div>
           </div>
         </div>
-        <div class="portfolio-faq-cta"><div class="portfolio-faq-cta-content"><h2>Curious about what we can create together?</h2><p>Book a call now so we can discuss your mobile app, website, or ecommerce site idea.</p><div class="portfolio-faq-cta-actions"><a class="button button-pink" href="/contact/">Book a call</a><a class="button button-ghost-light" href="/projects/">See all projects</a></div></div></div>
       </section>
 
     </main>
@@ -1168,6 +1268,6 @@
       </div>
     </footer>
 
-    <script src="/assets/site.js?v=1.5"></script>
+    <script src="/assets/site.js?v=1.6"></script>
   </body>
 </html>

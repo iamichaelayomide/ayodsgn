@@ -362,6 +362,35 @@ document.querySelectorAll("[data-swipe-stack]").forEach((stack) => {
   syncStack();
 });
 
+document.querySelectorAll(".about-photo-stack").forEach((stack) => {
+  let cards = Array.from(stack.querySelectorAll("[data-about-photo-card]"));
+  const positions = ["front", "middle", "back"];
+  cards.sort((a, b) => positions.indexOf(a.dataset.stackPosition) - positions.indexOf(b.dataset.stackPosition));
+
+  function syncPhotoStack() {
+    cards.forEach((card, index) => {
+      card.dataset.stackPosition = positions[Math.min(index, positions.length - 1)];
+      card.setAttribute("aria-pressed", String(index === 0));
+    });
+  }
+
+  function bringPhotoToFront(card) {
+    cards = [card, ...cards.filter((item) => item !== card)];
+    syncPhotoStack();
+  }
+
+  cards.forEach((card) => {
+    card.addEventListener("click", () => bringPhotoToFront(card));
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== " " && event.key !== "Enter") return;
+      event.preventDefault();
+      bringPhotoToFront(card);
+    });
+  });
+
+  syncPhotoStack();
+});
+
 // Playground Board Interactivity
 document.querySelectorAll('.playground-section').forEach((playgroundContainer) => {
   const titleCase = (slug) => slug.split('-').map((word) => {

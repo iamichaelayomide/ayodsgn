@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/site.css?v=1.5" />
+    <link rel="stylesheet" href="/assets/site.css?v=2.0" />
     <style>
       .playground-page {
         background: #f0f0f0;
@@ -18,12 +18,7 @@
 
       /* Dot Grid Canvas Background */
       .canvas-grid-bg {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1.5px, transparent 1.5px);
-        background-size: 24px 24px;
-        pointer-events: none;
-        z-index: 0;
+        display: none;
       }
 
       /* ─── Hero ─── */
@@ -338,9 +333,9 @@
   <body class="playground-page">
     <div class="canvas-grid-bg"></div>
 
-    <header class="site-header is-light" style="position: relative; z-index: 10;">
+    <header class="site-header is-light">
       <div class="nav-wrap">
-        <a class="brand-mark brand-wordmark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><img src="/assets/figma/footer/footer-logo.svg" alt="ayo.dsgn" /></a>
         <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
         <nav class="main-nav" aria-label="Main navigation">
           <a href="/projects/">Projects</a>
@@ -448,6 +443,6 @@
       </div>
     </footer>
 
-    <script src="/assets/site.js?v=1.5"></script>
+    <script src="/assets/site.js?v=1.6"></script>
   </body>
 </html>

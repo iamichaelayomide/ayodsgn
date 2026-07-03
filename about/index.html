@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/site.css?v=1.5" />
+    <link rel="stylesheet" href="/assets/site.css?v=2.0" />
     <style>
       .about-page { background: #f0f0f0; min-height: 100vh; }
 
@@ -99,17 +99,17 @@
       .about-socials a svg { display: none; }
       .about-socials a::before {
         content: "";
-        width: 21px;
-        height: 21px;
+        width: 22px;
+        height: 22px;
         display: block;
         background: currentColor;
       }
-      .about-socials a[aria-label="Behance"]::before { width: 24px; height: 24px; -webkit-mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat; }
+      .about-socials a[aria-label="Behance"]::before { -webkit-mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-behance.svg") center / contain no-repeat; }
       .about-socials a[aria-label="Dribbble"]::before { -webkit-mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-dribbble.svg") center / contain no-repeat; }
       .about-socials a[aria-label="GitHub"]::before { -webkit-mask: url("/assets/figma/footer/footer-github.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-github.svg") center / contain no-repeat; }
       .about-socials a[aria-label="X"]::before { -webkit-mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-x.svg") center / contain no-repeat; }
       .about-socials a[aria-label="LinkedIn"]::before { -webkit-mask: url("/assets/figma/footer/footer-linkedin.svg") center / contain no-repeat; mask: url("/assets/figma/footer/footer-linkedin.svg") center / contain no-repeat; }
-      .about-socials a:hover { color: var(--blue); background: rgba(31, 70, 210, 0.06); transform: translateY(-2px); }
+      .about-socials a:hover { color: var(--blue); background: transparent; transform: translateY(-2px); }
       .social-sep { width: 2px; height: 22px; background: rgba(72,63,63,0.18); border-radius: 1px; margin: 0 8px; }
       .about-socials li:last-child .social-sep { display: none; }
 
@@ -127,14 +127,18 @@
         overflow: hidden;
         border: 1px solid #f7e1e1;
         background: #f0f0f0;
-        transition: transform 400ms cubic-bezier(.22,.68,0,1.2);
+        padding: 0;
+        appearance: none;
+        cursor: pointer;
+        transition: transform 400ms cubic-bezier(.22,.68,0,1.2), box-shadow 300ms ease;
       }
-      .photo-layer:nth-child(1) { width: 82%; height: 80%; right: 0; top: 2%; transform: rotate(2.5deg); z-index: 1; }
-      .photo-layer:nth-child(2) { width: 82%; height: 80%; right: 4%; top: 6%; transform: rotate(0.8deg); z-index: 2; }
-      .photo-layer:nth-child(3) { width: 82%; height: 80%; right: 8%; top: 10%; transform: rotate(-1deg); z-index: 3; }
-      .about-photo-stack:hover .photo-layer:nth-child(1) { transform: rotate(5deg) translateY(-12px); }
-      .about-photo-stack:hover .photo-layer:nth-child(2) { transform: rotate(1.5deg) translateX(-10px); }
-      .about-photo-stack:hover .photo-layer:nth-child(3) { transform: rotate(-2deg); }
+      .photo-layer:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+      .photo-layer[data-stack-position="back"] { width: 82%; height: 80%; right: 0; top: 2%; transform: rotate(2.5deg); z-index: 1; }
+      .photo-layer[data-stack-position="middle"] { width: 82%; height: 80%; right: 4%; top: 6%; transform: rotate(0.8deg); z-index: 2; }
+      .photo-layer[data-stack-position="front"] { width: 82%; height: 80%; right: 8%; top: 10%; transform: rotate(-1deg); z-index: 3; box-shadow: 0 24px 70px rgba(38, 32, 32, 0.14); }
+      .about-photo-stack:hover .photo-layer[data-stack-position="back"] { transform: rotate(5deg) translateY(-12px); }
+      .about-photo-stack:hover .photo-layer[data-stack-position="middle"] { transform: rotate(1.5deg) translateX(-10px); }
+      .about-photo-stack:hover .photo-layer[data-stack-position="front"] { transform: rotate(-2deg); }
       .photo-layer img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
       .photo-layer-placeholder {
         width: 100%;
@@ -371,7 +375,7 @@
   <body class="about-page">
     <header class="site-header is-light">
       <div class="nav-wrap">
-        <a class="brand-mark brand-wordmark" href="/"><span class="brand-glyph">ayo.</span><span>dsgn</span></a>
+        <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><img src="/assets/figma/footer/footer-logo.svg" alt="ayo.dsgn" /></a>
         <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
         <nav class="main-nav" aria-label="Main navigation">
           <a href="/projects/">Projects</a>
@@ -449,16 +453,16 @@
           </div>
 
           <!-- Photo Stack -->
-          <div class="about-photo-stack" aria-hidden="true">
-            <div class="photo-layer">
+          <div class="about-photo-stack" aria-label="Selectable portrait cards">
+            <button class="photo-layer" type="button" data-about-photo-card data-stack-position="back" aria-label="Bring childhood portrait to front">
               <img src="/assets/figma/316fc73faf5a63c12c64c709b8becc45b4d1460a.png" alt="" />
-            </div>
-            <div class="photo-layer">
+            </button>
+            <button class="photo-layer" type="button" data-about-photo-card data-stack-position="middle" aria-label="Bring alternate portrait to front">
               <img src="/assets/figma/1ee71db6ac809222102a5f90bb63603fbbdcb08f.png" alt="" />
-            </div>
-            <div class="photo-layer">
+            </button>
+            <button class="photo-layer" type="button" data-about-photo-card data-stack-position="front" aria-label="Bring studio portrait to front">
               <img src="/assets/figma/48c889d92e4272c4996f05d5eee3e4c330381403.png" alt="" />
-            </div>
+            </button>
           </div>
         </div>
       </section>
@@ -548,7 +552,7 @@
       <section class="testimonials-section" id="testimonials" aria-labelledby="about-testi-h2">
         <p class="testimonial-watermark watermark-one" aria-hidden="true">ayo.<br />dsgn</p>
         <p class="testimonial-watermark watermark-two" aria-hidden="true">dsgn</p>
-        <div class="testimonials-top"><h2 id="about-testi-h2">What clients say</h2><div class="section-actions"><a class="button button-pink" href="/contact/">Book a call</a><a class="button button-ghost-light" href="/projects/">See all projects</a></div></div>
+        <div class="testimonials-top"><h2 id="about-testi-h2">What people are <em>saying</em></h2><div class="section-actions"><a class="button button-pink" href="/contact/">Book a call</a><a class="button button-ghost-light" href="/projects/">See all projects</a></div></div>
         <div class="testimonial-ticker" data-ticker tabindex="0" aria-label="Client testimonials ticker"><div class="testimonial-track">
           
           <article class="testimonial-card tilt-left"><div class="rating"><span>4.2/5</span><strong>&#9733;&#9733;&#9733;&#9733;&#9734;</strong></div><p>The Caladium Foundation runs six programs, a community of 11,000+ entrepreneurs, and research publications across Nigeria. Ayo thought through the structure and the experience.</p><footer><strong>Ayo Bankole</strong><span>Co-founder, Caladium Foundation</span></footer></article>
@@ -610,6 +614,6 @@
       </div>
     </footer>
 
-    <script src="/assets/site.js?v=1.5"></script>
+    <script src="/assets/site.js?v=1.6"></script>
   </body>
 </html>
