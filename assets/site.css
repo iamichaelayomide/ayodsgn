@@ -1290,15 +1290,17 @@ h2,
 
 .footer-social-section {
   justify-self: start;
+  padding-top: 18px;
 }
 
 .footer-social-section h4 {
   font-size: 24px;
   font-weight: 500;
+  line-height: 1.05;
   text-transform: none;
   letter-spacing: 0;
   color: var(--ink);
-  margin: 0 0 22px;
+  margin: 0 0 8px;
 }
 
 .footer-social-links {
@@ -1376,7 +1378,7 @@ h2,
   font-weight: 500;
   max-width: 280px;
   justify-self: end;
-  padding-top: 42px;
+  padding-top: 52px;
 }
 
 .process-section,
@@ -3374,6 +3376,10 @@ body.lightbox-open {
     justify-self: start;
   }
 
+  .footer-social-section {
+    padding-top: 0;
+  }
+
   .footer-copyright {
     padding-top: 0;
     max-width: none;
@@ -3381,7 +3387,7 @@ body.lightbox-open {
   }
 
   .footer-social-section h4 {
-    margin-bottom: 14px;
+    margin-bottom: 8px;
     font-size: 21px;
   }
 
