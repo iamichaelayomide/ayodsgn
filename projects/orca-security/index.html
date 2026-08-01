@@ -348,24 +348,23 @@
             <div class="footer-nav-col"><h3>Navigation</h3><div class="footer-nav-links"><a href="/projects/">Projects</a><a href="/services/">Services</a><a href="/playground/">Playground</a><a href="/blog/">Blog</a><a href="/#process">Process</a><a href="/#testimonials">Testimonials</a><a href="/#faq">FAQs</a><a href="/about/">About</a></div></div>
           </div>
           <div class="footer-card-bottom">
-            <div class="footer-social-section"><h4>Stay in touch!</h4><div class="footer-social-links"><a href="https://www.behance.net/michaelayomide1" target="_blank" rel="noopener">Behance</a><span class="divider"></span><a href="https://dribbble.com/" target="_blank" rel="noopener">Dribbble</a><span class="divider"></span><a href="https://github.com/iamichaelayomide" target="_blank" rel="noopener">GitHub</a><span class="divider"></span><a href="https://x.com/ayodsgn" target="_blank" rel="noopener">X</a><span class="divider"></span><a href="https://www.linkedin.com/in/michael-ayomide-0ba828194/" target="_blank" rel="noopener">LinkedIn</a></div></div>
+            <div class="footer-social-section"><h4>Stay in touch!</h4><div class="footer-social-links"><a href="https://www.behance.net/michaelayomide1" target="_blank" rel="noopener" aria-label="Behance">Behance</a><span class="divider"></span><a href="https://dribbble.com/" target="_blank" rel="noopener" aria-label="Dribbble">Dribbble</a><span class="divider"></span><a href="https://github.com/iamichaelayomide" target="_blank" rel="noopener" aria-label="GitHub">GitHub</a><span class="divider"></span><a href="https://x.com/ayodsgn" target="_blank" rel="noopener" aria-label="X">X</a><span class="divider"></span><a href="https://www.linkedin.com/in/michael-ayomide-0ba828194/" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a></div></div>
             <div class="footer-copyright">&copy; <span data-year></span> Ayo. All rights reserved.</div>
           </div>
         </div>
       </div>
     </footer>
-    <script src="/assets/site.js?v=2.5"></script>
+
+    <script src="/assets/site.js?v=2.6"></script>
     <script>
       const caseLinks = [...document.querySelectorAll(".case-nav a")];
       const caseSections = caseLinks.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
       if ("IntersectionObserver" in window && caseSections.length) {
         const caseObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              caseLinks.forEach((link) => link.classList.toggle("is-active", link.getAttribute("href") === "#" + entry.target.id));
-            }
-          });
-        }, { rootMargin: "-20% 0px -60% 0px" });
+          const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          caseLinks.forEach((link) => link.classList.toggle("is-active", link.getAttribute("href") === `#${visible.target.id}`));
+        }, { rootMargin: "-18% 0px -62% 0px", threshold: [0, 0.2, 0.6] });
         caseSections.forEach((section) => caseObserver.observe(section));
       }
     </script>

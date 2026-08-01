@@ -3,12 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/assets/figma/footer/footer-logo.svg" type="image/svg+xml" />
     <meta name="description" content="Product design, mobile app design, SaaS dashboards, UX audits, landing pages, and ecommerce design from ayo.dsgn — end-to-end creative & development services." />
     <title>ayo.dsgn | Services — Design & Build Work</title>
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://ayodsgn.com/services/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ayo.dsgn" />
+    <meta property="og:title" content="Product Design &amp; Website Services | ayo.dsgn" />
+    <meta property="og:description" content="Product design, mobile apps, SaaS dashboards, UX audits, landing pages, no-code websites, and visual design services." />
+    <meta property="og:url" content="https://ayodsgn.com/services/" />
+    <meta property="og:locale" content="en_NG" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Product Design &amp; Website Services | ayo.dsgn" />
+    <meta name="twitter:description" content="Product design, mobile apps, SaaS dashboards, UX audits, landing pages, no-code websites, and visual design services." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/site.css?v=2.2" />
+    <link rel="stylesheet" href="/assets/site.css?v=2.5" />
     <style>
       /* ===========================
          SERVICES PAGE STYLES
@@ -17,7 +29,7 @@
 
       /* ---- Hero ---- */
       .srv-hero {
-        padding: 200px 24px 100px;
+        padding: 160px 24px 64px;
         background: var(--paper);
         position: relative;
         overflow: hidden;
@@ -82,15 +94,21 @@
         flex-wrap: wrap;
       }
 
+      /* The hero already establishes the page hierarchy. Keep the carousel
+         directly beneath it instead of repeating another headline and CTA. */
+      .services-page .srv-motion-section {
+        padding-top: 0;
+      }
+
+      .services-page .srv-motion-section .services-layout {
+        margin-top: 0;
+      }
+
       /* ---- Services Detail (Figma 99:6463 stacked scroll) ---- */
       .srv-detail-section {
         padding: 18px 24px 132px;
         background: var(--paper);
         --srv-progress: 0%;
-      }
-
-      .srv-motion-section {
-        display: none;
       }
 
       .srv-detail-inner {
@@ -627,7 +645,7 @@
       }
 
       @media (max-width: 768px) {
-        .srv-hero { padding: 160px 24px 80px; }
+        .srv-hero { padding: 136px 24px 56px; }
         .srv-hero h1 { font-size: clamp(52px, 16vw, 78px); }
         .srv-detail-section { padding-left: 16px; padding-right: 16px; }
         .srv-detail-inner { grid-template-columns: 1fr; }
@@ -642,7 +660,7 @@
       }
 
       @media (max-width: 560px) {
-        .srv-hero { padding: 136px 16px 64px; }
+        .srv-hero { padding: 120px 16px 48px; }
         .srv-hero-actions,
         .srv-row-cta-actions {
           flex-direction: column;
@@ -668,6 +686,7 @@
           <a href="/services/" aria-current="page">Services</a>
           <a href="/about/">About me</a>
           <a href="/playground/">Playground</a>
+          <a href="/blog/">Blog</a>
           <a href="/contact/">Contact</a>
         </nav>
         <a class="nav-cta" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a call</a>
@@ -694,23 +713,17 @@
       </section>
 
       <!-- SERVICES DETAIL ROWS (Figma 99:6463 — alternating image+text for each service) -->
-      <section class="services-section srv-motion-section" aria-labelledby="srv-motion-heading">
-        <div class="section-top">
-          <div>
-            <p class="section-kicker">Swipe services</p>
-            <h2 id="srv-motion-heading">Service <em>motion</em></h2>
-            <p class="section-desc" style="max-width: 570px; margin-top: 18px; color: var(--muted); font-size: 18px; line-height: 1.55;">
-              Swipe through the main service areas and see the active card expand into focus.
-            </p>
-          </div>
-          <div class="section-actions">
-            <a class="button button-primary" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a call</a>
-            <a class="button button-outline" href="/projects/">See all projects</a>
-          </div>
-        </div>
-
+      <section class="services-section srv-motion-section" aria-label="Browse services">
         <div class="services-layout">
           <div class="service-carousel">
+            <div class="service-carousel-controls">
+              <p class="service-carousel-helper">Drag or swipe to explore</p>
+              <p class="service-carousel-count" data-service-count aria-live="polite">1 of 8</p>
+              <div class="service-arrows" aria-label="Service carousel controls">
+                <button class="service-arrow" type="button" data-service-prev aria-label="Previous service">&larr;</button>
+                <button class="service-arrow" type="button" data-service-next aria-label="Next service">&rarr;</button>
+              </div>
+            </div>
             <div class="service-rail" tabindex="0" aria-label="Swipe or scroll services">
               <button class="service-card is-selected" type="button" data-service="product" aria-pressed="true">
                 <span>01</span>
@@ -753,19 +766,10 @@
                 <strong>Custom Vector Illustration &amp; Brand Assets</strong>
               </button>
             </div>
-            <div class="service-arrows" aria-label="Service carousel controls">
-              <button class="service-arrow" type="button" data-service-prev aria-label="Previous service">←</button>
-              <button class="service-arrow" type="button" data-service-next aria-label="Next service">→</button>
-            </div>
           </div>
 
         </div>
 
-        <p class="service-summary" data-service-body aria-live="polite">I design clear, usable digital products across web and mobile, from early flows to polished Figma interfaces.</p>
-
-        <div class="center-action">
-          <a class="text-link-button" href="#services">See all services</a>
-        </div>
       </section>
 
       <section class="srv-detail-section" id="services" aria-labelledby="srv-services-heading" data-service-stack>
@@ -1224,7 +1228,7 @@
               <h2>Take your project to the next level. Let's talk!</h2>
               <div class="footer-cta-actions">
                 <a class="button button-pink" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a discovery call</a>
-                <a class="button-arrow" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">
+                <a class="button-arrow" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener" aria-label="Book a discovery call">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="7" y1="17" x2="17" y2="7"></line>
                     <polyline points="7 7 17 7 17 17"></polyline>
@@ -1238,6 +1242,7 @@
                 <a href="/projects/">Projects</a>
                 <a href="/services/">Services</a>
                 <a href="/playground/">Playground</a>
+                <a href="/blog/">Blog</a>
                 <a href="/#process">Process</a>
                 <a href="/#testimonials">Testimonials</a>
                 <a href="#faq">FAQs</a>
@@ -1268,6 +1273,6 @@
       </div>
     </footer>
 
-    <script src="/assets/site.js?v=1.6"></script>
+    <script src="/assets/site.js?v=2.4"></script>
   </body>
 </html>

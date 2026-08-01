@@ -241,7 +241,7 @@
           <h2 id="case-next-heading">Let’s turn the rough version into something people can use and trust.</h2>
           <div class="case-next-actions">
             <a href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a discovery call</a>
-            <a href="/projects/">See all projects</a>
+            <a href="/projects/">View all projects</a>
           </div>
         </section>
       </article>
@@ -249,45 +249,32 @@
 
     <footer class="site-footer">
       <div class="footer-inner">
-        <div class="footer-card-blue">
-          <div class="footer-logo-wrap"><span class="footer-logo-glyph">ayo.</span><span class="footer-logo-sub">dsgn</span></div>
-        </div>
+        <div class="footer-card-blue"><div class="footer-logo-wrap"><span class="footer-logo-glyph">ayo.</span><span class="footer-logo-sub">dsgn</span></div></div>
         <div class="footer-card-white">
           <div class="footer-card-content">
-            <div class="footer-cta-col">
-              <h2>Take your project to the next level. Let's talk!</h2>
-              <div class="footer-cta-actions">
-                <a class="button button-pink" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a discovery call</a>
-                <a class="button-arrow" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener" aria-label="Book a discovery call">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-                </a>
-              </div>
-            </div>
-            <div class="footer-nav-col">
-              <h3>Navigation</h3>
-              <div class="footer-nav-links">
-                <a href="/projects/">Projects</a><a href="/services/">Services</a><a href="/playground/">Playground</a><a href="/blog/">Blog</a>
-                <a href="/#process">Process</a><a href="/#testimonials">Testimonials</a><a href="/#faq">FAQs</a><a href="/about/">About</a>
-              </div>
-            </div>
+            <div class="footer-cta-col"><h2>Take your project to the next level. Let's talk!</h2><div class="footer-cta-actions"><a class="button button-pink" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a discovery call</a><a class="button-arrow" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener" aria-label="Book a discovery call"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a></div></div>
+            <div class="footer-nav-col"><h3>Navigation</h3><div class="footer-nav-links"><a href="/projects/">Projects</a><a href="/services/">Services</a><a href="/playground/">Playground</a><a href="/blog/">Blog</a><a href="/#process">Process</a><a href="/#testimonials">Testimonials</a><a href="/#faq">FAQs</a><a href="/about/">About</a></div></div>
           </div>
           <div class="footer-card-bottom">
-            <div class="footer-social-section">
-              <h4>Stay in touch!</h4>
-              <div class="footer-social-links">
-                <a href="https://www.behance.net/michaelayomide1" target="_blank" rel="noopener">Behance</a><span class="divider"></span>
-                <a href="https://dribbble.com/" target="_blank" rel="noopener">Dribbble</a><span class="divider"></span>
-                <a href="https://github.com/iamichaelayomide" target="_blank" rel="noopener">GitHub</a><span class="divider"></span>
-                <a href="https://x.com/ayodsgn" target="_blank" rel="noopener">X</a><span class="divider"></span>
-                <a href="https://www.linkedin.com/in/michael-ayomide-0ba828194/" target="_blank" rel="noopener">LinkedIn</a>
-              </div>
-            </div>
+            <div class="footer-social-section"><h4>Stay in touch!</h4><div class="footer-social-links"><a href="https://www.behance.net/michaelayomide1" target="_blank" rel="noopener" aria-label="Behance">Behance</a><span class="divider"></span><a href="https://dribbble.com/" target="_blank" rel="noopener" aria-label="Dribbble">Dribbble</a><span class="divider"></span><a href="https://github.com/iamichaelayomide" target="_blank" rel="noopener" aria-label="GitHub">GitHub</a><span class="divider"></span><a href="https://x.com/ayodsgn" target="_blank" rel="noopener" aria-label="X">X</a><span class="divider"></span><a href="https://www.linkedin.com/in/michael-ayomide-0ba828194/" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a></div></div>
             <div class="footer-copyright">&copy; <span data-year></span> Ayo. All rights reserved.</div>
           </div>
         </div>
       </div>
     </footer>
-    <script src="/assets/site.js?v=2.4"></script>
-    <script src="/assets/case-study.js?v=1.0"></script>
+
+    <script src="/assets/site.js?v=2.5"></script>
+    <script>
+      const caseLinks = [...document.querySelectorAll(".case-nav a")];
+      const caseSections = caseLinks.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+      if ("IntersectionObserver" in window && caseSections.length) {
+        const caseObserver = new IntersectionObserver((entries) => {
+          const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          caseLinks.forEach((link) => link.classList.toggle("is-active", link.getAttribute("href") === `#${visible.target.id}`));
+        }, { rootMargin: "-18% 0px -62% 0px", threshold: [0, 0.2, 0.6] });
+        caseSections.forEach((section) => caseObserver.observe(section));
+      }
+    </script>
   </body>
 </html>

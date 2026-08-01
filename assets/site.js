@@ -129,6 +129,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   const detailList = serviceLayout.querySelector("[data-service-list]");
   const prevButton = serviceLayout.querySelector("[data-service-prev]");
   const nextButton = serviceLayout.querySelector("[data-service-next]");
+  const serviceCount = serviceLayout.querySelector("[data-service-count]");
 
   function scrollCardIntoView(card, behavior = "smooth") {
     if (!rail || !card) return;
@@ -144,6 +145,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
     const selectedIndex = getSelectedIndex();
     if (prevButton) prevButton.disabled = selectedIndex <= 0;
     if (nextButton) nextButton.disabled = selectedIndex >= serviceCards.length - 1;
+    if (serviceCount) serviceCount.textContent = `${selectedIndex + 1} of ${serviceCards.length}`;
   }
 
   function selectService(key, shouldScroll = true) {
@@ -179,7 +181,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   }
 
   serviceCards.forEach((card) => {
-    card.addEventListener("focus", () => selectService(card.dataset.service));
+    card.addEventListener("focus", () => selectService(card.dataset.service, false));
     card.addEventListener("click", (event) => {
       if (rail?.dataset.suppressClick === "true") {
         event.preventDefault();
@@ -196,6 +198,7 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   let startX = 0;
   let startScroll = 0;
   let wheelTimer = 0;
+  let dragTimer = 0;
 
   rail.addEventListener("pointerdown", (event) => {
     isDown = true;
@@ -213,10 +216,12 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
   });
 
   const syncToNearestCard = () => {
-    const railCenter = rail.getBoundingClientRect().left + rail.clientWidth / 2;
+    const railRect = rail.getBoundingClientRect();
+    const cardHalfWidth = (serviceCards[0]?.getBoundingClientRect().width || 0) / 2;
+    const selectionLine = railRect.left + Math.min(cardHalfWidth, rail.clientWidth / 2);
     const nearest = serviceCards.reduce((best, card) => {
       const rect = card.getBoundingClientRect();
-      const distance = Math.abs(rect.left + rect.width / 2 - railCenter);
+      const distance = Math.abs(rect.left + rect.width / 2 - selectionLine);
       return distance < best.distance ? { card, distance } : best;
     }, { card: serviceCards[getSelectedIndex()], distance: Infinity }).card;
     if (nearest) selectService(nearest.dataset.service, false);
@@ -229,6 +234,8 @@ document.querySelectorAll(".services-layout").forEach((serviceLayout) => {
     if (didMove) {
       rail.dataset.suppressClick = "true";
       syncToNearestCard();
+      window.clearTimeout(dragTimer);
+      dragTimer = window.setTimeout(syncToNearestCard, 280);
       window.setTimeout(() => {
         delete rail.dataset.suppressClick;
       }, 0);
@@ -1098,4 +1105,20 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
   setHelperState();
   resetCamera();
   updateViews();
+
+  document.querySelectorAll('[data-case-back]').forEach((link) => {
+    let referrer;
+    try {
+      referrer = document.referrer ? new URL(document.referrer) : null;
+    } catch {
+      referrer = null;
+    }
+
+    if (referrer?.origin === window.location.origin && referrer.pathname === '/projects/') {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.history.back();
+      });
+    }
+  });
 });
