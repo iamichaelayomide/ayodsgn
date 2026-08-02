@@ -9,16 +9,26 @@
   --line: #e5e0e0;
   --blue: #1f46d2;
   --pink: #d21fae;
-  --max: 1408px;
-  --section-space: clamp(88px, 7vw, 112px);
-  --section-content-gap: clamp(56px, 5vw, 72px);
+  --max: 1200px;
+  --site-gutter: clamp(16px, 4vw, 48px);
+  --section-space: clamp(64px, 7vw, 112px);
+  --section-content-gap: clamp(48px, 5vw, 72px);
   --serif: "Instrument Serif", Georgia, serif;
   --sans: "Geist", "Instrument Sans", Arial, sans-serif;
   --display: "Instrument Sans", "Geist", Arial, sans-serif;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 html {
@@ -153,9 +163,11 @@ body:not(.home) .site-header {
 }
 
 .nav-wrap {
-  width: min(calc(100% - 48px), var(--max));
+  width: min(100%, var(--max));
   min-height: 76px;
   margin: 0 auto;
+  padding-left: var(--site-gutter);
+  padding-right: var(--site-gutter);
   display: flex;
   align-items: center;
   gap: 44px;
@@ -370,8 +382,15 @@ body:not(.home) .brand-glyph {
 .projects-section,
 .services-section,
 .page-hero,
-.content-section {
-  padding: var(--section-space) 24px;
+.content-section,
+.process-section,
+.playground-section,
+.blog-preview-section,
+.portfolio-faq-section {
+  padding-top: var(--section-space);
+  padding-bottom: var(--section-space);
+  padding-left: 0;
+  padding-right: 0;
   background: var(--paper);
 }
 
@@ -386,9 +405,18 @@ body:not(.home) .brand-glyph {
 .section-top,
 .footer-row,
 .page-inner,
-.content-inner {
+.content-inner,
+.process-inner,
+.playground-board,
+.portfolio-faq-inner,
+.portfolio-faq-cta,
+.footer-inner {
   width: min(100%, var(--max));
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--site-gutter);
+  padding-right: var(--site-gutter);
+  box-sizing: border-box;
 }
 
 .section-top {
@@ -1269,15 +1297,17 @@ h2,
 
 /* Premium Footer */
 .site-footer {
-  padding: 77px 24px 64px;
+  padding: 77px 0 64px;
   color: var(--ink);
   background: #f7f7f7;
   border-top: none;
 }
 
 .footer-inner {
-  width: min(100%, 1588px);
+  width: min(100%, var(--max));
   margin: 0 auto;
+  padding-left: var(--site-gutter);
+  padding-right: var(--site-gutter);
   display: grid;
   grid-template-columns: minmax(340px, 500px) minmax(0, 1063px);
   gap: 32px;

@@ -48,7 +48,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/site.css?v=4.0" />
+    <link rel="stylesheet" href="/assets/site.css?v=6.0" />
     <style>
       /* ── Home Projects Carousel ── */
       .proj-home-carousel-wrap {
@@ -56,8 +56,11 @@
         width: min(100%, var(--max));
         height: clamp(500px, 46vw, 620px);
         margin: 70px auto 0;
+        padding-left: var(--site-gutter);
+        padding-right: var(--site-gutter);
         overflow: hidden;
         touch-action: pan-y;
+        box-sizing: border-box;
       }
       .proj-home-carousel {
         position: relative;
@@ -100,9 +103,9 @@
       /* ── Heading italic fix ── */
       .home .projects-section h2 em { font-style: italic; font-family: var(--serif); }
       @media (max-width: 700px) {
-        .proj-home-carousel-wrap { height: 470px; margin-top: 44px; }
-        .home-proj-card { left: 50%; width: min(78vw, 300px); }
-        .home-proj-card-body { min-height: 132px; }
+        .proj-home-carousel-wrap { height: 470px; margin-top: 36px; padding-left: var(--site-gutter); padding-right: var(--site-gutter); }
+        .home-proj-card { left: 50%; width: calc(100vw - (var(--site-gutter) * 2)); max-width: 360px; }
+        .home-proj-card-body { min-height: 130px; }
       }
     </style>
   </head>
