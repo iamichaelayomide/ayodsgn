@@ -48,7 +48,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/site.css?v=6.0" />
+    <link rel="stylesheet" href="/assets/site.css?v=7.0" />
     <style>
       /* ── Home Projects Carousel ── */
       .proj-home-carousel-wrap {
@@ -553,32 +553,81 @@
         </div>
       </section>
 
-      <section class="blog-preview-section" aria-labelledby="blog-preview-heading">
+      <section class="blog-preview-section" id="blog" aria-labelledby="blog-preview-heading">
         <div class="section-top">
           <div>
             <p class="section-kicker">Design notes</p>
             <h2 id="blog-preview-heading">Ideas behind <em>better products</em></h2>
-          </div>
-          <div class="section-actions">
-            <a class="button button-outline" href="/blog/">Read all notes</a>
+            <p class="section-desc" style="max-width: 610px; margin-top: 14px; color: var(--muted); font-size: 17px; line-height: 1.5;">
+              Practical frameworks, sprint guides, and strategic UX insights for founders and product teams.
+            </p>
           </div>
         </div>
+
         <div class="blog-preview-grid">
-          <a class="blog-preview-card is-featured" href="/blog/product-clarity-before-polished-ui/">
-            <div><span>Product strategy</span><time datetime="2026-07-30">July 30, 2026</time></div>
-            <h3>Why product clarity comes before polished UI</h3>
-            <p>A practical framework for creating alignment before visual design begins.</p>
+          <!-- Card 1: Top-Left (Landscape) -->
+          <a class="blog-preview-card" href="/blog/product-clarity-before-polished-ui/">
+            <img class="blog-card-bg" src="/assets/blog/clarity-bg.jpg" alt="Why product clarity comes before polished UI" loading="lazy" />
+            <div class="blog-card-content">
+              <div class="blog-card-top">
+                <time datetime="2026-07-30">July 30, 2026</time>
+                <h3 class="blog-card-title">Why product clarity comes before polished UI</h3>
+                <p class="blog-card-dek">A practical framework for creating alignment before visual design begins.</p>
+              </div>
+              <div class="blog-card-bottom">
+                <span class="blog-card-btn">Read Article</span>
+              </div>
+            </div>
           </a>
+
+          <!-- Card 2: Top-Right (Tall Vertical) -->
           <a class="blog-preview-card" href="/blog/prepare-for-a-product-design-sprint/">
-            <div><span>Design process</span><time datetime="2026-07-30">July 30, 2026</time></div>
-            <h3>What founders should prepare before a product design sprint</h3>
-            <p>The inputs that make a sprint focused, faster, and more useful.</p>
+            <img class="blog-card-bg" src="/assets/blog/sprint-bg.jpg" alt="What founders should prepare before a product design sprint" loading="lazy" />
+            <div class="blog-card-content">
+              <div class="blog-card-top">
+                <time datetime="2026-07-30">July 30, 2026</time>
+                <h3 class="blog-card-title">What founders should prepare before a product design sprint</h3>
+                <p class="blog-card-dek">The essential inputs that make a product design sprint focused, faster, and more useful.</p>
+              </div>
+              <div class="blog-card-bottom">
+                <span class="blog-card-btn">Read Article</span>
+              </div>
+            </div>
           </a>
+
+          <!-- Card 3: Bottom-Left (Tall Vertical) -->
           <a class="blog-preview-card" href="/blog/ux-audit-or-full-redesign/">
-            <div><span>UX audit</span><time datetime="2026-07-30">July 30, 2026</time></div>
-            <h3>UX audit or full redesign: how to choose</h3>
-            <p>A decision guide for choosing the right level of intervention.</p>
+            <img class="blog-card-bg" src="/assets/blog/audit-bg.jpg" alt="UX audit or full redesign: how to choose" loading="lazy" />
+            <div class="blog-card-content">
+              <div class="blog-card-top">
+                <time datetime="2026-07-30">July 30, 2026</time>
+                <h3 class="blog-card-title">UX audit or full redesign: how to choose</h3>
+                <p class="blog-card-dek">A decision guide for choosing the right level of design intervention for growing products.</p>
+              </div>
+              <div class="blog-card-bottom">
+                <span class="blog-card-btn">Read Article</span>
+              </div>
+            </div>
           </a>
+
+          <!-- Card 4: Bottom-Right (Landscape) -->
+          <a class="blog-preview-card" href="/blog/">
+            <img class="blog-card-bg" src="/assets/blog/systems-bg.jpg" alt="Building design systems that scale" loading="lazy" />
+            <div class="blog-card-content">
+              <div class="blog-card-top">
+                <time datetime="2026-07-30">July 30, 2026</time>
+                <h3 class="blog-card-title">Building design systems that scale</h3>
+                <p class="blog-card-dek">How tokenized design systems bridge the gap between Figma components and production code.</p>
+              </div>
+              <div class="blog-card-bottom">
+                <span class="blog-card-btn">Read Article</span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div class="blog-preview-bottom-action">
+          <a class="text-link-button" href="/blog/">See all posts &rarr;</a>
         </div>
       </section>
 
