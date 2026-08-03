@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/assets/figma/footer/footer-logo.svg" type="image/svg+xml" />
+    <meta name="description" content="How tokenized design systems bridge the gap between Figma components, UI consistency, and production-ready code for growing product teams." />
+    <title>Building Design Systems That Scale | ayo.dsgn</title>
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://ayodsgn.com/blog/building-design-systems-that-scale/" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="ayo.dsgn" />
+    <meta property="og:title" content="Building Design Systems That Scale" />
+    <meta property="og:description" content="How tokenized design systems bridge the gap between Figma components and production-ready code." />
+    <meta property="og:url" content="https://ayodsgn.com/blog/building-design-systems-that-scale/" />
+    <meta property="article:published_time" content="2026-07-30" />
+    <meta property="article:author" content="Michael Ayomide" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Building Design Systems That Scale" />
+    <meta name="twitter:description" content="How tokenized design systems bridge the gap between Figma components and production-ready code." />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "BlogPosting",
+            "@id": "https://ayodsgn.com/blog/building-design-systems-that-scale/#article",
+            "mainEntityOfPage": "https://ayodsgn.com/blog/building-design-systems-that-scale/",
+            "headline": "Building design systems that scale",
+            "description": "How tokenized design systems bridge the gap between Figma components and production-ready code.",
+            "datePublished": "2026-07-30",
+            "dateModified": "2026-07-30",
+            "inLanguage": "en-NG",
+            "author": {"@type": "Person", "@id": "https://ayodsgn.com/#michael-ayomide", "name": "Michael Ayomide"},
+            "publisher": {"@type": "Person", "@id": "https://ayodsgn.com/#michael-ayomide", "name": "Michael Ayomide"}
+          },
+          {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://ayodsgn.com/"},
+              {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://ayodsgn.com/blog/"},
+              {"@type": "ListItem", "position": 3, "name": "Building design systems that scale"}
+            ]
+          }
+        ]
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/site.css?v=8.0" />
+    <link rel="stylesheet" href="/assets/blog.css?v=1.0" />
+  </head>
+  <body class="article-page">
+    <header class="site-header is-light">
+      <div class="nav-wrap">
+        <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><img src="/assets/figma/footer/footer-logo.svg" alt="ayo.dsgn" /></a>
+        <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
+        <nav class="main-nav" aria-label="Main navigation">
+          <a href="/projects/">Projects</a><a href="/services/">Services</a><a href="/about/">About me</a><a href="/playground/">Playground</a><a href="/blog/" aria-current="page">Blog</a><a href="/contact/">Contact</a>
+        </nav>
+        <a class="nav-cta" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a call</a>
+      </div>
+    </header>
+    <main class="blog-main">
+      <article>
+        <header class="article-header">
+          <p class="article-eyebrow"><a href="/blog/">Design notes</a> / Product systems</p>
+          <h1>Building design systems that scale</h1>
+          <p class="article-dek">How tokenized design systems bridge the gap between Figma components, UI consistency, and production-ready code.</p>
+          <div class="article-meta"><span>By Michael Ayomide</span><time datetime="2026-07-30">July 30, 2026</time><span>5 min read</span></div>
+        </header>
+        <div class="article-layout">
+          <nav class="article-toc" aria-label="On this page">
+            <strong>On this page</strong>
+            <a href="#tokens">Design tokens as single source</a>
+            <a href="#components">Component architecture</a>
+            <a href="#alignment">Figma to code alignment</a>
+            <a href="#governance">Maintenance and governance</a>
+          </nav>
+          <div class="article-body">
+            <p>As digital products grow, visual inconsistency and developer friction expand exponentially unless anchored by a scalable design system. A design system is not just a UI kit in Figma; it is an active contract between product strategy, user experience, and frontend engineering.</p>
+            <p>When built effectively, a design system reduces redundant decisions, accelerates sprint velocity, and guarantees that every customer touchpoint feels cohesive across web, mobile, and web application interfaces.</p>
+
+            <h2 id="tokens">Design tokens as a single source of truth</h2>
+            <p>Design tokens are the atomic values—colors, typography scales, spacing units, border radii, and elevation shadows—expressed in plain, platform-agnostic data structures. Instead of hardcoding static pixel values like <code>16px</code> or hex colors like <code>#1f46d2</code>, designers and developers consume semantic tokens such as <code>var(--site-gutter)</code> or <code>var(--blue)</code>.</p>
+            <div class="article-callout">
+              <strong>Why tokens matter</strong>
+              Tokenizing your design decisions allows instant theme updates, light/dark mode adaptations, and global spacing adjustments without refactoring individual component CSS files.
+            </div>
+
+            <h2 id="components">Component architecture and hierarchy</h2>
+            <p>A scalable component library follows clear hierarchical layers:</p>
+            <ul>
+              <li><strong>Primitives:</strong> Buttons, inputs, badges, typography tags, and icons.</li>
+              <li><strong>Molecules:</strong> Search bars, user avatar cards, form groups, and breadcrumbs.</li>
+              <li><strong>Organisms:</strong> Navigation headers, project carousels, pricing tables, and modal dialogs.</li>
+            </ul>
+            <p>Keeping components focused on a single responsibility prevents bloated, over-engineered code structures that are hard to maintain down the line.</p>
+
+            <h2 id="alignment">Figma to code alignment</h2>
+            <p>Design systems fail when Figma components diverge from frontend implementations. Achieving 1:1 parity requires naming convention alignment. Component variant names in Figma (e.g. <code>state=hover</code>, <code>size=large</code>) must mirror prop names in React, Vue, or CSS modifier classes.</p>
+            <p>Regular design-engineering syncs during sprint retrospectives ensure that newly created component variants are documented, tested, and shipped in parallel.</p>
+
+            <h2 id="governance">Maintenance and governance</h2>
+            <p>A design system is a living product. Without governance, teams will create ad-hoc workarounds. Establish clear criteria for when to introduce a new component versus extending an existing variant, ensuring the system evolves alongside the product without accumulating technical debt.</p>
+
+            <div class="article-cta">
+              <h3>Need a scalable design system for your product?</h3>
+              <p>I help growing teams create tokenized Figma design systems and production-ready component libraries.</p>
+              <a class="button button-primary" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a discovery call</a>
+            </div>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-card-blue">
+          <div class="footer-logo-wrap">
+            <span class="footer-logo-glyph">ayo.</span>
+            <span class="footer-logo-sub">dsgn</span>
+          </div>
+        </div>
+        <div class="footer-card-white">
+          <div class="footer-card-content">
+            <div class="footer-cta-col">
+              <h2>Take your project to the next level. Let's talk!</h2>
+              <div class="footer-cta-actions">
+                <a class="button button-pink" href="https://calendar.app.google/Um4G3aYbGQ798AWw5" target="_blank" rel="noopener">Book a discovery call</a>
+              </div>
+            </div>
+            <div class="footer-nav-col">
+              <h3>Navigation</h3>
+              <div class="footer-nav-links">
+                <a href="/projects/">Projects</a>
+                <a href="/services/">Services</a>
+                <a href="/playground/">Playground</a>
+                <a href="/blog/">Blog</a>
+                <a href="/about/">About</a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-card-bottom">
+            <div class="footer-copyright">&copy; <span data-year></span> Ayo. All rights reserved.</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="/assets/site.js?v=2.5"></script>
+  </body>
+</html>
