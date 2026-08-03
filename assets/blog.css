@@ -165,12 +165,16 @@
   display: grid;
   grid-template-columns: minmax(0, 220px) minmax(0, 720px);
   gap: clamp(44px, 8vw, 100px);
+  align-items: start;
 }
 
 .article-toc {
   align-self: start;
   position: sticky;
-  top: 110px;
+  position: -webkit-sticky;
+  top: 100px;
+  z-index: 10;
+  height: fit-content;
 }
 
 .article-toc strong {
