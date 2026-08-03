@@ -1297,10 +1297,11 @@ h2,
 
 /* Premium Footer */
 .site-footer {
-  padding: 77px 0 64px;
+  padding: 80px 0;
   color: var(--ink);
   background: #f7f7f7;
   border-top: none;
+  width: 100%;
 }
 
 .footer-inner {
@@ -1309,19 +1310,19 @@ h2,
   padding-left: var(--site-gutter);
   padding-right: var(--site-gutter);
   display: grid;
-  grid-template-columns: minmax(280px, 380px) 1fr;
-  gap: 24px;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 28px;
   align-items: stretch;
 }
 
 .footer-card-blue {
   background: var(--blue);
   border-radius: 20px;
-  min-height: 640px;
+  min-height: 520px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 64px 48px;
+  padding: 48px 36px;
   position: relative;
   overflow: hidden;
 }
@@ -1329,17 +1330,17 @@ h2,
 .footer-card-blue::before {
   content: "";
   position: absolute;
-  left: 51px;
-  top: 46px;
-  width: 113px;
-  height: 110px;
+  left: 36px;
+  top: 36px;
+  width: 100px;
+  height: 98px;
   background: url("/assets/figma/footer/footer-logo.svg") center / contain no-repeat;
 }
 
 .footer-logo-wrap {
   position: absolute;
   left: -8px;
-  bottom: 54px;
+  bottom: 36px;
   display: flex;
   flex-direction: column;
   line-height: 0.59;
@@ -1352,13 +1353,13 @@ h2,
 
 .footer-logo-glyph {
   font-family: var(--display);
-  font-size: clamp(150px, 12.5vw, 226px);
+  font-size: clamp(120px, 10vw, 180px);
   font-weight: 500;
 }
 
 .footer-logo-sub {
   font-family: var(--display);
-  font-size: clamp(150px, 12.5vw, 226px);
+  font-size: clamp(120px, 10vw, 180px);
   font-weight: 500;
   padding-left: 0;
 }
@@ -1366,12 +1367,12 @@ h2,
 .footer-card-white {
   background: #ffffff;
   border-radius: 20px;
-  min-height: 640px;
-  display: grid;
-  grid-template-rows: auto auto;
-  align-content: space-between;
-  gap: 44px;
-  padding: clamp(56px, 5vw, 79px) clamp(48px, 7vw, 113px) 32px;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 36px;
+  padding: clamp(36px, 4vw, 56px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
   position: relative;
   overflow: hidden;
@@ -1384,36 +1385,44 @@ h2,
   right: 22px;
   bottom: 8px;
   color: transparent;
-  -webkit-text-stroke: 0.25px rgba(130, 119, 119, 0.6);
+  -webkit-text-stroke: 0.25px rgba(130, 119, 119, 0.4);
   font-family: var(--display);
-  font-size: clamp(82px, 6.8vw, 114px);
+  font-size: clamp(70px, 5.5vw, 96px);
   font-weight: 500;
   line-height: 0.59;
-  opacity: 0.6;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 .footer-card-content {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(190px, 260px) minmax(320px, 1fr);
-  gap: clamp(56px, 7vw, 118px);
-  align-items: start;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: wrap;
 }
 
 .footer-nav-col {
   order: -1;
+  min-width: 160px;
+}
+
+.footer-cta-col {
+  flex: 1;
+  min-width: 240px;
+  max-width: 440px;
 }
 
 .footer-cta-col h2 {
   font-family: var(--sans);
-  font-size: clamp(25px, 1.75vw, 29px);
+  font-size: clamp(22px, 1.8vw, 28px);
   font-weight: 400;
-  line-height: 1.18;
+  line-height: 1.22;
   color: var(--black);
-  margin: 0 0 40px;
-  max-width: 350px;
+  margin: 0 0 28px;
+  max-width: 380px;
 }
 
 .footer-cta-actions {
