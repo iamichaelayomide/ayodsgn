@@ -1158,25 +1158,34 @@ document.addEventListener("DOMContentLoaded", () => {
     updateReadingProgress();
   }
 
-  const articleHeadings = document.querySelectorAll(".article-body h2[id]");
+  const articleHeadings = [...document.querySelectorAll(".article-body h2[id]")];
   if (articleHeadings.length > 0 && tocLinks.length > 0) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute("id");
-            tocLinks.forEach((link) => {
-              const href = link.getAttribute("href");
-              const isMatch = href === `#${id}`;
-              link.classList.toggle("is-active", isMatch);
-            });
-          }
-        });
-      },
-      { rootMargin: "-15% 0px -60% 0px" }
-    );
+    const updateActiveToc = () => {
+      const scrollPosition = window.scrollY + 180;
+      let currentHeadingId = "";
 
-    articleHeadings.forEach((heading) => observer.observe(heading));
+      for (let i = 0; i < articleHeadings.length; i++) {
+        const heading = articleHeadings[i];
+        if (heading.offsetTop <= scrollPosition) {
+          currentHeadingId = heading.getAttribute("id");
+        } else {
+          break;
+        }
+      }
+
+      if (!currentHeadingId && articleHeadings[0]) {
+        currentHeadingId = articleHeadings[0].getAttribute("id");
+      }
+
+      tocLinks.forEach((link) => {
+        const href = link.getAttribute("href");
+        const isMatch = href === `#${currentHeadingId}`;
+        link.classList.toggle("is-active", isMatch);
+      });
+    };
+
+    window.addEventListener("scroll", updateActiveToc, { passive: true });
+    updateActiveToc();
   }
 });
 
