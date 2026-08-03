@@ -3989,4 +3989,83 @@ body.lightbox-open {
   }
 }
 
+/*
+ * Unified responsive page rails
+ *
+ * Editorial pages previously mixed 12px, 16px, 24px, and nested
+ * width-minus-48px shells. Keep full-bleed backgrounds and horizontal
+ * carousels, while aligning readable content to the shared site gutter.
+ */
+@media (max-width: 1024px) {
+  .projects-page .proj-page-hero,
+  .projects-page .proj-grid-section,
+  .projects-page .proj-process-inner,
+  .projects-page .proj-testimonials-inner,
+  .projects-page .proj-faq-inner,
+  .projects-page .proj-cta-banner,
+  .playground-page .play-hero,
+  .playground-page .play-controls-bar,
+  .playground-page .playground-board,
+  .playground-page .play-grid-container,
+  .about-page .pg-divider,
+  .about-page .about-process-inner,
+  .about-page .about-testi-inner,
+  .about-page .about-faq-inner,
+  .about-page .about-cta-banner,
+  .contact-page .contact-grid,
+  body.case-page .case-shell {
+    width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
+  }
+
+  .services-page .srv-detail-section {
+    padding-left: var(--site-gutter);
+    padding-right: var(--site-gutter);
+  }
+
+  .playground-page .play-footer-actions {
+    width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .about-page .about-hero {
+    width: 100%;
+    padding-left: var(--site-gutter);
+    padding-right: var(--site-gutter);
+  }
+
+  .about-page .about-hero-inner {
+    width: 100%;
+  }
+
+  body .blog-main .blog-hero,
+  body.article-page .article-header,
+  body.article-page .article-layout {
+    width: min(100%, var(--max));
+  }
+
+  body:not(.article-page) .blog-preview-grid {
+    width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
+  }
+
+  body.article-page .related-articles-section {
+    padding-left: var(--site-gutter);
+    padding-right: var(--site-gutter);
+  }
+
+  body.article-page .related-articles-section .blog-preview-grid {
+    width: min(100%, var(--max));
+  }
+
+  .site-footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .footer-inner {
+    padding-left: var(--site-gutter);
+    padding-right: var(--site-gutter);
+  }
+}
+
 
