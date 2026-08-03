@@ -1,4 +1,17 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "ayodsgn.vercel.app"
+        }
+      ],
+      "destination": "https://ayodsgn.com/:path*",
+      "permanent": true
+    }
+  ]
 }
