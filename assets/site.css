@@ -1309,8 +1309,8 @@ h2,
   padding-left: var(--site-gutter);
   padding-right: var(--site-gutter);
   display: grid;
-  grid-template-columns: minmax(340px, 500px) minmax(0, 1063px);
-  gap: 32px;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -3866,20 +3866,48 @@ body.lightbox-open {
   min-height: 44px;
   padding: 0 24px;
   border-radius: 999px;
-  background: #111111;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #ffffff;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  color: #111111;
   font-family: var(--sans);
   font-size: 13px;
-  font-weight: 500;
-  transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms ease;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 }
 
 .blog-preview-card:hover .blog-card-btn {
-  background: #ffffff;
+  background: #f0f0f0;
   color: #111111;
-  border-color: #ffffff;
-  transform: translateY(-1px);
+  border-color: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.button-white-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 32px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #111111;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  transition: background 200ms ease, color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+
+.button-white-pill:hover {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
 }
 
 /* Staggered 2x2 Layout Heights (Matching User's Reference Screenshot) */
