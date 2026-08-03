@@ -1122,3 +1122,61 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
     }
   });
 });
+
+/* ── Article Page Reading Progress & Active TOC Section Observer ── */
+document.addEventListener("DOMContentLoaded", () => {
+  const articleBody = document.querySelector(".article-body");
+  const tocLinks = document.querySelectorAll(".article-toc a");
+  const progressPercentEl = document.querySelector("[data-read-percentage]");
+  const progressBarEl = document.querySelector("[data-read-progress-bar]");
+
+  if (articleBody) {
+    const updateReadingProgress = () => {
+      const rect = articleBody.getBoundingClientRect();
+      const totalHeight = articleBody.clientHeight;
+      const windowHeight = window.innerHeight;
+
+      const scrollableDistance = totalHeight - windowHeight + 120;
+      const currentScroll = Math.max(0, -rect.top + 100);
+
+      let percentage = 0;
+      if (scrollableDistance > 0) {
+        percentage = Math.min(100, Math.max(0, Math.round((currentScroll / scrollableDistance) * 100)));
+      } else if (rect.top <= 100) {
+        percentage = 100;
+      }
+
+      if (progressPercentEl) {
+        progressPercentEl.textContent = `${percentage}% read`;
+      }
+      if (progressBarEl) {
+        progressBarEl.style.width = `${percentage}%`;
+      }
+    };
+
+    window.addEventListener("scroll", updateReadingProgress, { passive: true });
+    updateReadingProgress();
+  }
+
+  const articleHeadings = document.querySelectorAll(".article-body h2[id]");
+  if (articleHeadings.length > 0 && tocLinks.length > 0) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
+            tocLinks.forEach((link) => {
+              const href = link.getAttribute("href");
+              const isMatch = href === `#${id}`;
+              link.classList.toggle("is-active", isMatch);
+            });
+          }
+        });
+      },
+      { rootMargin: "-15% 0px -60% 0px" }
+    );
+
+    articleHeadings.forEach((heading) => observer.observe(heading));
+  }
+});
+

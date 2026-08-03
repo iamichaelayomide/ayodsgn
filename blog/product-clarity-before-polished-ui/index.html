@@ -53,6 +53,7 @@
   </head>
   <body class="article-page">
     <header class="site-header is-light">
+      <div class="article-top-progress-bar" data-read-progress-bar></div>
       <div class="nav-wrap">
         <a class="brand-mark" href="/" aria-label="ayo.dsgn home"><img src="/assets/figma/footer/footer-logo.svg" alt="ayo.dsgn" /></a>
         <button class="menu-toggle" type="button" aria-label="Toggle menu" aria-expanded="false">Menu</button>
@@ -77,6 +78,7 @@
             <a href="#cost">The cost of skipping it</a>
             <a href="#framework">The four-part framework</a>
             <a href="#ready">When you are ready for UI</a>
+            <div class="article-progress-badge" data-read-percentage>0% read</div>
           </nav>
           <div class="article-body">
             <p>Teams often reach for interface design when what they really need is a sharper product decision. The request sounds visual: “Make the dashboard feel modern,” “clean up the onboarding,” or “give the landing page more energy.” But when I look beneath the surface, the real problem is often that the product is trying to say too many things to too many people.</p>
@@ -122,6 +124,45 @@
           </div>
         </div>
       </article>
+
+      <section class="related-articles-section" aria-labelledby="related-heading">
+        <div class="related-inner">
+          <div class="section-top">
+            <div>
+              <p class="section-kicker">Keep reading</p>
+              <h2 id="related-heading">You might <em>also read</em></h2>
+            </div>
+          </div>
+          <div class="blog-preview-grid">
+            <a class="blog-preview-card" href="/blog/prepare-for-a-product-design-sprint/">
+              <img class="blog-card-bg" src="/assets/blog/sprint-bg.jpg" alt="What founders should prepare before a product design sprint" loading="lazy" />
+              <div class="blog-card-content">
+                <div class="blog-card-top">
+                  <time datetime="2026-07-30">July 30, 2026</time>
+                  <h3 class="blog-card-title">What founders should prepare before a product design sprint</h3>
+                  <p class="blog-card-dek">The essential inputs that make a product design sprint focused, faster, and more useful.</p>
+                </div>
+                <div class="blog-card-bottom">
+                  <span class="blog-card-btn">Read Article</span>
+                </div>
+              </div>
+            </a>
+            <a class="blog-preview-card" href="/blog/ux-audit-or-full-redesign/">
+              <img class="blog-card-bg" src="/assets/blog/audit-bg.jpg" alt="UX audit or full redesign: how to choose" loading="lazy" />
+              <div class="blog-card-content">
+                <div class="blog-card-top">
+                  <time datetime="2026-07-30">July 30, 2026</time>
+                  <h3 class="blog-card-title">UX audit or full redesign: how to choose</h3>
+                  <p class="blog-card-dek">A decision guide for choosing the right level of design intervention for growing products.</p>
+                </div>
+                <div class="blog-card-bottom">
+                  <span class="blog-card-btn">Read Article</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
     </main>
     <footer class="site-footer">
       <div class="footer-inner">
@@ -138,6 +179,6 @@
         </div>
       </div>
     </footer>
-    <script src="/assets/site.js?v=2.4"></script>
+    <script src="/assets/site.js?v=3.0"></script>
   </body>
 </html>
