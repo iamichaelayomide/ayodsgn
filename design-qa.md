@@ -58,3 +58,54 @@ No remaining P0, P1, or P2 issues were found after the final comparison pass.
 
 final result: passed
 
+## Case-study credibility and discovery — 2026-08-03
+
+### Source visual truth
+
+- Caladium Foundation live homepage: `output/playwright/source-caladium-home-1440.png` — 1440 × 1000 px at a 1440 × 1000 CSS viewport, 1× density.
+- Orca Securities live homepage: `output/playwright/source-orca-home-1440.png` — 1440 × 1000 px at a 1440 × 1000 CSS viewport, 1× density.
+- Orca DAC live page: `output/playwright/source-orca-dac-1440.png` — 1440 × 1000 px at a 1440 × 1000 CSS viewport, 1× density.
+
+### Implementation evidence
+
+- Caladium case-study hero and live-site CTA: `output/playwright/local-caladium-hero-desktop.png`.
+- Orca full case study with fresh live “before” screens and redesign “after” screens: `output/playwright/local-orca-case-desktop.png`.
+- Projects grid after removing work without case-study routes: `output/playwright/local-projects-clean-mobile.png`.
+- Related case studies on mobile: `output/playwright/local-caladium-related-mobile.png` — 358 × 853 px inside a 390 × 844 CSS viewport.
+
+### Side-by-side comparisons
+
+- Caladium source vs embedded implementation asset: `output/playwright/source-vs-implementation-caladium.png` — both normalized to 1440 × 1000 px at 1×.
+- Orca live homepage source vs embedded “before” asset: `output/playwright/source-vs-implementation-orca-live-home.png` — both normalized to 1440 × 1000 px at 1×.
+- Orca live DAC source vs embedded “before” asset: `output/playwright/source-vs-implementation-orca-live-dac.png` — both normalized to 1440 × 1000 px at 1×.
+
+### Findings and comparison history
+
+1. P1 — Orca’s previous “before” images were captured beneath a grey loading overlay and did not faithfully represent the live site.
+   - Replaced them with fresh browser captures from Orca’s live homepage and DAC page.
+   - Post-fix side-by-side comparisons show the embedded assets match the live-source captures.
+2. P1 — Bloodlines appeared in Projects without a case-study route.
+   - Removed it from the Projects grid and homepage carousel.
+   - The remaining six project cards all link to real case-study routes.
+3. P2 — Case studies ended without a next-work discovery path.
+   - Added two contextual related case-study cards to all six case studies, with no page recommending itself.
+4. P2 — Caladium lacked a direct live-site path.
+   - Added a prominent `https://caladiumfoundation.com/` CTA in the case-study hero.
+5. P2 — Lazy related-card imagery appeared blank in immediate element captures.
+   - Made the two related images per case study eager and confirmed they render on desktop and mobile.
+
+### Required surface review
+
+- Typography: existing case-study families, weights, and hierarchy preserved.
+- Spacing and layout: related cards follow the shared case shell and collapse to one column on mobile; no overflow at 390 px or 1440 px.
+- Colors and tokens: existing neutral, blue, serif, and accent system preserved.
+- Image quality and fidelity: Caladium imagery matches the live Caladium site; Orca “before” imagery matches the live Orca site and the “after” imagery remains the actual redesign work.
+- Copy and content: project names, disciplines, live-link label, and related-case-study labels are accurate.
+- Interaction and runtime: 12 responsive route checks passed; every case study has two working related links, zero self-links, zero broken related images, and zero console errors.
+- Projects grid: six cards, six real case-study links, zero broken images.
+- Build: `npm.cmd run build` passes.
+
+No actionable P0, P1, or P2 issues remain.
+
+final result: passed
+

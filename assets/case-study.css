@@ -78,6 +78,34 @@
   line-height: 1.48;
 }
 
+.case-hero-summary {
+  display: grid;
+  justify-items: start;
+  gap: 24px;
+}
+
+.case-live-link {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border: 1px solid rgba(36, 19, 36, 0.22);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  transition: border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.case-live-link:hover,
+.case-live-link:focus-visible {
+  border-color: #1f48d7;
+  color: #1f48d7;
+  transform: translateY(-2px);
+}
+
 .case-hero-media,
 .case-figure {
   overflow: hidden;
@@ -419,6 +447,112 @@
   color: #1f48d7;
 }
 
+.case-related {
+  padding: clamp(78px, 9vw, 132px) 0 0;
+}
+
+.case-related-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.case-related-kicker {
+  margin: 0 0 10px;
+  color: #690069;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.case-related h2 {
+  max-width: 760px;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(44px, 5.5vw, 76px);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+}
+
+.case-related-all {
+  flex: 0 0 auto;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(36, 19, 36, 0.35);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.case-related-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.case-related-card {
+  overflow: hidden;
+  border: 1px solid rgba(36, 19, 36, 0.12);
+  border-radius: 18px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.case-related-card-media {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #ecece7;
+}
+
+.case-related-card-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 260ms ease;
+}
+
+.case-related-card:hover .case-related-card-media img,
+.case-related-card:focus-visible .case-related-card-media img {
+  transform: scale(1.025);
+}
+
+.case-related-card-copy {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px;
+}
+
+.case-related-card-copy span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.case-related-card-copy strong {
+  font-family: var(--serif);
+  font-size: clamp(25px, 2.4vw, 36px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.case-related-card-copy em {
+  flex: 0 0 auto;
+  color: #1f48d7;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+}
+
 @media (max-width: 980px) {
   .case-hero-top,
   .case-layout {
@@ -468,6 +602,11 @@
   .case-nav a.is-active {
     transform: none;
     border-color: #690069;
+  }
+
+  .case-related-header {
+    align-items: start;
+    flex-direction: column;
   }
 }
 
@@ -545,11 +684,21 @@
     align-items: stretch;
     flex-direction: column;
   }
+
+  .case-related-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-related-card-copy {
+    padding: 18px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .case-nav a,
-  .case-back {
+  .case-back,
+  .case-live-link,
+  .case-related-card-media img {
     transition: none;
   }
 }
