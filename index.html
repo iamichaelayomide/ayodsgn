@@ -58,65 +58,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/assets/site.css?v=13.0" />
-    <style>
-      /* ── Home Projects Carousel ── */
-      .proj-home-carousel-wrap {
-        position: relative;
-        width: min(100%, var(--max));
-        height: clamp(500px, 46vw, 620px);
-        margin: 70px auto 0;
-        padding-left: var(--site-gutter);
-        padding-right: var(--site-gutter);
-        overflow: hidden;
-        touch-action: pan-y;
-        box-sizing: border-box;
-      }
-      .proj-home-carousel {
-        position: relative;
-        height: 100%;
-        outline: none;
-        cursor: grab;
-        user-select: none;
-      }
-      .proj-home-carousel::-webkit-scrollbar { display: none; }
-      .proj-home-carousel.is-dragging { cursor: grabbing; }
-      .home-proj-card {
-        position: absolute;
-        left: 58%;
-        top: 50%;
-        width: clamp(260px, 31vw, 540px);
-        background: #ffffff;
-        border: 0.3px solid #f8f1f1;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 18px 42px rgba(1, 1, 1, 0.06);
-        opacity: 0;
-        pointer-events: none;
-        transform-origin: center center;
-        backface-visibility: hidden;
-        will-change: transform, opacity, filter;
-        transition: box-shadow 180ms ease;
-      }
-      .home-proj-card.is-active,
-      .home-proj-card.is-nearby { pointer-events: auto; }
-      .home-proj-card:hover { box-shadow: 0 22px 54px rgba(0,0,0,0.11); }
-      .home-proj-card-img { height: clamp(168px, 16vw, 278px); margin: clamp(6px, 1.05vw, 18px); overflow: hidden; border-radius: 8px; background: #eaeaea; }
-      .home-proj-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 480ms ease; }
-      .home-proj-card:hover .home-proj-card-img img { transform: scale(1.03); }
-      .home-proj-card-body { min-height: clamp(156px, 10.8vw, 195px); padding: 14px clamp(14px, 1.7vw, 26px) clamp(16px, 1.8vw, 26px); display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-      .home-proj-card-body h3 { margin: 0; font-family: var(--serif); font-size: clamp(25px, 2.45vw, 42px); font-weight: 400; line-height: 1.05; color: var(--ink); }
-      .home-proj-card-body p { margin: 10px 0 0; color: var(--ink); font-size: clamp(11px, 0.86vw, 15px); }
-      .home-proj-card-btn { flex-shrink: 0; padding: 10px 13px; border-radius: 8px; background: #f0f0f0; color: var(--ink); font-family: var(--sans); font-size: clamp(9px, 0.75vw, 13px); white-space: nowrap; transition: background 180ms ease, color 180ms ease; align-self: flex-end; }
-      .home-proj-card-btn:hover { background: var(--blue); color: #fff; }
-      .proj-home-carousel-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-      /* ── Heading italic fix ── */
-      .home .projects-section h2 em { font-style: italic; font-family: var(--serif); }
-      @media (max-width: 700px) {
-        .proj-home-carousel-wrap { height: 470px; margin-top: 36px; padding-left: var(--site-gutter); padding-right: var(--site-gutter); }
-        .home-proj-card { left: 50%; width: calc(100vw - (var(--site-gutter) * 2)); max-width: 360px; }
-        .home-proj-card-body { min-height: 130px; }
-      }
-    </style>
   </head>
   <body class="home">
     <header class="site-header" data-theme="dark">
@@ -422,12 +363,12 @@
               <footer><strong>Kingsley Inyang</strong><span>CEO, Delluxe Vogue</span></footer>
             </article>
             <article class="testimonial-card tilt-soft" aria-hidden="true">
-              <div class="rating"><span>4.2/5</span><strong>â˜…â˜…â˜…â˜…â˜†</strong></div>
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
               <p>I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. His work is neat, he pays attention to details, and communication was smooth.</p>
               <footer><strong>Olumide Adepoju</strong><span>CEO, Orca Securities Ltd</span></footer>
             </article>
             <article class="testimonial-card tilt-right" aria-hidden="true">
-              <div class="rating"><span>4.2/5</span><strong>â˜…â˜…â˜…â˜…â˜†</strong></div>
+              <div class="rating"><span>4.2/5</span><strong>★★★★☆</strong></div>
               <p>I needed a website for Bitzsznn that captures the energy and lets me collect payments directly. The site looks premium and ticketing flows smoothly.</p>
               <footer><strong>Yungbitz</strong><span>CEO, Bitzsznn Entertainment</span></footer>
             </article>

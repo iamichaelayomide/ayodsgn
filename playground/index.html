@@ -45,8 +45,8 @@
       .play-hero {
         position: relative;
         z-index: 1;
-        padding: 140px 0 0;
-        width: min(calc(100% - 48px), 1436px);
+        padding: var(--page-hero-pt) 0 var(--page-hero-pb);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
       }
       .play-hero-row {
@@ -55,7 +55,7 @@
         justify-content: space-between;
         gap: 40px;
         flex-wrap: wrap;
-        padding-bottom: 40px;
+        padding-bottom: 24px;
       }
       .play-hero h1 {
         margin: 0;
@@ -82,14 +82,14 @@
       .play-controls-bar {
         position: relative;
         z-index: 2;
-        width: min(calc(100% - 48px), 1436px);
-        margin: 40px auto 20px;
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
+        margin: 20px auto 20px;
         display: flex;
         flex-direction: column;
         gap: 18px;
-        background: rgba(255, 255, 255, 0.8);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(12px);
-        border: 0.5px solid rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(72, 63, 63, 0.08);
         border-radius: 12px;
         padding: 20px 24px;
       }
@@ -127,7 +127,7 @@
         font-size: 14px;
         color: #010101;
         outline: none;
-        transition: border-color 200ms, background 200ms;
+        transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out);
       }
       .play-search-input:focus {
         border-color: var(--blue);
@@ -147,7 +147,7 @@
         font-weight: 500;
         color: #483f3f;
         cursor: pointer;
-        transition: background 180ms;
+        transition: background 160ms var(--ease-out), transform 160ms var(--ease-out);
       }
       .play-canvas-toggle:hover { background: #eeeeee; }
       .play-canvas-toggle svg { width: 16px; height: 16px; transition: transform 200ms; }
@@ -178,7 +178,7 @@
         font-weight: 500;
         color: #483f3f;
         cursor: pointer;
-        transition: background 200ms, color 200ms, border-color 200ms;
+        transition: background 160ms var(--ease-out), color 160ms var(--ease-out), border-color 160ms var(--ease-out);
       }
       .play-tab:hover { background: rgba(0, 0, 0, 0.04); }
       .play-tab.is-active {
@@ -197,7 +197,7 @@
         cursor: pointer;
         text-decoration: underline;
         padding: 0;
-        transition: color 180ms;
+        transition: color 160ms var(--ease-out);
       }
       .play-reset-btn:hover { color: var(--blue); }
 
@@ -205,7 +205,7 @@
       .play-grid-container {
         position: relative;
         z-index: 1;
-        width: min(calc(100% - 48px), 1436px);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 20px auto 80px;
       }
       .play-grid {

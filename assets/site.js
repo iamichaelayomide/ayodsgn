@@ -3,9 +3,32 @@ const mainNav = document.querySelector(".main-nav");
 const header = document.querySelector(".site-header");
 
 if (menuToggle && mainNav) {
-  menuToggle.addEventListener("click", () => {
+  const closeMenu = () => {
+    mainNav.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+  };
+
+  menuToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
     const isOpen = mainNav.classList.toggle("is-open");
     menuToggle.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  mainNav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMenu);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (mainNav.classList.contains("is-open") && !mainNav.contains(e.target) && e.target !== menuToggle) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mainNav.classList.contains("is-open")) {
+      closeMenu();
+      menuToggle.focus();
+    }
   });
 }
 

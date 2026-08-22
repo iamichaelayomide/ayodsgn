@@ -8,12 +8,13 @@
 }
 
 .case-shell {
-  width: min(calc(100% - 48px), var(--max));
+  width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
   margin-inline: auto;
+  box-sizing: border-box;
 }
 
 .case-hero {
-  padding: clamp(72px, 9vw, 132px) 0 clamp(46px, 6vw, 84px);
+  padding: clamp(52px, 6.5vw, 84px) 0 clamp(46px, 6vw, 84px);
 }
 
 .case-back {
@@ -26,13 +27,14 @@
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
-  transition: border-color 180ms ease, color 180ms ease;
+  transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
 }
 
 .case-back:hover,
 .case-back:focus-visible {
   border-color: currentColor;
   color: var(--ink);
+  transform: translateX(-3px);
 }
 
 .case-hero-top {
@@ -612,23 +614,22 @@
 
 @media (max-width: 760px) {
   .case-shell {
-    width: calc(100vw - 32px);
-    max-width: var(--max);
+    width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
   }
 
   .case-hero {
-    padding-top: 52px;
+    padding-top: 40px;
   }
 
   .case-hero-top,
   .case-hero-media,
   .case-facts {
-    width: calc(100vw - 32px);
+    width: 100%;
     max-width: 100%;
   }
 
   .case-hero-intro {
-    max-width: calc(100vw - 32px);
+    max-width: 100%;
   }
 
   .case-facts,

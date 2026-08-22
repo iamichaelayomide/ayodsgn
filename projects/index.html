@@ -34,8 +34,8 @@
 
       /* ─── Hero ─── */
       .proj-page-hero {
-        padding: 150px 0 0;
-        width: min(calc(100% - 48px), 1436px);
+        padding: var(--page-hero-pt) 0 var(--page-hero-pb);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
       }
       .proj-page-hero-row {
@@ -44,7 +44,7 @@
         justify-content: space-between;
         gap: 40px;
         flex-wrap: wrap;
-        padding-bottom: 40px;
+        padding-bottom: 24px;
       }
       .proj-page-hero h1 {
         margin: 0;
@@ -71,8 +71,8 @@
 
       /* ─── Masonry / Grid layout ─── */
       .proj-grid-section {
-        width: min(calc(100% - 48px), 1436px);
-        margin: 40px auto 0;
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
+        margin: 20px auto 0;
         padding-bottom: 60px;
       }
       .proj-grid {
@@ -82,14 +82,14 @@
       }
       .proj-grid-card {
         background: #ffffff;
-        border: 0.3px solid #f8f1f1;
-        border-radius: 10px;
+        border: 1px solid rgba(72, 63, 63, 0.08);
+        border-radius: 12px;
         overflow: hidden;
-        transition: transform 280ms ease, box-shadow 280ms ease;
+        transition: transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
       }
       .proj-grid-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 18px 46px rgba(0,0,0,0.08);
+        box-shadow: 0 20px 48px rgba(0,0,0,0.08);
       }
       .proj-grid-card.card-tall { grid-row: span 1; }
       .proj-grid-card.card-wide { grid-column: span 1; }
@@ -155,11 +155,11 @@
 
       /* ─── Process Section ─── */
       .proj-process-section {
-        padding: 100px 0;
+        padding: var(--section-space) 0;
         background: #f0f0f0;
       }
       .proj-process-inner {
-        width: min(calc(100% - 48px), 1436px);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
       }
       .proj-process-inner > h2 {
@@ -183,7 +183,7 @@
         gap: 16px;
         color: #483f3f;
         cursor: pointer;
-        transition: transform 320ms ease, opacity 320ms ease;
+        transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out);
       }
       .process-row:hover .process-col,
       .process-row:focus-within .process-col { opacity: 0.78; }
@@ -199,7 +199,7 @@
         border-radius: 5px;
         display: grid;
         place-items: center;
-        transition: transform 320ms ease, filter 320ms ease;
+        transition: transform 220ms var(--ease-out);
       }
       .process-col:hover .process-icon,
       .process-col:focus-within .process-icon,
@@ -247,11 +247,11 @@
 
       /* ─── Testimonials ─── */
       .proj-testimonials-section {
-        padding: 100px 0;
+        padding: var(--section-space) 0;
         background: #f0f0f0;
       }
       .proj-testimonials-inner {
-        width: min(calc(100% - 48px), 1436px);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
       }
       .proj-testimonials-inner .section-top { margin-bottom: 60px; }
@@ -419,11 +419,11 @@
 
       /* ─── FAQ section ─── */
       .proj-faq-section {
-        padding: 100px 0;
+        padding: var(--section-space) 0;
         background: #f0f0f0;
       }
       .proj-faq-inner {
-        width: min(calc(100% - 48px), 1436px);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
       }
       .faq-layout {
@@ -457,7 +457,7 @@
         font-weight: 600;
         color: #483f3f;
         user-select: none;
-        transition: color 180ms ease;
+        transition: color 160ms var(--ease-out);
       }
       .faq-item summary::-webkit-details-marker { display: none; }
       .faq-toggle {
@@ -470,7 +470,7 @@
         place-items: center;
         font-size: 18px;
         font-weight: 300;
-        transition: transform 280ms ease, background 180ms ease;
+        transition: transform 200ms var(--ease-out), background 160ms var(--ease-out);
         color: #483f3f;
       }
       .faq-item[open] summary { color: #010101; }
@@ -494,9 +494,9 @@
       /* ─── Blue CTA banner ─── */
       .proj-cta-banner {
         margin: 0 auto 0;
-        width: min(calc(100% - 48px), 1436px);
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         background: var(--blue);
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 60px 80px;
         display: flex;
         flex-direction: column;

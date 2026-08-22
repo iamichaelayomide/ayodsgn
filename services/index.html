@@ -37,7 +37,7 @@
 
       /* ---- Hero ---- */
       .srv-hero {
-        padding: 160px 24px 64px;
+        padding: var(--page-hero-pt) 0 var(--page-hero-pb);
         background: var(--paper);
         position: relative;
         overflow: hidden;
@@ -60,7 +60,7 @@
       }
 
       .srv-hero-inner {
-        width: min(100%, var(--max));
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
         display: grid;
         grid-template-columns: 1fr min(480px, 40%);
@@ -114,13 +114,13 @@
 
       /* ---- Services Detail (Figma 99:6463 stacked scroll) ---- */
       .srv-detail-section {
-        padding: 140px 24px 132px;
+        padding: var(--section-space) 0;
         background: var(--paper);
         --srv-progress: 0%;
       }
 
       .srv-detail-inner {
-        width: min(100%, var(--max));
+        width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
         margin: 0 auto;
         position: relative;
         display: grid;
