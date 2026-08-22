@@ -409,6 +409,84 @@ main,
   background: #f7f7f7;
 }
 
+.button-white-cta {
+  background: #ffffff !important;
+  color: var(--pink) !important;
+  border-color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  flex-shrink: 0;
+}
+
+.button-white-cta:hover {
+  background: #ffffff !important;
+  color: var(--pink-hover) !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+.button-white-blue {
+  background: #ffffff !important;
+  color: var(--blue) !important;
+  border-color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  flex-shrink: 0;
+}
+
+.button-white-blue:hover {
+  background: #f7f7f7 !important;
+  color: var(--blue-hover) !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+/* Contextual overrides ensuring zero color vibration */
+.process-cta .button,
+.process-cta-row .button,
+.process-cta a,
+.process-cta-row a {
+  background: #ffffff !important;
+  color: var(--pink) !important;
+  border-color: #ffffff !important;
+  font-family: var(--serif) !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+  flex-shrink: 0 !important;
+}
+
+.process-cta .button:hover,
+.process-cta-row .button:hover,
+.process-cta a:hover,
+.process-cta-row a:hover {
+  background: #ffffff !important;
+  color: var(--pink-hover) !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2) !important;
+}
+
+.testimonials-section .section-actions .button-pink,
+.testimonials-section .section-actions .button-white-blue,
+.testimonials-top .button-pink,
+.testimonials-top .button-white-blue {
+  background: #ffffff !important;
+  color: var(--blue) !important;
+  border-color: #ffffff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14) !important;
+}
+
+.testimonials-section .section-actions .button-pink:hover,
+.testimonials-section .section-actions .button-white-blue:hover,
+.testimonials-top .button-pink:hover,
+.testimonials-top .button-white-blue:hover {
+  background: #f7f7f7 !important;
+  color: var(--blue-hover) !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22) !important;
+}
+
 /* ==========================================================================
    Header & Navigation
    ========================================================================== */
