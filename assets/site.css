@@ -2224,6 +2224,14 @@ h2 em {
   filter: saturate(1.08);
 }
 
+.trusted-strip img[alt="Hay Artz"] {
+  width: 112px;
+  height: 18px;
+  max-width: 112px;
+  max-height: 18px;
+  object-fit: fill;
+}
+
 .trusted-note {
   position: relative;
   z-index: 2;
