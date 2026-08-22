@@ -348,16 +348,28 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
 
 document.querySelectorAll("[data-process-set]").forEach((processSet) => {
   const cards = Array.from(processSet.querySelectorAll(".process-step, .process-col"));
+  cards.forEach((card, index) => {
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-pressed", "false");
+    card.setAttribute("aria-label", `Step ${index + 1}: ${card.querySelector("h3, h4")?.textContent?.trim() || "Process step"}`);
+  });
+
+  function selectCard(selectedCard) {
+    cards.forEach((item) => {
+      const isSelected = item === selectedCard;
+      item.classList.toggle("is-selected", isSelected);
+      item.setAttribute("aria-pressed", String(isSelected));
+    });
+  }
+
   cards.forEach((card) => {
     card.addEventListener("click", () => {
-      cards.forEach((item) => item.classList.remove("is-selected"));
-      card.classList.add("is-selected");
+      selectCard(card);
     });
     card.addEventListener("keydown", (event) => {
       if (event.key !== " " && event.key !== "Enter") return;
       event.preventDefault();
-      cards.forEach((item) => item.classList.remove("is-selected"));
-      card.classList.add("is-selected");
+      selectCard(card);
     });
   });
 });
@@ -1211,4 +1223,3 @@ document.addEventListener("DOMContentLoaded", () => {
     updateActiveToc();
   }
 });
-

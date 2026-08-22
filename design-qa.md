@@ -1,5 +1,27 @@
 # Design QA
 
+## Margin and process repair — 2026-08-22
+
+final result: passed
+
+### Visual checks
+
+1. Negative — Observation: the shared `.process-inner` wrapper was missing from the site container system, making the homepage and Services process content touch the viewport edges. Suggestion: use the same centered max-width and responsive gutter as the adjacent sections. Fixed.
+2. Negative — Observation: the process interaction used a large spring scale and rotation that made adjacent cards jump and read as visually unstable. Suggestion: use a small vertical lift, a stable selected border, and consistent card geometry. Fixed.
+3. Negative — Observation: process cards did not expose their selected state to assistive technology. Suggestion: give the keyboard-focusable cards button semantics and keep `aria-pressed` synchronized. Fixed.
+4. Negative — Observation: hash navigation placed section headings underneath the sticky header at tablet and mobile widths. Suggestion: offset anchored sections by the shared header height. Fixed.
+5. Positive — Observation: the existing type, blue/pink palette, icon artwork, CTA styling, and four-step content already form a coherent visual system and were preserved.
+
+### Responsive and runtime verification
+
+- Desktop: 1440 × 1000, seven primary routes, no horizontal overflow, broken images, empty main regions, console errors, or error overlays.
+- Tablet: 768 × 900, seven primary routes, no horizontal overflow, broken images, or empty main regions.
+- Mobile: 390 × 844, seven primary routes, no horizontal overflow, broken images, or empty main regions.
+- Process component: verified on Home, Services, About, and Projects; click and keyboard selection update the visual state and `aria-pressed`.
+- Source validation and `git diff --check`: passed.
+
+Summary tally: 5 observations — 1 positive (20%), 4 negative corrected (80%), 0 unresolved P0/P1/P2 issues.
+
 final result: blocked
 
 Build validation passed with `npm.cmd run build`.
@@ -108,4 +130,3 @@ final result: passed
 No actionable P0, P1, or P2 issues remain.
 
 final result: passed
-
