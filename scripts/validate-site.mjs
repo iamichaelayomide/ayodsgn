@@ -7,6 +7,7 @@ const requiredFiles = [
   "about/index.html",
   "contact/index.html",
   "assets/site.css",
+  "assets/case-study.css",
   "assets/site.js"
 ];
 
@@ -16,17 +17,21 @@ for (const file of requiredFiles) {
 
 const js = await readFile("assets/site.js", "utf8");
 const css = await readFile("assets/site.css", "utf8");
+const caseStudyCss = await readFile("assets/case-study.css", "utf8");
 const home = await readFile("index.html", "utf8");
 
 const requiredSnippets = [
   ["site title", "Ayo Design Studio"],
   ["primary nav", "main-nav"],
   ["responsive styles", "@media"],
-  ["mobile menu script", "menu-toggle"]
+  ["mobile menu script", "menu-toggle"],
+  ["blue-surface foreground token", "--on-blue: #ffffff"],
+  ["future blue-surface contract", "[data-surface=\"blue\"]"],
+  ["case-study blue CTA contrast", "color: var(--on-blue, #fff)"]
 ];
 
 for (const [label, snippet] of requiredSnippets) {
-  const haystack = `${js}\n${css}\n${home}`;
+  const haystack = `${js}\n${css}\n${caseStudyCss}\n${home}`;
   if (!haystack.includes(snippet)) {
     throw new Error(`Missing ${label}: ${snippet}`);
   }

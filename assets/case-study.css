@@ -418,6 +418,7 @@
 .case-next h2 {
   max-width: 880px;
   margin: 0 auto;
+  color: var(--on-blue, #fff);
   font-family: var(--serif);
   font-size: clamp(48px, 7vw, 92px);
   font-weight: 400;
@@ -789,10 +790,6 @@
 .meala-case .case-reflection-note {
   background: #e8f1d2;
   color: #223015;
-}
-
-.meala-case .case-next h2 {
-  color: #fff;
 }
 
 .meala-case .case-hero-media img,

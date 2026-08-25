@@ -10,6 +10,7 @@
   --line: #e5e0e0;
   --blue: #1f46d2;
   --blue-hover: #1537a7;
+  --on-blue: #ffffff;
   --pink: #d21fae;
   --pink-hover: #b51594;
   --surface: #ffffff;
@@ -3538,6 +3539,31 @@ h2 em {
   font-weight: 500;
   max-width: 280px;
   justify-self: end;
+}
+
+/*
+ * Blue-surface contrast contract.
+ * Existing blue sections are covered here; future components should use
+ * .surface-blue or data-surface="blue" so text can never fall back to black.
+ */
+.surface-blue,
+[data-surface="blue"],
+.srv-row-cta,
+.testimonials-section,
+.portfolio-faq-cta,
+.case-next {
+  color: var(--on-blue);
+}
+
+:is(
+  .surface-blue,
+  [data-surface="blue"],
+  .srv-row-cta,
+  .testimonials-section,
+  .portfolio-faq-cta,
+  .case-next
+) :is(h1, h2, h3, h4, h5, h6, p, strong, em, small) {
+  color: inherit !important;
 }
 
 /* ==========================================================================
