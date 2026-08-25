@@ -478,7 +478,6 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       'zucchini-food-carousel-interaction.mp4'
     ], 'User Interactions', 'video', '/assets/playground/interactions', ['interactions']),
     ...makeItems([
-      'appointment-booking-dashboard-ui.png',
       'ayo-community-landing-footer.jpg',
       'ayo-crypto-future-landing-page.png',
       'ayo-design-portfolio-footer.png',
@@ -497,8 +496,6 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       'music-player-widget-ui.png',
       'orca-newsletter-footer-ui.png',
       'pricing-plan-cards-ui.png',
-      'prop-firm-challenge-dashboard.png',
-      'sales-analytics-dashboard-ui.png',
       'security-landing-page-ui.jpg',
       'smart-home-tab-controls-ui.png',
       'spnd-card-success-screens.jpg',
@@ -506,6 +503,11 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       'spnd-sleep-tracking-app-screens.jpg',
       'video-upload-modal-ui.jpg'
     ], 'UI Designs', 'image', '/assets/playground/ui', ['designs']),
+    ...makeItems([
+      'appointment-booking-dashboard-ui.png',
+      'prop-firm-challenge-dashboard.png',
+      'sales-analytics-dashboard-ui.png'
+    ], 'Dashboard', 'image', '/assets/playground/ui', ['dashboard', 'dashboards', 'designs']),
     ...makeItems([
       'avo-buddy-character-set.png',
       'ayo-football-jersey-character.png',
@@ -530,7 +532,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       'stargirl-desert-illustration.png',
       'waiting-by-the-phone-illustration.png',
       'woman-in-yellow-hat-illustration.png'
-    ], 'Artworks', 'image', '/assets/playground/artworks', ['artworks'])
+    ], 'Illustrations', 'image', '/assets/playground/artworks', ['illustrations'])
   ];
 
   let currentMode = 'canvas';
@@ -550,6 +552,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
   const camera = { x: 0, y: 0, zoom: 1 };
   const world = { width: 2600, height: 1800 };
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isHomePreview = document.body.classList.contains('home');
 
   const searchInput = playgroundContainer.querySelector('#playground-search');
   const modeTriggerBtn = playgroundContainer.querySelector('#mode-trigger-btn');
@@ -617,7 +620,8 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
   function resetCamera() {
     camera.x = world.width / 2;
     camera.y = world.height / 2;
-    camera.zoom = Math.min(1, canvasView ? Math.max(0.62, canvasView.clientWidth / 1500) : 1);
+    const fitWidth = isHomePreview ? 1800 : 1500;
+    camera.zoom = Math.min(1, canvasView ? Math.max(0.62, canvasView.clientWidth / fitWidth) : 1);
     clampCamera();
     applyCamera();
   }
@@ -669,14 +673,16 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
   }
 
   function createState(item, index, total) {
-    const columns = Math.ceil(Math.sqrt(total * 1.25));
-    const gapX = 260;
-    const gapY = 218;
+    const isSmallSet = total <= 6;
+    const columns = isSmallSet ? Math.max(1, Math.min(3, total)) : (isHomePreview ? Math.min(10, Math.max(6, Math.ceil(Math.sqrt(total * 1.45)))) : Math.ceil(Math.sqrt(total * 1.25)));
+    const gapX = isHomePreview ? 220 : 260;
+    const gapY = isHomePreview ? 180 : 218;
     const startX = Math.max(180, (world.width - (columns - 1) * gapX) / 2);
     const row = Math.floor(index / columns);
     const col = index % columns;
-    const x = startX + col * gapX + (row % 2 ? 80 : 0);
-    const y = 180 + row * gapY;
+    const x = startX + col * gapX + (!isSmallSet && row % 2 ? 80 : 0);
+    const rows = Math.ceil(total / columns);
+    const y = isSmallSet ? (world.height - (rows - 1) * gapY) / 2 + row * gapY : (isHomePreview ? 150 : 180) + row * gapY;
     return {
       item,
       x: clamp(x, 130, world.width - 130),
@@ -691,14 +697,22 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
   }
 
   function syncStates(items) {
+    if (isHomePreview) {
+      const columns = Math.min(10, Math.max(6, Math.ceil(Math.sqrt(Math.max(items.length, 1) * 1.45))));
+      const rows = Math.ceil(Math.max(items.length, 1) / columns);
+      world.width = Math.max(2240, (columns - 1) * 220 + 440);
+      world.height = Math.max(1320, (rows - 1) * 180 + 420);
+    } else {
+      world.width = Math.max(1800, Math.ceil(Math.sqrt(Math.max(items.length, 1))) * 410);
+      world.height = Math.max(1180, Math.ceil(items.length / Math.ceil(Math.sqrt(Math.max(items.length, 1)))) * 310 + 320);
+    }
     const previous = activeStateById;
+    const preserveLayout = previous.size === items.length && items.every((item) => previous.has(item.id));
     activeStates = items.map((item, index) => {
       const existing = previous.get(item.id);
-      return existing || createState(item, index, items.length);
+      return preserveLayout && existing ? existing : createState(item, index, items.length);
     });
     activeStateById = new Map(activeStates.map((state) => [state.item.id, state]));
-    world.width = Math.max(1800, Math.ceil(Math.sqrt(Math.max(items.length, 1))) * 410);
-    world.height = Math.max(1180, Math.ceil(items.length / Math.ceil(Math.sqrt(Math.max(items.length, 1)))) * 310 + 320);
     clampCamera();
   }
 
