@@ -3595,8 +3595,9 @@ h2 em {
     border: 1px solid rgba(72, 63, 63, 0.14);
     border-radius: 12px;
     color: var(--black);
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(20px);
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
   }
 
