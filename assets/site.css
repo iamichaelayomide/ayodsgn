@@ -3864,11 +3864,10 @@ h2 em {
   }
 
   .testimonial-card {
-    flex-basis: calc(100vw - 48px);
-    width: calc(100vw - 48px);
-    min-height: 240px;
+    flex-basis: min(82vw, 320px);
+    width: min(82vw, 320px);
+    min-height: 220px;
     padding: 24px 22px 22px;
-    scroll-snap-align: center;
     transform: none;
   }
 
@@ -3883,13 +3882,7 @@ h2 em {
 
   .testimonial-ticker {
     margin-top: 32px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-
-  .testimonial-ticker::-webkit-scrollbar {
-    display: none;
+    overflow: hidden;
   }
 
   .testimonial-ticker::before,
@@ -3900,12 +3893,8 @@ h2 em {
   .testimonial-track {
     min-height: 0;
     gap: 16px;
-    padding: 18px var(--site-gutter) 28px;
-    animation: none;
-  }
-
-  .testimonial-card[aria-hidden="true"] {
-    display: none;
+    padding: 18px 0 28px;
+    animation: testimonialTicker 44s linear infinite;
   }
 
   .testimonial-meta {
