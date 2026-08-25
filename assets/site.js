@@ -939,8 +939,30 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
     const rect = canvasView.getBoundingClientRect();
     const halfW = rect.width / 2 / camera.zoom;
     const halfH = rect.height / 2 / camera.zoom;
-    camera.x = clamp(camera.x, halfW, Math.max(halfW, world.width - halfW));
-    camera.y = clamp(camera.y, halfH, Math.max(halfH, world.height - halfH));
+    if (!activeStates.length) {
+      camera.x = clamp(camera.x, halfW, Math.max(halfW, world.width - halfW));
+      camera.y = clamp(camera.y, halfH, Math.max(halfH, world.height - halfH));
+      return;
+    }
+
+    const edgePaddingX = Math.min(180, Math.max(96, halfW * 0.16));
+    const edgePaddingY = Math.min(150, Math.max(84, halfH * 0.18));
+    const contentMinX = Math.min(...activeStates.map((state) => state.x - state.width / 2)) - edgePaddingX;
+    const contentMaxX = Math.max(...activeStates.map((state) => state.x + state.width / 2)) + edgePaddingX;
+    const contentMinY = Math.min(...activeStates.map((state) => state.y - state.height / 2)) - edgePaddingY;
+    const contentMaxY = Math.max(...activeStates.map((state) => state.y + state.height / 2)) + edgePaddingY;
+
+    const minCameraX = contentMinX + halfW;
+    const maxCameraX = contentMaxX - halfW;
+    const minCameraY = contentMinY + halfH;
+    const maxCameraY = contentMaxY - halfH;
+
+    camera.x = minCameraX > maxCameraX
+      ? (contentMinX + contentMaxX) / 2
+      : clamp(camera.x, minCameraX, maxCameraX);
+    camera.y = minCameraY > maxCameraY
+      ? (contentMinY + contentMaxY) / 2
+      : clamp(camera.y, minCameraY, maxCameraY);
   }
 
   function applyCamera() {
@@ -1045,6 +1067,14 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       return preserveLayout && existing ? existing : createState(item, index, items.length);
     });
     activeStateById = new Map(activeStates.map((state) => [state.item.id, state]));
+    if (!preserveLayout && activeStates.length) {
+      const contentMinX = Math.min(...activeStates.map((state) => state.x - state.width / 2));
+      const contentMaxX = Math.max(...activeStates.map((state) => state.x + state.width / 2));
+      const contentMinY = Math.min(...activeStates.map((state) => state.y - state.height / 2));
+      const contentMaxY = Math.max(...activeStates.map((state) => state.y + state.height / 2));
+      camera.x = (contentMinX + contentMaxX) / 2;
+      camera.y = (contentMinY + contentMaxY) / 2;
+    }
     clampCamera();
   }
 

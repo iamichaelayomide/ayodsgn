@@ -49,4 +49,13 @@ Checked all 18 routes at all three viewports: Home, Projects, Services, About, P
 - The proof total reflects the seven current featured projects rather than the repeated `20+` values in the source screenshot.
 - Anonymous descriptors are used rather than fabricated client names.
 
+## Canvas edge-balance refinement
+
+- Compared the supplied wide canvas screenshot with the corrected homepage canvas at the matching effective wide layout.
+- Centered the initial camera on the actual card bounds rather than the larger invisible physics world.
+- Clamped panning to the active card bounds, preventing empty left, right, top, or bottom dead zones at the canvas limits.
+- Verified the homepage and standalone playground canvases at 390, 768, and 1288 CSS pixels wide.
+- Confirmed document width equals viewport width at every tested size and no horizontal page overflow is present.
+- Visible initial canvas density increased to 21 cards on mobile, 42 on tablet, and 56 on the wide homepage view, with content continuing cleanly through both side edges.
+
 final result: passed
