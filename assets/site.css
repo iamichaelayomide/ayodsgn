@@ -2158,9 +2158,7 @@ h2 em {
   margin-top: clamp(48px, 4vw, 72px);
   overflow: hidden;
   outline: none;
-  cursor: grab;
-  touch-action: pan-y;
-  overscroll-behavior-x: contain;
+  cursor: pointer;
 }
 
 .testimonial-ticker::before,
@@ -2175,18 +2173,6 @@ h2 em {
   height: clamp(360px, 27vw, 450px);
   display: block;
   padding: 0;
-  transform: translateX(var(--testimonial-drag-x, 0px));
-  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.testimonial-ticker.is-swiping .testimonial-track {
-  transition: none;
-}
-
-.testimonial-ticker.is-swiping .testimonial-card {
-  cursor: grabbing;
-  user-select: none;
 }
 
 .testimonial-ticker:hover .testimonial-track,
@@ -2276,7 +2262,7 @@ h2 em {
   margin-top: -8px;
 }
 
-.testimonial-swipe-hint {
+.testimonial-click-hint {
   position: relative;
   z-index: 7;
   width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
@@ -4314,7 +4300,7 @@ body.lightbox-open {
     text-align: left;
   }
 
-  .testimonial-swipe-hint {
+  .testimonial-click-hint {
     margin-top: 12px;
     text-align: left;
   }

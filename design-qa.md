@@ -17,7 +17,7 @@ The source screenshots and final implementation captures were inspected together
 1. Project carousel: added a persistent “Drag or swipe projects” instruction, current-position count, seven pagination dots, and desktop/tablet arrow buttons. The mobile carousel now exposes the next card edge while keeping the active card readable. The gap before “See all projects” is reduced.
 2. Proof statistics: removed the duplicated project count, changed the total to the seven projects actually displayed, and reduced the mobile layout to one left-aligned three-item column. The counters animate once when the block enters the viewport and respect reduced-motion preferences.
 3. Service controls: the instruction, count, and arrows now share a clear horizontal reading line. Arrow glyphs are optically centered in their buttons. Mobile cards stay readable before the next card enters.
-4. Testimonials: the fan composition and swipe behavior remain intact. The carousel now contains exactly eight entries with varied 5-, 4-, and 3-star ratings. Requested names were removed; unverified identities were not invented, so anonymous location/role labels are used where needed.
+4. Testimonials: the fan composition remains intact with click/tap selection and autoplay. The carousel contains exactly eight entries with varied 5-, 4-, and 3-star ratings. Requested names were removed; unverified identities were not invented, so anonymous location/role labels are used where needed.
 
 ## Full route QA
 
@@ -35,8 +35,8 @@ Checked all 18 routes at all three viewports: Home, Projects, Services, About, P
 
 ## Gallery and motion refinement
 
-- Confirmed testimonial cards can be swiped directly on the 390 px touch layout and autoplay advances again after the gesture.
-- Added a visible `Swipe or drag testimonials · Auto-plays` cue without changing the existing fan composition.
+- Confirmed testimonial cards support click/tap selection and autoplay without a drag gesture.
+- Added a visible `Click or tap a card · Auto-plays` cue without changing the existing fan composition.
 - Left-aligned the proof statistics, supporting copy, and trusted-organizations note at phone, tablet, and desktop widths.
 - Confirmed the Dashboard filter exposes three existing dashboard designs.
 - Confirmed canvas items open in a full-screen modal at 390 x 844, 768 x 1024, and 1440 x 900.
@@ -57,5 +57,12 @@ Checked all 18 routes at all three viewports: Home, Projects, Services, About, P
 - Verified the homepage and standalone playground canvases at 390, 768, and 1288 CSS pixels wide.
 - Confirmed document width equals viewport width at every tested size and no horizontal page overflow is present.
 - Visible initial canvas density increased to 21 cards on mobile, 42 on tablet, and 56 on the wide homepage view, with content continuing cleanly through both side edges.
+
+## Testimonial click refinement
+
+- Removed pointer, touch, and mouse-drag handling from the testimonial carousel.
+- Confirmed clicking or tapping the active card advances to the next testimonial, while clicking a side card or pagination dot selects that entry.
+- Confirmed autoplay resumes after a click and the existing keyboard arrow controls remain available.
+- Replaced the drag instruction with a concise click/tap and autoplay cue.
 
 final result: passed
