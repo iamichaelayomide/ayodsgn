@@ -115,6 +115,7 @@ main,
 .nav-wrap,
 .page-inner,
 .section-top,
+.about-preview-inner,
 .proj-page-hero-inner,
 .proj-page-hero,
 .proj-grid-section,
@@ -158,6 +159,7 @@ main,
 /* Base section wrapper rules (no side padding on wrappers to prevent double-gutters) */
 .projects-section,
 .services-section,
+.about-preview-section,
 .page-hero,
 .content-section,
 .process-section,
@@ -3628,6 +3630,11 @@ h2 em {
     min-height: auto;
   }
 
+  .about-image-stack {
+    width: 100%;
+    min-height: 460px;
+  }
+
   .about-photo-stack {
     height: 440px;
   }
@@ -3670,6 +3677,57 @@ h2 em {
 }
 
 @media (max-width: 760px) {
+  .playground-toolbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 18px 18px 14px;
+  }
+
+  .mode-control,
+  .mode-trigger,
+  .play-canvas-toggle {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+  }
+
+  .filter-row,
+  .play-filter-row {
+    padding-inline: 18px;
+  }
+
+  .about-preview-inner {
+    gap: 32px;
+  }
+
+  .about-preview-copy {
+    gap: 16px;
+  }
+
+  .about-image-stack {
+    min-height: 360px;
+  }
+
+  .stack-card.is-front {
+    top: 40px;
+    min-height: 280px;
+  }
+
+  .stack-card.is-middle {
+    left: 12px;
+    right: 14px;
+    top: 22px;
+    min-height: 260px;
+    transform: translateX(12px) scale(0.95);
+  }
+
+  .stack-card.is-back {
+    left: 24px;
+    right: 28px;
+    min-height: 240px;
+    transform: translateX(24px) scale(0.9);
+  }
+
   .filter-row,
   .play-filter-row {
     align-items: flex-start;
@@ -3809,6 +3867,26 @@ h2 em {
   .footer-card-blue,
   .footer-card-white {
     padding: 36px 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .section-actions {
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .section-actions .button {
+    width: 100%;
+  }
+
+  .skill-tags span,
+  .about-skills li {
+    min-height: 36px;
+    padding-inline: 13px;
+    font-size: 12.5px;
   }
 }
 

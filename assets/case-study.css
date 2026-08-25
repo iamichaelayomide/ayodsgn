@@ -760,6 +760,50 @@
   background: #efefef;
 }
 
+.meala-case .case-kicker,
+.meala-case .case-index {
+  color: #5d7f20;
+}
+
+.meala-case .case-hero h1 em {
+  color: #769e2d;
+  font-style: italic;
+}
+
+.meala-case .case-nav a:hover,
+.meala-case .case-nav a:focus-visible,
+.meala-case .case-nav a.is-active {
+  color: #5d7f20;
+}
+
+.meala-case .case-hero-media,
+.meala-case .meala-figure {
+  background: #e8f1d2;
+}
+
+.meala-case .case-quote,
+.meala-case .case-reflection-primary {
+  background: #17230f;
+}
+
+.meala-case .case-reflection-note {
+  background: #e8f1d2;
+  color: #223015;
+}
+
+.meala-case .case-hero-media img,
+.meala-case .case-figure img {
+  min-height: 320px;
+  object-fit: cover;
+}
+
+@media (max-width: 760px) {
+  .meala-case .case-hero-media img,
+  .meala-case .case-figure img {
+    min-height: 240px;
+  }
+}
+
 .knowlab-case .case-hero-media img {
   aspect-ratio: 1860 / 910;
 }
