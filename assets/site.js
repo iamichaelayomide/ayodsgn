@@ -425,7 +425,6 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
 
   let activeIndex = 0;
   let rotationTimer = null;
-  let manuallyPaused = false;
   let swipeState = null;
   let suppressCardClick = false;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -473,7 +472,7 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
 
   function startRotation() {
     stopRotation();
-    if (reduceMotion || manuallyPaused) return;
+    if (reduceMotion) return;
     rotationTimer = window.setInterval(() => {
       activeIndex = (activeIndex + 1) % cards.length;
       render();
@@ -487,12 +486,7 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
   cards.forEach((card, index) => {
     card.addEventListener("click", () => {
       if (suppressCardClick) return;
-      if (index === activeIndex) {
-        manuallyPaused = !manuallyPaused;
-        ticker.classList.toggle("is-paused", manuallyPaused);
-        startRotation();
-        return;
-      }
+      if (index === activeIndex) return;
       activeIndex = index;
       render();
       restartRotation();
@@ -633,6 +627,11 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
 
   render();
   startRotation();
+
+  const swipeHint = document.createElement("p");
+  swipeHint.className = "testimonial-swipe-hint";
+  swipeHint.textContent = "Swipe or drag testimonials · Auto-plays";
+  dots.insertAdjacentElement("afterend", swipeHint);
 });
 
 const proofCounters = Array.from(document.querySelectorAll("[data-count-target]"));
@@ -1064,6 +1063,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
 
     activeStates.forEach((state, index) => {
       const item = state.item;
+      let suppressOpen = false;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'canvas-card';
@@ -1133,17 +1133,20 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       });
       button.addEventListener('pointerup', (event) => {
         if (!dragState || dragState.pointerId !== event.pointerId || dragState.state !== state) return;
-        const wasClick = !dragState.moved && performance.now() - dragState.startTime < 420;
+        suppressOpen = dragState.moved;
         dragState = null;
         button.classList.remove('is-dragging');
         button.releasePointerCapture?.(event.pointerId);
-        if (wasClick) openLightbox(index, button);
+        if (suppressOpen) window.setTimeout(() => { suppressOpen = false; }, 360);
       });
       button.addEventListener('pointercancel', (event) => {
         if (!dragState || dragState.pointerId !== event.pointerId || dragState.state !== state) return;
         dragState = null;
         button.classList.remove('is-dragging');
         button.releasePointerCapture?.(event.pointerId);
+      });
+      button.addEventListener('click', (event) => {
+        if (!suppressOpen) openLightbox(index, button);
       });
     });
     applyCamera();
@@ -1311,11 +1314,13 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
     const previousButton = document.createElement('button');
     previousButton.className = 'media-lightbox-nav is-prev';
     previousButton.type = 'button';
-    previousButton.textContent = 'Prev';
+    previousButton.textContent = 'Previous';
+    previousButton.setAttribute('aria-label', 'View previous playground item');
     const nextButton = document.createElement('button');
     nextButton.className = 'media-lightbox-nav is-next';
     nextButton.type = 'button';
     nextButton.textContent = 'Next';
+    nextButton.setAttribute('aria-label', 'View next playground item');
     const frame = document.createElement('figure');
     frame.className = 'media-lightbox-frame';
     if (item.mediaType === 'video') {
@@ -1334,7 +1339,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       frame.appendChild(img);
     }
     const caption = document.createElement('figcaption');
-    caption.textContent = item.title;
+    caption.innerHTML = `<strong>${item.title}</strong><span>${lightboxIndex + 1} of ${items.length}</span>`;
     frame.appendChild(caption);
     stage.append(closeButton, previousButton, frame, nextButton);
     overlay.appendChild(stage);

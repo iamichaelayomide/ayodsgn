@@ -15,7 +15,7 @@
 The source screenshots and final implementation captures were inspected together. The browser chrome visible in the sources is outside the page-owned layout and was excluded from the comparison.
 
 1. Project carousel: added a persistent “Drag or swipe projects” instruction, current-position count, seven pagination dots, and desktop/tablet arrow buttons. The mobile carousel now exposes the next card edge while keeping the active card readable. The gap before “See all projects” is reduced.
-2. Proof statistics: removed the duplicated project count, changed the total to the seven projects actually displayed, and reduced the mobile layout to one centered three-item column. The counters animate once when the block enters the viewport and respect reduced-motion preferences.
+2. Proof statistics: removed the duplicated project count, changed the total to the seven projects actually displayed, and reduced the mobile layout to one left-aligned three-item column. The counters animate once when the block enters the viewport and respect reduced-motion preferences.
 3. Service controls: the instruction, count, and arrows now share a clear horizontal reading line. Arrow glyphs are optically centered in their buttons. Mobile cards stay readable before the next card enters.
 4. Testimonials: the fan composition and swipe behavior remain intact. The carousel now contains exactly eight entries with varied 5-, 4-, and 3-star ratings. Requested names were removed; unverified identities were not invented, so anonymous location/role labels are used where needed.
 
@@ -32,6 +32,16 @@ Checked all 18 routes at all three viewports: Home, Projects, Services, About, P
 - Testimonial pagination exposed eight controls and the eighth control selected the 3-star entry.
 - Proof counters settled at `2+`, `97%`, and `7`.
 - Service and project controls remained aligned at mobile, tablet, and desktop widths.
+
+## Gallery and motion refinement
+
+- Confirmed testimonial cards can be swiped directly on the 390 px touch layout and autoplay advances again after the gesture.
+- Added a visible `Swipe or drag testimonials · Auto-plays` cue without changing the existing fan composition.
+- Left-aligned the proof statistics, supporting copy, and trusted-organizations note at phone, tablet, and desktop widths.
+- Confirmed the Dashboard filter exposes three existing dashboard designs.
+- Confirmed canvas items open in a full-screen modal at 390 x 844, 768 x 1024, and 1440 x 900.
+- Confirmed Previous and Next cycle within the active filter, Close dismisses the viewer, captions show title and position, Escape/arrow keys remain supported, and focus returns to the originating item.
+- Confirmed gallery images use contained scaling without cropping or viewport overflow.
 
 ## Intentional differences
 
