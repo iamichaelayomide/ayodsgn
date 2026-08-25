@@ -8,7 +8,8 @@ const requiredFiles = [
   "contact/index.html",
   "assets/site.css",
   "assets/case-study.css",
-  "assets/site.js"
+  "assets/site.js",
+  "assets/og/ayodsgn-social-preview-v1.jpg"
 ];
 
 for (const file of requiredFiles) {
@@ -27,7 +28,9 @@ const requiredSnippets = [
   ["mobile menu script", "menu-toggle"],
   ["blue-surface foreground token", "--on-blue: #ffffff"],
   ["future blue-surface contract", "[data-surface=\"blue\"]"],
-  ["case-study blue CTA contrast", "color: var(--on-blue, #fff)"]
+  ["case-study blue CTA contrast", "color: var(--on-blue, #fff)"],
+  ["default Open Graph preview", "https://ayodsgn.com/assets/og/ayodsgn-social-preview-v1.jpg"],
+  ["large Twitter preview", "twitter:card\" content=\"summary_large_image"]
 ];
 
 for (const [label, snippet] of requiredSnippets) {

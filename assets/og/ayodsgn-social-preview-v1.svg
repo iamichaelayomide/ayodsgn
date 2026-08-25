@@ -1,0 +1,22 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="48" fill="#1F46D2"/>
+  <path d="M0 0H1200V16H0V0Z" fill="#D21FAE"/>
+  <circle cx="1092" cy="112" r="92" stroke="white" stroke-width="3" opacity="0.18"/>
+  <circle cx="1092" cy="112" r="56" fill="#D21FAE"/>
+  <path d="M1058 112C1074 87 1110 79 1132 106C1142 119 1139 139 1128 151C1105 176 1073 155 1058 130" stroke="white" stroke-width="8" stroke-linecap="round"/>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="72" y="94" fill="white" font-size="27" font-weight="700" letter-spacing="4">AYO DESIGN STUDIO</text>
+    <text x="72" y="238" fill="white" font-size="86" font-weight="700" letter-spacing="-4">Design that moves</text>
+    <text x="72" y="334" fill="#F5A6E4" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-style="italic" letter-spacing="-4">your business.</text>
+    <text x="75" y="407" fill="white" font-size="27" font-weight="400" opacity="0.9">Product design · Websites · Visual storytelling</text>
+  </g>
+
+  <rect x="72" y="487" width="350" height="72" rx="36" fill="white"/>
+  <text x="247" y="534" text-anchor="middle" fill="#1F46D2" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700">ayodsgn.com</text>
+
+  <g transform="translate(931 482)">
+    <path d="M0 45C25 11 82 11 107 45" stroke="#F5A6E4" stroke-width="7" stroke-linecap="round"/>
+    <path d="M98 45C123 11 180 11 205 45" stroke="white" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>
