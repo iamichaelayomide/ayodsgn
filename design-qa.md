@@ -60,6 +60,7 @@ The focused center-card comparison confirmed the quote glyph, rating placement, 
 - Confirmed no horizontal document overflow, broken images, or blocking overlays at the tested widths.
 - Confirmed timed auto-advance, clickable pagination, side-card selection, and left/right keyboard navigation.
 - Confirmed mobile swipe handling with horizontal intent locking, drag resistance, touch and pointer fallbacks, and vertical page scrolling preserved.
+- Confirmed Services cards remain fully visible before the next desktop card begins its overlap; tablet and mobile use a non-sticky reading flow so tall content is never covered.
 - Confirmed reduced-motion users receive a stable, non-automated state.
 
 ## Remaining intentional differences
