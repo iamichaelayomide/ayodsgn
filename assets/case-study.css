@@ -791,17 +791,15 @@
   color: #223015;
 }
 
-.meala-case .case-hero-media img,
-.meala-case .case-figure img {
-  min-height: 320px;
-  object-fit: cover;
+.meala-case .case-next h2 {
+  color: #fff;
 }
 
-@media (max-width: 760px) {
-  .meala-case .case-hero-media img,
-  .meala-case .case-figure img {
-    min-height: 240px;
-  }
+.meala-case .case-hero-media img,
+.meala-case .case-figure img {
+  aspect-ratio: 1434 / 701;
+  object-fit: cover;
+  object-position: top center;
 }
 
 .knowlab-case .case-hero-media img {
