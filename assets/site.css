@@ -3566,6 +3566,11 @@ h2 em {
   color: inherit !important;
 }
 
+/* Keep decorative testimonial lettering outlined instead of filling white. */
+.testimonials-section .testimonial-watermark {
+  color: transparent !important;
+}
+
 /* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
@@ -3845,9 +3850,81 @@ h2 em {
   }
 
   .testimonial-card {
-    flex-basis: min(80vw, 320px);
-    width: min(80vw, 320px);
-    min-height: 220px;
+    flex-basis: calc(100vw - 48px);
+    width: calc(100vw - 48px);
+    min-height: 240px;
+    padding: 24px 22px 22px;
+    scroll-snap-align: center;
+    transform: none;
+  }
+
+  .testimonial-card:hover,
+  .testimonial-card:focus-within {
+    transform: none;
+  }
+
+  .testimonial-watermark {
+    display: none;
+  }
+
+  .testimonial-ticker {
+    margin-top: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .testimonial-ticker::-webkit-scrollbar {
+    display: none;
+  }
+
+  .testimonial-ticker::before,
+  .testimonial-ticker::after {
+    display: none;
+  }
+
+  .testimonial-track {
+    min-height: 0;
+    gap: 16px;
+    padding: 18px var(--site-gutter) 28px;
+    animation: none;
+  }
+
+  .testimonial-card[aria-hidden="true"] {
+    display: none;
+  }
+
+  .testimonial-meta {
+    margin-top: 24px;
+    gap: 24px;
+  }
+
+  .proof-stats {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .proof-stats span {
+    text-align: left;
+  }
+
+  .trusted-strip {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 20px;
+  }
+
+  .trusted-strip img {
+    justify-self: center;
+    max-width: min(110px, 100%);
+    max-height: 64px;
+  }
+
+  .trusted-note {
+    margin-top: 28px;
   }
 
   .about-photo-stack {
