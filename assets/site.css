@@ -1636,6 +1636,19 @@ h2 em {
   display: block;
 }
 
+.social-row a img {
+  width: 26px;
+  height: 26px;
+  display: block;
+  object-fit: contain;
+}
+
+.social-row a[href*="github"] img,
+.social-row a[href*="linkedin"] img {
+  width: 21px;
+  height: 21px;
+}
+
 .social-row a:hover,
 .about-socials a:hover {
   color: var(--blue);
