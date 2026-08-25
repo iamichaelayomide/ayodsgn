@@ -886,6 +886,12 @@
   aspect-ratio: 1440 / 1000;
 }
 
+.caladium-case .caladium-figure img {
+  aspect-ratio: 1434 / 701;
+  object-fit: cover;
+  object-position: top center;
+}
+
 .caladium-case .case-nav a:hover,
 .caladium-case .case-nav a:focus-visible,
 .caladium-case .case-nav a.is-active {
