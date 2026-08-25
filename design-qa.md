@@ -59,6 +59,7 @@ The focused center-card comparison confirmed the quote glyph, rating placement, 
 - Confirmed one active card, five visible fan cards, five pagination controls, and four proof statistics.
 - Confirmed no horizontal document overflow, broken images, or blocking overlays at the tested widths.
 - Confirmed timed auto-advance, clickable pagination, side-card selection, and left/right keyboard navigation.
+- Confirmed mobile swipe handling with horizontal intent locking, drag resistance, touch and pointer fallbacks, and vertical page scrolling preserved.
 - Confirmed reduced-motion users receive a stable, non-automated state.
 
 ## Remaining intentional differences

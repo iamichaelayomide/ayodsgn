@@ -359,6 +359,8 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
   let activeIndex = 0;
   let rotationTimer = null;
   let manuallyPaused = false;
+  let swipeState = null;
+  let suppressCardClick = false;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const dotButtons = cards.map((card, index) => {
@@ -417,6 +419,7 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => {
+      if (suppressCardClick) return;
       if (index === activeIndex) {
         manuallyPaused = !manuallyPaused;
         ticker.classList.toggle("is-paused", manuallyPaused);
@@ -428,6 +431,125 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
       restartRotation();
     });
   });
+
+  function beginSwipe(pointerId, clientX, clientY) {
+    if (swipeState) return false;
+
+    swipeState = {
+      pointerId,
+      startX: clientX,
+      startY: clientY,
+      deltaX: 0,
+      axis: null,
+      startedAt: performance.now(),
+    };
+    stopRotation();
+    return true;
+  }
+
+  function moveSwipe(pointerId, clientX, clientY, preventDefault) {
+    if (!swipeState || pointerId !== swipeState.pointerId) return;
+
+    const deltaX = clientX - swipeState.startX;
+    const deltaY = clientY - swipeState.startY;
+    swipeState.deltaX = deltaX;
+
+    if (!swipeState.axis && Math.hypot(deltaX, deltaY) >= 8) {
+      swipeState.axis = Math.abs(deltaX) > Math.abs(deltaY) * 1.15 ? "x" : "y";
+      if (swipeState.axis === "x") ticker.classList.add("is-swiping");
+    }
+
+    if (swipeState.axis !== "x") return;
+    preventDefault?.();
+    const resistance = Math.max(-120, Math.min(120, deltaX * 0.72));
+    track.style.setProperty("--testimonial-drag-x", `${resistance}px`);
+  }
+
+  function finishSwipe(pointerId, cancelled = false) {
+    if (!swipeState || pointerId !== swipeState.pointerId) return;
+
+    const elapsed = Math.max(1, performance.now() - swipeState.startedAt);
+    const velocity = swipeState.deltaX / elapsed;
+    const isHorizontalSwipe = swipeState.axis === "x"
+      && (Math.abs(swipeState.deltaX) >= 48 || (Math.abs(swipeState.deltaX) >= 24 && Math.abs(velocity) >= 0.35));
+
+    ticker.classList.remove("is-swiping");
+    track.style.removeProperty("--testimonial-drag-x");
+
+    if (!cancelled && isHorizontalSwipe) {
+      const direction = swipeState.deltaX < 0 ? 1 : -1;
+      activeIndex = (activeIndex + direction + cards.length) % cards.length;
+      render();
+      suppressCardClick = true;
+      window.setTimeout(() => {
+        suppressCardClick = false;
+      }, 360);
+    }
+
+    swipeState = null;
+    restartRotation();
+  }
+
+  ticker.addEventListener("pointerdown", (event) => {
+    if (event.isPrimary === false) return;
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    if (!beginSwipe(event.pointerId, event.clientX, event.clientY)) return;
+    try {
+      ticker.setPointerCapture?.(event.pointerId);
+    } catch (_error) {
+      // Synthetic pointer events used by QA do not own pointer capture.
+    }
+  });
+
+  ticker.addEventListener("pointermove", (event) => {
+    moveSwipe(event.pointerId, event.clientX, event.clientY, () => event.preventDefault());
+  });
+
+  ticker.addEventListener("pointerup", (event) => {
+    finishSwipe(event.pointerId);
+    try {
+      ticker.releasePointerCapture?.(event.pointerId);
+    } catch (_error) {
+      // Pointer capture can already be released when a browser cancels a gesture.
+    }
+  });
+  ticker.addEventListener("pointercancel", (event) => finishSwipe(event.pointerId, true));
+
+  ticker.addEventListener("touchstart", (event) => {
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    beginSwipe(`touch-${touch.identifier}`, touch.clientX, touch.clientY);
+  }, { passive: true });
+
+  ticker.addEventListener("touchmove", (event) => {
+    if (!swipeState || typeof swipeState.pointerId !== "string") return;
+    const identifier = Number(swipeState.pointerId.replace("touch-", ""));
+    const touch = Array.from(event.changedTouches).find((item) => item.identifier === identifier);
+    if (!touch) return;
+    moveSwipe(swipeState.pointerId, touch.clientX, touch.clientY, () => event.preventDefault());
+  }, { passive: false });
+
+  ticker.addEventListener("touchend", (event) => {
+    if (!swipeState || typeof swipeState.pointerId !== "string") return;
+    const identifier = Number(swipeState.pointerId.replace("touch-", ""));
+    if (!Array.from(event.changedTouches).some((item) => item.identifier === identifier)) return;
+    finishSwipe(swipeState.pointerId);
+  }, { passive: true });
+
+  ticker.addEventListener("touchcancel", () => {
+    if (swipeState && typeof swipeState.pointerId === "string") finishSwipe(swipeState.pointerId, true);
+  }, { passive: true });
+
+  ticker.addEventListener("mousedown", (event) => {
+    if (event.button !== 0) return;
+    beginSwipe("mouse", event.clientX, event.clientY);
+  });
+
+  window.addEventListener("mousemove", (event) => {
+    moveSwipe("mouse", event.clientX, event.clientY, () => event.preventDefault());
+  });
+
+  window.addEventListener("mouseup", () => finishSwipe("mouse"));
 
   ticker.addEventListener("mouseenter", stopRotation);
   ticker.addEventListener("mouseleave", startRotation);
