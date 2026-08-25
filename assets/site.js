@@ -335,15 +335,115 @@ document.querySelectorAll("[data-service-stack]").forEach((section) => {
 });
 
 document.querySelectorAll("[data-ticker]").forEach((ticker) => {
-  ticker.addEventListener("click", () => {
-    ticker.classList.toggle("is-paused");
+  const track = ticker.querySelector(".testimonial-track");
+  if (!track) return;
+
+  const allCards = Array.from(track.querySelectorAll(".testimonial-card"));
+  const cards = allCards.slice(0, 5);
+  if (!cards.length) return;
+
+  allCards.slice(cards.length).forEach((card) => {
+    card.hidden = true;
   });
 
-  ticker.addEventListener("keydown", (event) => {
-    if (event.key !== " " && event.key !== "Enter") return;
-    event.preventDefault();
-    ticker.classList.toggle("is-paused");
+  ticker.setAttribute("role", "region");
+  ticker.setAttribute("aria-roledescription", "carousel");
+  ticker.setAttribute("aria-label", "Client testimonials");
+
+  const dots = document.createElement("div");
+  dots.className = "testimonial-dots";
+  dots.setAttribute("role", "group");
+  dots.setAttribute("aria-label", "Choose a testimonial");
+  ticker.insertAdjacentElement("afterend", dots);
+
+  let activeIndex = 0;
+  let rotationTimer = null;
+  let manuallyPaused = false;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const dotButtons = cards.map((card, index) => {
+    const button = document.createElement("button");
+    button.className = "testimonial-dot";
+    button.type = "button";
+    button.setAttribute("aria-label", `Show testimonial ${index + 1} of ${cards.length}`);
+    button.addEventListener("click", () => {
+      activeIndex = index;
+      render();
+      restartRotation();
+    });
+    dots.appendChild(button);
+    return button;
   });
+
+  function positionFor(index) {
+    let position = index - activeIndex;
+    const midpoint = Math.floor(cards.length / 2);
+    if (position > midpoint) position -= cards.length;
+    if (position < -midpoint) position += cards.length;
+    return position;
+  }
+
+  function render() {
+    cards.forEach((card, index) => {
+      const position = positionFor(index);
+      const isActive = position === 0;
+      card.dataset.position = String(position);
+      card.setAttribute("aria-hidden", String(!isActive));
+      card.tabIndex = isActive ? 0 : -1;
+    });
+
+    dotButtons.forEach((button, index) => {
+      button.setAttribute("aria-current", String(index === activeIndex));
+    });
+  }
+
+  function stopRotation() {
+    if (rotationTimer) window.clearInterval(rotationTimer);
+    rotationTimer = null;
+  }
+
+  function startRotation() {
+    stopRotation();
+    if (reduceMotion || manuallyPaused) return;
+    rotationTimer = window.setInterval(() => {
+      activeIndex = (activeIndex + 1) % cards.length;
+      render();
+    }, 4600);
+  }
+
+  function restartRotation() {
+    startRotation();
+  }
+
+  cards.forEach((card, index) => {
+    card.addEventListener("click", () => {
+      if (index === activeIndex) {
+        manuallyPaused = !manuallyPaused;
+        ticker.classList.toggle("is-paused", manuallyPaused);
+        startRotation();
+        return;
+      }
+      activeIndex = index;
+      render();
+      restartRotation();
+    });
+  });
+
+  ticker.addEventListener("mouseenter", stopRotation);
+  ticker.addEventListener("mouseleave", startRotation);
+  ticker.addEventListener("focusin", stopRotation);
+  ticker.addEventListener("focusout", startRotation);
+  ticker.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowRight" ? 1 : -1;
+    activeIndex = (activeIndex + direction + cards.length) % cards.length;
+    render();
+    restartRotation();
+  });
+
+  render();
+  startRotation();
 });
 
 document.querySelectorAll("[data-process-set]").forEach((processSet) => {
