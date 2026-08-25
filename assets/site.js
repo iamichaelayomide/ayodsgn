@@ -334,17 +334,84 @@ document.querySelectorAll("[data-service-stack]").forEach((section) => {
   window.addEventListener("resize", requestSync);
 });
 
+const testimonialEntries = [
+  {
+    rating: 5,
+    quote: "Ayo took a rough product idea and turned it into a flow our team could understand and build. The screens were clear, and every decision had a reason.",
+    name: "Anonymous product founder",
+    role: "Lagos, Nigeria",
+  },
+  {
+    rating: 5,
+    quote: "Working with Ayo was a great experience. He pays attention to details, listens well, works fast, and the quality of his work has a very classy vibe.",
+    name: "Hay_artz stores",
+    role: "Founder",
+  },
+  {
+    rating: 4,
+    quote: "The redesign made our offer easier to understand and gave the team a much clearer direction. Review rounds were focused and the handoff was organized.",
+    name: "Anonymous startup operator",
+    role: "Toronto, Canada",
+  },
+  {
+    rating: 5,
+    quote: "I hired Ayo to handle the UI revamp for the Orca Securities website and he delivered exactly what we needed. His work is neat, detailed, and communication was smooth.",
+    name: "Olumide Adepoju",
+    role: "CEO, Orca Securities Ltd",
+  },
+  {
+    rating: 4,
+    quote: "I needed a website for Bitzsznn that captures the energy and lets me collect payments directly. The site looks premium and the ticketing flow feels smooth.",
+    name: "Yungbitz",
+    role: "CEO, Bitzsznn Entertainment",
+  },
+  {
+    rating: 5,
+    quote: "Ayo brought structure to a complicated dashboard without making it feel heavy. Our core actions are easier to find and the product finally feels consistent.",
+    name: "Anonymous SaaS lead",
+    role: "Austin, United States",
+  },
+  {
+    rating: 4,
+    quote: "The visual direction felt considered from the first presentation. He responded well to feedback and kept the final system flexible for our internal team.",
+    name: "Anonymous creative director",
+    role: "Berlin, Germany",
+  },
+  {
+    rating: 3,
+    quote: "The first direction needed another pass, but the feedback was handled thoughtfully. The final storefront is cleaner, faster to scan, and easier to maintain.",
+    name: "Anonymous e-commerce founder",
+    role: "Accra, Ghana",
+  },
+];
+
 document.querySelectorAll("[data-ticker]").forEach((ticker) => {
   const track = ticker.querySelector(".testimonial-track");
   if (!track) return;
 
   const allCards = Array.from(track.querySelectorAll(".testimonial-card"));
-  const cards = allCards.slice(0, 5);
+  const cards = allCards.slice(0, testimonialEntries.length);
   if (!cards.length) return;
 
-  allCards.slice(cards.length).forEach((card) => {
-    card.hidden = true;
+  cards.forEach((card, index) => {
+    const entry = testimonialEntries[index];
+    if (!entry) return;
+    const ratingLabel = card.querySelector(".rating span");
+    const ratingStars = card.querySelector(".rating strong");
+    const quote = card.querySelector(":scope > p");
+    const author = card.querySelector("footer strong");
+    const role = card.querySelector("footer span");
+    if (ratingLabel) ratingLabel.textContent = `${entry.rating}/5`;
+    if (ratingStars) {
+      ratingStars.textContent = `${"★".repeat(entry.rating)}${"☆".repeat(5 - entry.rating)}`;
+      ratingStars.setAttribute("aria-label", `${entry.rating} out of 5 stars`);
+    }
+    if (quote) quote.textContent = entry.quote;
+    if (author) author.textContent = entry.name;
+    if (role) role.textContent = entry.role;
   });
+
+  allCards.slice(cards.length).forEach((card) => card.remove());
 
   ticker.setAttribute("role", "region");
   ticker.setAttribute("aria-roledescription", "carousel");
@@ -567,6 +634,50 @@ document.querySelectorAll("[data-ticker]").forEach((ticker) => {
   render();
   startRotation();
 });
+
+const proofCounters = Array.from(document.querySelectorAll("[data-count-target]"));
+if (proofCounters.length) {
+  const reduceCounterMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function showCounterValue(counter, value) {
+    const suffix = counter.dataset.countSuffix || "";
+    counter.textContent = `${value}${suffix}`;
+  }
+
+  function animateCounter(counter) {
+    if (counter.dataset.counted === "true") return;
+    counter.dataset.counted = "true";
+    const target = Number(counter.dataset.countTarget || 0);
+    if (reduceCounterMotion || !Number.isFinite(target)) {
+      showCounterValue(counter, target);
+      return;
+    }
+
+    const startedAt = performance.now();
+    const duration = 1200;
+    const tick = (now) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = 1 - (1 - progress) ** 3;
+      showCounterValue(counter, Math.round(target * eased));
+      if (progress < 1) window.requestAnimationFrame(tick);
+    };
+    showCounterValue(counter, 0);
+    window.requestAnimationFrame(tick);
+  }
+
+  if ("IntersectionObserver" in window) {
+    const counterObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        animateCounter(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.45 });
+    proofCounters.forEach((counter) => counterObserver.observe(counter));
+  } else {
+    proofCounters.forEach(animateCounter);
+  }
+}
 
 document.querySelectorAll("[data-process-set]").forEach((processSet) => {
   const cards = Array.from(processSet.querySelectorAll(".process-step, .process-col"));

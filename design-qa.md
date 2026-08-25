@@ -1,74 +1,42 @@
-# Testimonial Section Design QA
+# Responsive Portfolio Design QA
 
-## Source and implementation
+## Sources and implementation captures
 
-- Source: `/Users/mac/Downloads/MacBook Pro 16_ - 29.png`
-- Normalized source: `/Users/mac/Documents/Codex/2026-08-25/s/work/figma-testimonial/source-pil-1728x1205.jpg`
-- Desktop implementation: `/Users/mac/Documents/Codex/2026-08-25/s/work/figma-testimonial/implementation-desktop-final.png`
-- Mobile implementation: `/Users/mac/Documents/Codex/2026-08-25/s/work/figma-testimonial/implementation-mobile-final.png`
-- Desktop comparison viewport: 1728 px wide, initial carousel state
-- Mobile comparison viewport: 390 x 844 px, initial carousel state
+- Project carousel source: `/var/folders/0b/5822wqv52rj02qf0mv0tdv2h0000gn/T/codex-clipboard-fc0d3e8f-c63a-4939-8213-1e55caa46e50.png`
+- Proof statistics source: `/var/folders/0b/5822wqv52rj02qf0mv0tdv2h0000gn/T/codex-clipboard-d2c24c02-be35-4f5a-9d3a-c22525bf70f6.png`
+- Service controls source: `/var/folders/0b/5822wqv52rj02qf0mv0tdv2h0000gn/T/codex-clipboard-38e039c5-aed0-4df8-898d-fc2734cecda6.png`
+- Final mobile captures: `/Users/mac/Documents/Codex/2026-08-25/s/outputs/site-visual-qa/mobile/`
+- Final tablet captures: `/Users/mac/Documents/Codex/2026-08-25/s/outputs/site-visual-qa/tablet/`
+- Final desktop captures: `/Users/mac/Documents/Codex/2026-08-25/s/outputs/site-visual-qa/desktop/`
+- Viewports: 390 x 844, 768 x 1024, and 1440 x 900.
 
-## Full-view comparison
+## Direct comparison findings
 
-The implemented section preserves the source composition: heading and paired calls to action at the top, a layered five-card fan as the dominant visual, centered pagination, supporting copy at lower left, and four proof statistics beneath the carousel. The live site's fixed navigation remains above the section; it was not present in the standalone Figma frame.
+The source screenshots and final implementation captures were inspected together. The browser chrome visible in the sources is outside the page-owned layout and was excluded from the comparison.
 
-### Typography
+1. Project carousel: added a persistent “Drag or swipe projects” instruction, current-position count, seven pagination dots, and desktop/tablet arrow buttons. The mobile carousel now exposes the next card edge while keeping the active card readable. The gap before “See all projects” is reduced.
+2. Proof statistics: removed the duplicated project count, changed the total to the seven projects actually displayed, and reduced the mobile layout to one centered three-item column. The counters animate once when the block enters the viewport and respect reduced-motion preferences.
+3. Service controls: the instruction, count, and arrows now share a clear horizontal reading line. Arrow glyphs are optically centered in their buttons. Mobile cards stay readable before the next card enters.
+4. Testimonials: the fan composition and swipe behavior remain intact. The carousel now contains exactly eight entries with varied 5-, 4-, and 3-star ratings. Requested names were removed; unverified identities were not invented, so anonymous location/role labels are used where needed.
 
-- The editorial serif heading, button labels, proof numerals, and sans-serif testimonial content follow the existing site type system and the reference hierarchy.
-- The large quote mark and compact rating treatment now match the visual weight of the source.
-- Real client names, roles, and testimonials are retained instead of the placeholder copy in the reference.
+## Full route QA
 
-### Spacing and layout
+Checked all 18 routes at all three viewports: Home, Projects, Services, About, Playground, Blog, Contact, Meala, Slumber Pal, SPND, Knowlab, Bitzsznn, Caladium Foundation, Orca Security, and the four article routes.
 
-- Desktop card spread, overlap, rotation, and scale match the source's fan composition.
-- The supporting copy, pagination, and statistics maintain the reference's visual rhythm.
-- Mobile reflows the heading and actions vertically, keeps the active card readable, and allows neighboring cards to peek without horizontal page overflow.
+- No horizontal document overflow was found.
+- No broken loaded images were found.
+- Every route retained its header, main content, and footer structure.
+- No duplicate element IDs were found.
+- No blocking overlays or console errors were found.
+- Project next control changed the state from `1 of 7` to `2 of 7`.
+- Testimonial pagination exposed eight controls and the eighth control selected the 3-star entry.
+- Proof counters settled at `2+`, `97%`, and `7`.
+- Service and project controls remained aligned at mobile, tablet, and desktop widths.
 
-### Colors and material
+## Intentional differences
 
-- The established cobalt background, white cards, pink primary action, blue rating details, and subtle outlined watermark remain consistent with the source and site brand.
-- Borders, radii, and card shadows are restrained and coherent with the existing design language.
+- The live site's fixed navigation is retained.
+- The proof total reflects the seven current featured projects rather than the repeated `20+` values in the source screenshot.
+- Anonymous descriptors are used rather than fabricated client names.
 
-### Imagery and assets
-
-- The reference uses typographic testimonial cards rather than photographic imagery; the implementation keeps that same asset model.
-- No placeholder boxes, synthetic icons, or unrelated graphics were introduced.
-
-### Copy
-
-- The section heading is now `What clients say`, matching the supplied design.
-- The source's proof labels are preserved while testimonial content uses verified live-site client copy.
-
-## Focused component comparison
-
-The focused center-card comparison confirmed the quote glyph, rating placement, body-copy position, author block, rotation, and proportions. The center card is the primary readable surface while side cards remain intentionally subordinate and layered.
-
-## Iteration record
-
-1. Replaced the flat horizontal testimonial ticker with the five-card fan carousel shown in the source.
-2. Refined desktop offsets, card spread, and section spacing to match the 1728 px reference composition.
-3. Corrected the primary testimonial call to action to pink after a more specific legacy button rule overrode it.
-4. Added mobile top clearance so the fixed header no longer clips the section heading.
-5. Refined the center-card quote scale, rating position, and body-copy alignment.
-6. Added five stateful pagination controls, keyboard navigation, pause behavior, reduced-motion support, and timed rotation.
-
-## Responsive and interaction verification
-
-- Checked Home, Projects, Services, and About at 320, 390, 768, 1440, and 1728 px.
-- Confirmed one active card, five visible fan cards, five pagination controls, and four proof statistics.
-- Confirmed no horizontal document overflow, broken images, or blocking overlays at the tested widths.
-- Confirmed timed auto-advance, clickable pagination, side-card selection, and left/right keyboard navigation.
-- Confirmed mobile swipe handling with horizontal intent locking, drag resistance, touch and pointer fallbacks, and vertical page scrolling preserved.
-- Confirmed Services cards remain fully visible before the next desktop card begins its overlap; tablet and mobile use a non-sticky reading flow so tall content is never covered.
-- Confirmed reduced-motion users receive a stable, non-automated state.
-
-## Remaining intentional differences
-
-- The live fixed header is retained above the section.
-- Real testimonial content replaces the Figma placeholder content.
-- The source's faint purple lower glow and additional cropped watermark fragments are treated as optional polish; no P0, P1, or P2 visual discrepancy remains.
-
-## Result
-
-passed
+final result: passed
