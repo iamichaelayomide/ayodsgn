@@ -858,6 +858,8 @@ h2 em {
 
 .proj-home-carousel-wrap {
   position: relative;
+  /* Keep card z-index values below the fixed site navigation. */
+  isolation: isolate;
   width: min(calc(100% - (2 * var(--site-gutter))), var(--max));
   height: clamp(470px, 42vw, 580px);
   margin: 16px auto 0;
