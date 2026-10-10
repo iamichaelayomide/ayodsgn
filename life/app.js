@@ -1,3 +1,4 @@
+import {createAccountability} from './accountability.js?v=1';
 import {emptyState} from './empty-states.js?v=1';
 import {createGoals} from './goals.js?v=2';
 import {installNavigation} from './navigation.js?v=1';
@@ -7,7 +8,8 @@ import {installSelects} from './selects.js?v=1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
-let suspendedDialog = '';
+let suspendedDialog = '', role='owner';
+const inviteParams=new URLSearchParams(location.search);let inviteToken=inviteParams.get('invite');const partnerId=inviteParams.get('partner');
 const API = new URL('../api/life/',import.meta.url).pathname;
 const order = (items) => [...items].sort((a,b) => a.position-b.position);
 const activeLists = () => order(data.state.lists.filter(l => !l.archived));
@@ -40,20 +42,22 @@ async function mutate(action,args) {
 }
 async function loadBoard() {
   data=await request('board'); selectedWeek ||= data.week; conflict=false; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
-  $('auth').hidden=true; $('workspace').hidden=false; if(data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
+  $('auth').hidden=true; $('workspace').hidden=false; if(role==='owner'&&data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
 async function start() {
   try {
-    const session=await request('session'); csrf=session.csrf; setup=session.setupRequired;
+    const session=await request('session'); csrf=session.csrf; setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
     $('setup-label').hidden=!setup; $('auth-submit').disabled=false; $('auth-submit').textContent=setup?'Create my private planner':'Sign in';
     $('auth-copy').textContent=setup?'Enter your one-time setup key and choose a passphrase of at least 14 characters.':'Sign in to your life planner.';
     $('auth-form').elements.password.autocomplete=setup?'new-password':'current-password';
+    if(inviteToken){$('auth-copy').textContent='Accept your private partner invitation. Choose a passphrase of at least 14 characters. You will see the whole planner and approve goals and reviewed tasks.';$('auth-submit').textContent='Accept invitation';$('partner-login').hidden=true;}
+    else if(partnerId){$('auth-form').elements.partnerId.value=partnerId;$('partner-login').open=true;}
     if (session.authenticated) await loadBoard();
   } catch(e) { $('auth-error').textContent=e.message; $('auth-submit').textContent='Unavailable'; }
 }
 $('auth-form').addEventListener('submit',async(e)=>{
   e.preventDefault(); const form=e.currentTarget; $('auth-error').textContent=''; $('auth-submit').disabled=true;
-  try { const result=await request(setup?'setup':'login',{password:form.elements.password.value,token:form.elements.token.value}); csrf=result.csrf; setup=false; form.reset(); await loadBoard(); }
+  try { const result=await request(inviteToken?'partner.accept':setup?'setup':'login',{password:form.elements.password.value,token:inviteToken||form.elements.token.value,id:partnerId,partnerId:form.elements.partnerId.value}); csrf=result.csrf;role=result.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');if(inviteToken){history.replaceState(null,'',location.pathname+'?partner='+partnerId);inviteToken=null;}setup=false; form.reset(); await loadBoard(); }
   catch(e) { $('auth-error').textContent=e.message; }
   finally { $('auth-submit').disabled=false; }
 });
@@ -71,11 +75,14 @@ function dayLabel(value) {
 function today() { return new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Lagos',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
 function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
-  return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
+  return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${role==='partner'?'disabled':''} ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
 }
 const planning = createCalendar({getData:()=>data,today,mutate,openTask,refreshSelects,escape});
+const accountability=createAccountability({getData:()=>data,request,mutate,escape,role:()=>role});
 const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
 function render() {
+  $('accountability').hidden=view!=='accountability';
+  if(view==='accountability'){$('goals').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Accountability';$('page-title').innerHTML='Better, <em>together.</em>';$('page-description').textContent='A trusted perspective. A little encouragement. Shared progress.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});accountability.render();return;}
   $('goals').hidden=view!=='goals';
   if(view==='goals'){$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Goals';$('page-title').innerHTML='Keep your <em>big picture.</em>';$('page-description').textContent='Give your quarter a direction. Turn it into smaller, meaningful steps.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});goals.render();return;}
   const isPlanning=view==='today'||view==='calendar';
@@ -133,7 +140,7 @@ function openTask(id='',listId='') {
   form.elements.listId.value=task?.listId||listId||mobileList||activeLists()[0].id;
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.labels.value=task?.labels.join(', ')||'';form.elements.inSprint.checked=task?sprint().taskIds.includes(task.id):view==='week';
-  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-dialog').showModal();form.elements.title.focus();
+  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});$('task-dialog').showModal();form.elements.title.focus();
 }
 function openList(id='') {
   const list=data.state.lists.find(l=>l.id===id),form=$('list-form');form.reset();form.elements.id.value=id;form.elements.name.value=list?.name||'';

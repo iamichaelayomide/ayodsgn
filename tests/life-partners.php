@@ -1,0 +1,12 @@
+<?php
+require __DIR__.'/../api/life/store.php';require __DIR__.'/../api/life/partners.php';
+$db=new PDO('sqlite::memory:');$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);$db->exec(file_get_contents(__DIR__.'/../api/life/schema.sql'));$s=new LifeStore($db);$s->initialize('test-only-long-passphrase');$p=new LifePartners($s);$n=0;
+function ok($c){global $n;if(!$c)throw new RuntimeException('Partner check failed');$n++;}
+function denied($fn,$code){try{$fn();}catch(LifeError $e){ok($e->status===$code);return;}throw new RuntimeException('Expected denial');}
+$i=$p->invite('Test partner');ok(strlen($i['token'])===64);ok(!str_contains(json_encode($p->list()),$i['token']));denied(fn()=>$p->accept($i['id'],'bad','partner-test-passphrase'),403);$account=$p->accept($i['id'],$i['token'],'partner-test-passphrase');ok(password_verify('partner-test-passphrase',$account['password_hash']));ok($s->read()['state']['accountabilityEnabled']);denied(fn()=>$p->accept($i['id'],$i['token'],'partner-test-passphrase'),403);
+$d=$s->read();$review=$d['state']['lists'][3]['id'];$done=$d['state']['lists'][5]['id'];$d=$s->mutate($d['version'],'task.save',['title'=>'For review','listId'=>$review]);$t=end($d['state']['tasks'])['id'];
+foreach(['task.complete'=>['id'=>$t,'done'=>true],'task.move'=>['id'=>$t,'listId'=>$done],'task.save'=>['id'=>$t,'title'=>'Bypass','listId'=>$done],'task.approve'=>['id'=>$t]] as $a=>$args)denied(fn()=>$s->mutate($d['version'],$a,$args),403);
+denied(fn()=>$s->mutate($d['version'],'task.rename',['id'=>$t,'title'=>'Partner edit'],'partner',$i['id']),403);
+$d=$s->mutate($d['version'],'task.approve',['id'=>$t],'partner',$i['id']);ok($d['state']['tasks'][0]['listId']===$done);ok($d['state']['tasks'][0]['approval']['by']===$i['id']);
+$d=$s->mutate($d['version'],'goal.save',['title'=>'Real intention','type'=>'quarter','period'=>'2026-Q4','category'=>'Work']);$g=end($d['state']['goals'])['id'];denied(fn()=>$s->mutate($d['version'],'goal.save',['id'=>$g,'title'=>'Real intention','type'=>'quarter','period'=>'2026-Q4','category'=>'Work','completed'=>true]),403);$d=$s->mutate($d['version'],'goal.approve',['id'=>$g],'partner',$i['id']);ok($d['state']['goals'][0]['completed']);
+$p->revoke($i['id']);ok((bool)$p->find($i['id'])['revoked']);ok($s->read()['state']['accountabilityEnabled']);$expired=$p->invite('Expired');$db->prepare('UPDATE life_partner SET expires_at=0 WHERE id=?')->execute([$expired['id']]);denied(fn()=>$p->accept($expired['id'],$expired['token'],'partner-test-passphrase'),403);echo "$n partner checks passed\n";

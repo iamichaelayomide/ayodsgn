@@ -26,9 +26,9 @@ function life_session(): void {
     session_name('ayolife');
     session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>($_SERVER['HTTPS']??'')==='on','httponly'=>true,'samesite'=>'Strict']);
     session_start();
-    if (isset($_SESSION['owner']) && time()-($_SESSION['last_activity']??0)>3600) { $_SESSION=[]; session_regenerate_id(true); }
+    if ((isset($_SESSION['owner'])||isset($_SESSION['partner'])) && time()-($_SESSION['last_activity']??0)>3600) { $_SESSION=[]; session_regenerate_id(true); }
     $_SESSION['csrf']??=bin2hex(random_bytes(32));
-    if (isset($_SESSION['owner'])) $_SESSION['last_activity']=time();
+    if ((isset($_SESSION['owner'])||isset($_SESSION['partner']))) $_SESSION['last_activity']=time();
 }
 function life_json(array $value, int $status=200): never {
     http_response_code($status); header('Content-Type: application/json; charset=utf-8'); echo json_encode($value,JSON_THROW_ON_ERROR); exit;
