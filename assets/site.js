@@ -869,7 +869,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       return img;
     }
     const img = document.createElement('img');
-    img.src = item.imageSrc || item.thumbnail;
+    img.src = item.thumbnail || item.imageSrc;
     img.alt = item.alt || item.title;
     img.className = className;
     img.loading = 'lazy';
@@ -1237,10 +1237,11 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       video.src = item.videoSrc;
       video.controls = true;
       video.playsInline = true;
+      video.poster = item.thumbnail;
       video.autoplay = true;
       video.preload = 'metadata';
       frame.appendChild(video);
-      video.play().catch(() => {});
+
     } else {
       const img = document.createElement('img');
       img.src = item.imageSrc || item.thumbnail;
@@ -1254,6 +1255,8 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
     overlay.appendChild(stage);
     document.body.appendChild(overlay);
     document.body.classList.add('lightbox-open');
+    const activeVideo = frame.querySelector('video');
+    if (activeVideo) activeVideo.play().catch(() => {});
     overlay.focus();
     const showOffset = (offset) => {
       lightboxIndex = (lightboxIndex + offset + items.length) % items.length;
