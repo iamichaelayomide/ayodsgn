@@ -40,5 +40,14 @@ rejects(fn()=>$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'2
 rejects(fn()=>$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'2026-10-14','time'=>'23:30','minutes'=>60]),422);
 rejects(fn()=>$store->mutate($before['version'],'task.schedule',['id'=>$id,'date'=>'2026-10-14','time'=>'09:00','minutes'=>60]),409);
 $d=$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'','time'=>'09:00','minutes'=>60]);check($d['state']['tasks'][0]['schedule']===null,'Work block removed');check($d['state']['tasks'][0]['dueDate']===$due,'Removal preserves deadline');
+$d=$store->mutate($d['version'],'task.rename',['id'=>$id,'title'=>'A clearer thought']);check($d['state']['tasks'][0]['title']==='A clearer thought','Inline rename persists');
+$ci=$d['state']['tasks'][0]['checklist'][0]['id'];$d=$store->mutate($d['version'],'checklist.toggle',['id'=>$id,'itemId'=>$ci,'done'=>true]);check($d['state']['tasks'][0]['checklist'][0]['done'],'Card checklist persists');
+$d=$store->mutate($d['version'],'goal.save',['title'=>'Quarter direction','type'=>'quarter','period'=>'2026-Q4','category'=>'Work']);$q=end($d['state']['goals'])['id'];
+$d=$store->mutate($d['version'],'goal.save',['title'=>'Monthly step','type'=>'month','period'=>'2026-10','parentId'=>$q,'category'=>'Work']);$m=end($d['state']['goals'])['id'];check(end($d['state']['goals'])['parentId']===$q,'Goal hierarchy persists');
+rejects(fn()=>$store->mutate($d['version'],'goal.save',['title'=>'Wrong quarter','type'=>'month','period'=>'2026-02','parentId'=>$q]),422);
+$d=$store->mutate($d['version'],'goal.save',['title'=>'Weekly step','type'=>'week','period'=>'2026-10-12','parentId'=>$m,'category'=>'Work']);check(end($d['state']['goals'])['parentId']===$m,'Weekly goal links month');
+$d=$store->mutate($d['version'],'review.save',['week'=>'2026-10-12','wins'=>'Progress','obstacles'=>'Too much scope','next'=>'Keep it smaller']);check($d['state']['reviews']['2026-10-12']['next']==='Keep it smaller','Weekly review persists');
+$d=$store->mutate($d['version'],'task.complete',['id'=>$id,'done'=>true]);check($d['state']['lists'][array_search($d['state']['tasks'][0]['listId'],array_column($d['state']['lists'],'id'))]['isDone'],'Today completion moves same task to Done');
+$d=$store->mutate($d['version'],'board.refine',[]);check(count(array_filter($d['state']['lists'],fn($l)=>$l['name']==='Idea Box'))===1,'Inbox becomes Idea Box');
 for($i=0;$i<5;$i++)$store->throttle('test-address');rejects(fn()=>$store->throttle('test-address'),429);
 echo "$checks backend checks passed\n";

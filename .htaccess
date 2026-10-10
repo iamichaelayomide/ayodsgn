@@ -1,0 +1,6 @@
+RewriteEngine On
+# Keep repository internals private.
+RewriteRule ^\.git(?:/|$) - [F,L]
+# Life shares the authenticated application and database.
+RewriteCond %{HTTP_HOST} ^life\.ayodsgn\.com$ [NC]
+RewriteRule ^$ life/index.php [L]
