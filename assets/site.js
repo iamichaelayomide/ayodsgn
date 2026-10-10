@@ -859,20 +859,45 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
     applyCamera();
   }
 
-  function createMedia(item, className = '') {
-    if (item.mediaType === 'video') {
-      const img = document.createElement('img');
-      img.src = item.thumbnail;
-      img.alt = item.alt || item.title;
-      img.className = className;
-      img.loading = 'lazy';
-      return img;
+  const previewQueue = [];
+  let previewsLoading = 0;
+  function loadQueuedPreviews() {
+    while (previewsLoading < 3 && previewQueue.length) {
+      const img = previewQueue.shift();
+      if (!img.isConnected) continue;
+      previewsLoading += 1;
+      const finish = () => {
+        previewsLoading -= 1;
+        img.onload = null;
+        img.onerror = null;
+        loadQueuedPreviews();
+      };
+      img.onload = finish;
+      img.onerror = finish;
+      img.src = img.dataset.previewSrc;
     }
+  }
+  const previewObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      previewObserver.unobserve(entry.target);
+      previewQueue.push(entry.target);
+    });
+    loadQueuedPreviews();
+  }, { rootMargin: '100px' }) : null;
+
+  function createMedia(item, className = '') {
     const img = document.createElement('img');
-    img.src = item.thumbnail || item.imageSrc;
     img.alt = item.alt || item.title;
     img.className = className;
-    img.loading = 'lazy';
+    img.decoding = 'async';
+    if (previewObserver) {
+      img.dataset.previewSrc = item.thumbnail || item.imageSrc;
+      previewObserver.observe(img);
+    } else {
+      img.src = item.thumbnail || item.imageSrc;
+      img.loading = 'lazy';
+    }
     return img;
   }
 
@@ -965,6 +990,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
 
   function renderCanvasView() {
     if (!canvasCardsContainer) return;
+    previewObserver?.disconnect();
     filteredItems = getFilteredItems();
     syncStates(filteredItems);
     canvasCardsContainer.innerHTML = '';
@@ -1131,6 +1157,7 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
   }
 
   function renderListView() {
+    previewObserver?.disconnect();
     if (!listRowsContainer) return;
     const items = getFilteredItems();
     listRowsContainer.innerHTML = '';
@@ -1241,7 +1268,6 @@ document.querySelectorAll('.playground-section').forEach((playgroundContainer) =
       video.autoplay = true;
       video.preload = 'metadata';
       frame.appendChild(video);
-
     } else {
       const img = document.createElement('img');
       img.src = item.imageSrc || item.thumbnail;
