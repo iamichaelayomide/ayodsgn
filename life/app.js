@@ -1,6 +1,7 @@
+import {createGoals} from './goals.js?v=1';
 import {installNavigation} from './navigation.js?v=1';
 installNavigation();
-import {createCalendar} from './calendar.js?v=1';
+import {createCalendar} from './calendar.js?v=2';
 import {installSelects} from './selects.js?v=1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
@@ -38,7 +39,7 @@ async function mutate(action,args) {
 }
 async function loadBoard() {
   data=await request('board'); selectedWeek ||= data.week; conflict=false; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
-  $('auth').hidden=true; $('workspace').hidden=false; render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
+  $('auth').hidden=true; $('workspace').hidden=false; if(data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
 async function start() {
   try {
@@ -69,10 +70,13 @@ function dayLabel(value) {
 function today() { return new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Lagos',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
 function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
-  return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong>${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button></div>`;
+  return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
 }
 const planning = createCalendar({getData:()=>data,today,mutate,openTask,refreshSelects,escape});
+const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
 function render() {
+  $('goals').hidden=view!=='goals';
+  if(view==='goals'){$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Goals';$('page-title').innerHTML='Keep your <em>big picture.</em>';$('page-description').textContent='Give your quarter a direction. Turn it into smaller, meaningful steps.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});goals.render();return;}
   const isPlanning=view==='today'||view==='calendar';
   $('planning').hidden=!isPlanning;
   document.querySelector('.toolbar').hidden=isPlanning;
@@ -80,7 +84,7 @@ function render() {
     $('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;
     $('breadcrumb').textContent=view==='today'?'Today':'Calendar';
     $('page-title').innerHTML=view==='today'?'Make today <em>count.</em>':'Make room for <em>your plans.</em>';
-    $('page-description').textContent=view==='today'?'Your work blocks, deadlines, and overdue tasks in one place.':'Plan time separately from deadlines. Your board and calendar share the same tasks.';
+    $('page-description').textContent=view==='today'?'A simple checklist for today. Small steps count, whether linked to a goal or ad hoc.':'Plan time separately from deadlines. Your board and calendar share the same tasks.';
     document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
     planning.render(view);return;
   }
@@ -100,7 +104,7 @@ function render() {
   if(view==='archive') { renderArchive(); refreshSelects(); return; }
   $('board').innerHTML=lists.map((list,index)=>{
     const cards=tasks.filter(t=>t.listId===list.id);
-    return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2>${escape(list.name)}</h2><span class="column-count">${cards.length}</span></div><div class="column-controls"><button data-list-edit="${list.id}" aria-label="Rename ${escape(list.name)}">Rename</button>${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}" title="Archive list"><img src="./icons/archive.svg" alt="" class="action-icon"></button>`:''}</div><div class="cards">${cards.length?cards.map(taskCard).join(''):'<p class="empty-column">A little space for your next step.</p>'}</div><button class="add-card" data-add-task="${list.id}">+ Add a task</button></section>`;
+    return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2><button class="list-title" data-list-edit="${list.id}" title="Rename list">${escape(list.name==='Inbox'?'Idea Box':list.name)}</button></h2><span class="column-count">${cards.length}</span></div><div class="column-controls">${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}" title="Archive list"><img src="./icons/archive.svg" alt="" class="action-icon"></button>`:''}</div><div class="cards">${cards.length?cards.map(taskCard).join(''):`<div class="empty-column">${list.name==='Inbox'||list.name==='Idea Box'?'<img src="./ideas-empty.png" alt="" width="110" height="90"><p>Drop a thought.<br>Make space for what could be.</p>':'<p>A little space for your next step.</p>'}</div>`}</div><form class="quick-add" data-quick-list="${list.id}"><input name="title" aria-label="Add to ${escape(list.name==='Inbox'?'Idea Box':list.name)}" maxlength="200" required placeholder="${(list.name==='Inbox'||list.name==='Idea Box')?'Drop an idea…':'Add a task…'}"><button aria-label="Add card" type="submit">+</button></form></section>`;
   }).join('');
   refreshSelects();
   if(view==='week') {
@@ -128,7 +132,7 @@ function openTask(id='',listId='') {
   form.elements.listId.value=task?.listId||listId||mobileList||activeLists()[0].id;
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.labels.value=task?.labels.join(', ')||'';form.elements.inSprint.checked=task?sprint().taskIds.includes(task.id):view==='week';
-  task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-dialog').showModal();form.elements.title.focus();
+  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-dialog').showModal();form.elements.title.focus();
 }
 function openList(id='') {
   const list=data.state.lists.find(l=>l.id===id),form=$('list-form');form.reset();form.elements.id.value=id;form.elements.name.value=list?.name||'';
@@ -153,7 +157,7 @@ $('add-checklist').addEventListener('click',()=>checklistRow().querySelector('in
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
 $('task-form').addEventListener('submit',async(e)=>{
   e.preventDefault();const f=e.currentTarget,submit=f.querySelector('[type=submit]');$('task-error').textContent='';submit.disabled=true;
-  const args={};for(const key of ['id','title','notes','blocker','priority','dueDate','listId'])args[key]=f.elements[key].value;
+  const args={};for(const key of ['id','title','notes','blocker','priority','dueDate','listId','goalId'])args[key]=f.elements[key].value;
   args.labels=f.elements.labels.value.split(',').map(l=>l.trim()).filter(Boolean);
   args.checklist=[...$('checklist').children].map(row=>({id:row.dataset.id,text:row.querySelector('[type=text]').value,done:row.querySelector('[type=checkbox]').checked}));
   args.sprintWeek=selectedWeek;args.inSprint=f.elements.inSprint.checked;
@@ -162,10 +166,11 @@ $('task-form').addEventListener('submit',async(e)=>{
 });
 $('list-form').addEventListener('submit',async(e)=>{e.preventDefault();const f=e.currentTarget,button=f.querySelector('[type=submit]');button.disabled=true;try{await mutate('list.save',{id:f.elements.id.value,name:f.elements.name.value});$('list-dialog').close();}catch(e){$('list-error').textContent=e.message;}finally{button.disabled=false;}});
 $('archive-task').addEventListener('click',async()=>{try{if(await confirmArchive('task.archive',$('task-form').elements.id.value))$('task-dialog').close();}catch(e){$('task-error').textContent=e.message;}});
+let cardOpenTimer;
 document.addEventListener('click',async(e)=>{
   const b=e.target.closest('button');if(!b||!data)return;
   try{
-    if(b.dataset.task)openTask(b.dataset.task);
+    if(b.dataset.task){if(e.detail>1)return;clearTimeout(cardOpenTimer);cardOpenTimer=setTimeout(()=>openTask(b.dataset.task),280);}
     else if(b.dataset.addTask)openTask('',b.dataset.addTask);
     else if(b.dataset.listEdit)openList(b.dataset.listEdit);
     else if(b.dataset.listMove)await mutate('list.move',{id:b.dataset.listMove,position:Number(b.dataset.position)});
@@ -230,3 +235,7 @@ boardElement.addEventListener('scroll',()=>{cancelAnimationFrame(boardScrollFram
   if(nearest&&mobileList!==nearest.dataset.list){mobileList=nearest.dataset.list;$('mobile-list').value=mobileList;refreshSelects();}
 });},{passive:true});
 boardElement.addEventListener('keydown',event=>{const handle=event.target.closest('[data-drag-task]');if(handle&&['Enter',' '].includes(event.key)){event.preventDefault();openTask(handle.dataset.dragTask);}});
+
+$('board').addEventListener('submit',async event=>{const form=event.target.closest('[data-quick-list]');if(!form)return;event.preventDefault();const title=form.elements.title.value.trim();if(!title)return;try{await mutate('task.save',{title,listId:form.dataset.quickList,priority:'normal',labels:[],checklist:[],notes:'',blocker:'',dueDate:'',...(view==='week'?{sprintWeek:selectedWeek,inSprint:true}:{})});}catch(e){pageError(e.message);}});
+$('board').addEventListener('change',async event=>{const input=event.target.closest('[data-check-item]');if(!input)return;input.disabled=true;try{await mutate('checklist.toggle',{id:input.dataset.checkTask,itemId:input.dataset.checkItem,done:input.checked});}catch(e){input.checked=!input.checked;input.disabled=false;pageError(e.message);}});
+$('board').addEventListener('dblclick',event=>{const title=event.target.closest('[data-rename-task]');if(!title)return;clearTimeout(cardOpenTimer);event.preventDefault();const task=data.state.tasks.find(t=>t.id===title.dataset.renameTask),form=document.createElement('form');form.className='inline-rename';form.innerHTML=`<input aria-label="Rename card" maxlength="200" required value="${escape(task.title)}"><button type="submit">Save</button><button type="button">Cancel</button>`;title.closest('.task-shell').append(form);form.querySelector('input').focus();form.querySelector('input').select();form.querySelector('[type=button]').addEventListener('click',()=>form.remove());form.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();form.remove();}});form.addEventListener('submit',async e=>{e.preventDefault();try{await mutate('task.rename',{id:task.id,title:form.querySelector('input').value});}catch(error){pageError(error.message);}});});
