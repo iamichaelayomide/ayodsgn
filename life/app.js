@@ -1,7 +1,8 @@
-import {createGoals} from './goals.js?v=1';
+import {emptyState} from './empty-states.js?v=1';
+import {createGoals} from './goals.js?v=2';
 import {installNavigation} from './navigation.js?v=1';
 installNavigation();
-import {createCalendar} from './calendar.js?v=2';
+import {createCalendar} from './calendar.js?v=3';
 import {installSelects} from './selects.js?v=1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
@@ -104,7 +105,7 @@ function render() {
   if(view==='archive') { renderArchive(); refreshSelects(); return; }
   $('board').innerHTML=lists.map((list,index)=>{
     const cards=tasks.filter(t=>t.listId===list.id);
-    return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2><button class="list-title" data-list-edit="${list.id}" title="Rename list">${escape(list.name==='Inbox'?'Idea Box':list.name)}</button></h2><span class="column-count">${cards.length}</span></div><div class="column-controls">${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}" title="Archive list"><img src="./icons/archive.svg" alt="" class="action-icon"></button>`:''}</div><div class="cards">${cards.length?cards.map(taskCard).join(''):`<div class="empty-column">${list.name==='Inbox'||list.name==='Idea Box'?'<img src="./ideas-empty.png" alt="" width="110" height="90"><p>Drop a thought.<br>Make space for what could be.</p>':'<p>A little space for your next step.</p>'}</div>`}</div><form class="quick-add" data-quick-list="${list.id}"><input name="title" aria-label="Add to ${escape(list.name==='Inbox'?'Idea Box':list.name)}" maxlength="200" required placeholder="${(list.name==='Inbox'||list.name==='Idea Box')?'Drop an idea…':'Add a task…'}"><button aria-label="Add card" type="submit">+</button></form></section>`;
+    return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2><button class="list-title" data-list-edit="${list.id}" title="Rename list">${escape(list.name==='Inbox'?'Idea Box':list.name)}</button></h2><div class="column-actions"><span class="column-count">${cards.length}</span>${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}" title="Archive list"><img src="./icons/archive.svg" alt="" class="action-icon"></button>`:''}</div></div><div class="cards">${cards.length?cards.map(taskCard).join(''):`<div class="empty-column"><img src="./ideas-empty.png" alt="" width="110" height="90"><p>${cards.length===0&&data.state.tasks.some(t=>!t.archived&&t.listId===list.id)?'No tasks match these filters.':(list.name==='Inbox'||list.name==='Idea Box')?'Drop a thought.<br>Make space for what could be.':list.isDone?'A little space to celebrate progress.':list.name==='Review'?'Make room for a fresh perspective.':list.name==='Blocked'?'A space to untangle what is in the way.':'A little space for your next step.'}</p></div>`}</div><form class="quick-add" data-quick-list="${list.id}"><input name="title" aria-label="Add to ${escape(list.name==='Inbox'?'Idea Box':list.name)}" maxlength="200" required placeholder="${(list.name==='Inbox'||list.name==='Idea Box')?'Drop an idea…':'Add a task…'}"><button aria-label="Add card" type="submit">+</button></form></section>`;
   }).join('');
   refreshSelects();
   if(view==='week') {
@@ -118,7 +119,7 @@ function render() {
 }
 function renderArchive() {
   const lists=data.state.lists.filter(l=>l.archived),tasks=data.state.tasks.filter(t=>t.archived&&matches(t));
-  $('archive').innerHTML=`<h2>Archived lists</h2>${lists.length?lists.map(l=>`<div class="archive-row"><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore list</button></div>`).join(''):'<p>No archived lists.</p>'}<h2>Archived tasks</h2>${tasks.length?tasks.map(t=>`<div class="archive-row"><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${activeLists().map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}">Restore task</button></div>`).join(''):'<p>No archived tasks match these filters.</p>'}`;
+  $('archive').innerHTML=`<h2>Archived lists</h2>${lists.length?lists.map(l=>`<div class="archive-row"><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore list</button></div>`).join(''):emptyState('archive','No archived lists.')}<h2>Archived tasks</h2>${tasks.length?tasks.map(t=>`<div class="archive-row"><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${activeLists().map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}">Restore task</button></div>`).join(''):emptyState('archive','No archived tasks match these filters.')}`;
 }
 function checklistRow(item={text:'',done:false,id:''}) {
   const row=document.createElement('div');row.className='check-row';row.dataset.id=item.id||'';
