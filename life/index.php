@@ -10,7 +10,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="/life/life.css?v=1"><script type="module" src="/life/app.js?v=1"></script>
+  <link rel="stylesheet" href="./life.css?v=2"><script type="module" src="./app.js?v=2"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
@@ -34,7 +34,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
         <button data-view="archive"><span aria-hidden="true">▱</span> Archive</button>
       </nav>
       <div class="sidebar-note"><span class="accent-line"></span><p>Make room for<br>what <em>matters.</em></p><small>One next step at a time.</small></div>
-      <div class="sidebar-bottom"><a href="/api/life/?action=export" id="export">Export my data</a><button id="logout">Sign out</button></div>
+      <div class="sidebar-bottom"><a href="../api/life/?action=export" id="export">Export my data</a><button id="logout">Sign out</button></div>
     </aside>
     <main>
       <header class="topbar"><p>My Life <span>/</span> <span id="breadcrumb">My board</span></p><span id="save-status" role="status">All changes saved</span></header>
@@ -58,10 +58,10 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <label>What's blocking this?<textarea name="blocker" rows="2" maxlength="2000" placeholder="Optional — name the thing in your way"></textarea></label>
       <div class="checklist-heading"><h3>Checklist</h3><button type="button" id="add-checklist">+ Add item</button></div><div id="checklist"></div>
       <label class="checkbox-label"><input name="inSprint" type="checkbox"> Include in the selected week's sprint</label>
-      <p id="task-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" id="archive-task" class="danger" hidden>Archive task</button><button type="button" data-close>Cancel</button><button type="submit" class="primary">Save task</button></div>
+      <p id="task-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" id="archive-task" class="danger" hidden>Archive task</button><button type="button" data-close>Cancel</button><button type="submit" class="primary">Save task</button></div>
     </form>
   </dialog>
-  <dialog id="list-dialog" aria-labelledby="list-dialog-title"><form id="list-form"><div class="dialog-heading"><h2 id="list-dialog-title">Add list</h2><button type="button" data-close aria-label="Close list">×</button></div><input type="hidden" name="id"><label>List name<input name="name" required maxlength="80"></label><p id="list-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save list</button></div></form></dialog>
-  <dialog id="sprint-dialog" aria-labelledby="sprint-dialog-title"><form id="sprint-form"><div class="dialog-heading"><h2 id="sprint-dialog-title">Choose sprint tasks</h2><button type="button" data-close aria-label="Close sprint selection">×</button></div><p>Choose what you will focus on. These remain the same tasks on your board.</p><div id="sprint-choices"></div><p id="sprint-error" class="error" role="alert"></p><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save selection</button></div></form></dialog>
+  <dialog id="list-dialog" aria-labelledby="list-dialog-title"><form id="list-form"><div class="dialog-heading"><h2 id="list-dialog-title">Add list</h2><button type="button" data-close aria-label="Close list">×</button></div><input type="hidden" name="id"><label>List name<input name="name" required maxlength="80"></label><p id="list-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save list</button></div></form></dialog>
+  <dialog id="sprint-dialog" aria-labelledby="sprint-dialog-title"><form id="sprint-form"><div class="dialog-heading"><h2 id="sprint-dialog-title">Choose sprint tasks</h2><button type="button" data-close aria-label="Close sprint selection">×</button></div><p>Choose what you will focus on. These remain the same tasks on your board.</p><div id="sprint-choices"></div><p id="sprint-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save selection</button></div></form></dialog>
   <dialog id="confirm-dialog" aria-labelledby="confirm-title"><div class="dialog-heading"><h2 id="confirm-title">Archive this item?</h2></div><p>You can restore it from Archive.</p><div class="dialog-actions"><button id="confirm-cancel">Cancel</button><button id="confirm-yes" class="primary">Archive</button></div></dialog>
 </body></html>

@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
 let suspendedDialog = '';
-const API = '/api/life/';
+const API = new URL('../api/life/',import.meta.url).pathname;
 const order = (items) => [...items].sort((a,b) => a.position-b.position);
 const activeLists = () => order(data.state.lists.filter(l => !l.archived));
 const sprint = () => data.state.sprints[selectedWeek] || {goal:'',taskIds:[]};
@@ -16,7 +16,7 @@ async function request(action, body) {
   try { result=await response.json(); } catch { throw new Error('The server could not respond. Your draft is preserved.'); }
   if (!response.ok) {
     const error=new Error(result.error || 'The request could not be completed.'); error.status=response.status;
-    if (response.status===409) { conflict=true; $('reload').hidden=false; }
+    if (response.status===409) { conflict=true; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=false); }
     if (response.status===401 && action!=='login') { const openDialog=document.querySelector('dialog[open]'); if(openDialog){suspendedDialog=openDialog.id;openDialog.close();} const session=await request('session');csrf=session.csrf; $('workspace').hidden=true; $('auth').hidden=false; $('auth-copy').textContent='Your session ended. Sign in again to continue; your open draft is preserved.'; }
     throw error;
   }
@@ -32,7 +32,7 @@ async function mutate(action,args) {
   finally { saving=false; document.body.classList.remove('saving'); }
 }
 async function loadBoard() {
-  data=await request('board'); selectedWeek ||= data.week; conflict=false; $('reload').hidden=true;
+  data=await request('board'); selectedWeek ||= data.week; conflict=false; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
   $('auth').hidden=true; $('workspace').hidden=false; render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
 async function start() {
@@ -175,6 +175,6 @@ $('choose-tasks').addEventListener('click',()=>{
   $('sprint-choices').innerHTML=data.state.tasks.filter(t=>!t.archived).map(t=>`<label class="sprint-choice"><input type="checkbox" name="task" value="${t.id}" ${selected.has(t.id)?'checked':''}><span>${escape(t.title)}</span></label>`).join('')||'<p>Add a task to your board first.</p>';$('sprint-dialog').showModal();
 });
 $('sprint-form').addEventListener('submit',async(e)=>{e.preventDefault();const visible=[...$('sprint-choices').querySelectorAll('input:checked')].map(i=>i.value);const archived=sprint().taskIds.filter(id=>data.state.tasks.find(t=>t.id===id)?.archived);try{await mutate('sprint.save',{week:selectedWeek,goal:sprint().goal,taskIds:[...visible,...archived]});$('sprint-dialog').close();}catch(e){$('sprint-error').textContent=e.message;}});
-$('reload').addEventListener('click',async()=>{try{await loadBoard();pageError('Latest board loaded. Review your preserved draft before saving.');}catch(e){pageError(e.message);}});
+document.querySelectorAll('#reload,[data-reload]').forEach(button=>button.addEventListener('click',async()=>{try{await loadBoard();const message='Latest board loaded. Review your preserved draft before saving.';pageError(message);document.querySelectorAll('dialog[open] .error').forEach(el=>el.textContent=message);}catch(e){pageError(e.message);}}));
 window.addEventListener('beforeunload',(e)=>{if(saving||$('sprint-goal').dataset.dirty||document.querySelector('dialog[open] form')){e.preventDefault();e.returnValue='';}});
 start();

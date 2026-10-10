@@ -1,15 +1,18 @@
-# Phase 1A implementation checkpoint
+# Phase 1A release checkpoint
 
-Baseline: cb275059b6726811d6366a47cc61f33dec44762f (deployed public site).
+Baseline deployed public site: cb275059b6726811d6366a47cc61f33dec44762f.
 
-Implemented private owner authentication, versioned persistent board, task/list editing and ordering, checklists, labels, priorities, deadlines, blockers, archive/restore, weekly sprint selection and goal, search/filter, export, no-store responses, CSRF and login throttling.
+Implemented isolated owner login, persistent board, lists, tasks, notes/checklists/labels, priorities/deadlines/blockers, ordering and movement, archive/restore, weekly goal and task selection, search/filters, JSON export and conflict recovery.
 
-Validation: 24 PHP store checks and 20 actual PHP API checks passed using PHP 8.3 WebAssembly and SQLite. Browser exercised owner setup, task creation/editing, checklist completion, refresh persistence, explicit list movement, weekly selection and sprint goal. Production MySQL, drag/drop, mobile, save-failure browser flows and backup restoration remain to be verified.
+Validation passed:
+- 24 PHP store checks and 22 PHP API security/persistence checks with PHP 8.3.
+- 29 actual Hostinger MySQL/API checks: secure cookies, no-store/Cloudflare DYNAMIC, anonymous denial, CSRF, writes, stale-version conflicts, checklist IDs, movement/order, archive/restore, sprints, exports and cross-session persistence.
+- Browser: 390px mobile editing/list selection/save, desktop drag from In Progress to Review followed by reload, search/priority filters, archive/restore and two-tab conflict/retry preserving the draft.
+- Staging SQL data backup exported through phpMyAdmin, restored after mutations, and the original task notes recovered. Schema is retained in versioned source.
+- Existing portfolio validator passed.
 
-Hostinger PHP 8.3 confirmed. Dedicated lifeprod and lifestage databases created with separate users. Their configuration files are stored in the domain-level private directory outside public_html, with permissions 600. Secrets are excluded from this repository. Schema migration has NOT been applied on Hostinger.
+Staging uses dedicated lifestage database and isolated /life-stage/ application. Production uses dedicated lifeprod database. Their config files are outside public_html with permissions 600; no secrets are in Git. Migration version 1. The stage test account is never copied to production.
 
-This release candidate is not merged or live. Public site remains unchanged.
+Deployment is authorized. Release checks and production owner initialization must be recorded after deployment. Real owner passphrase is entered by the owner. Private pages/API are no-store; static app assets use versioned URLs.
 
-Next batch: apply schema on staging MySQL; upload isolated staging application; run complete acceptance workflows and backup/restore; merge only after release gates pass; run production migration and owner setup, then verify live cache/authentication. Real owner passphrase must be entered by the owner.
-
-Local test harnesses: workspace work/life-tools/runner.mjs and api-test.mjs; provisioning credentials and setup keys are workspace work/private-life, owner-only permissions. These files are outside Git. No AI, calendar, goals or business modules included.
+Recovery: docs/life-phase-1a.md. Local private backups/configuration are in workspace work/private-life (owner-only). Test harnesses are work/life-tools. Next bounded batch: calendar/goals/routines, then thinking system, AI, and business modules. Those later phases are not implemented.
