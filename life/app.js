@@ -1,4 +1,4 @@
-import {createRoutines} from './routines.js?v=1';
+import {createRoutines} from './routines.js?v=2';
 import {createAccountability} from './accountability.js?v=1';
 import {emptyState} from './empty-states.js?v=1';
 import {createGoals} from './goals.js?v=3';
