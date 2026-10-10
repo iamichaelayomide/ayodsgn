@@ -85,13 +85,13 @@ final class LifeStore {
                     $frequency=$args['frequency']??'';if(!in_array($frequency,['daily','weekly','monthly'],true))throw new LifeError('Choose a recurrence.');$date=self::validDate($args['startDate']??'');
                     $s['routines']??=[];if(count($s['routines'])>=100)throw new LifeError('Routine limit reached.');$s['routines'][]=['id'=>self::id(),'title'=>self::text($args['title']??'',200,true),'listId'=>$list,'frequency'=>$frequency,'startDate'=>$date,'nextDate'=>$date,'archived'=>false,'createdAt'=>self::now()];break;
                 case 'routine.toggle':
-                    $i=self::index($s['routines']??[],$id);$s['routines'][$i]['archived']=!$s['routines'][$i]['archived'];break;
+                    $i=self::index($s['routines']??[],$id);$s['routines'][$i]['archived']=!$s['routines'][$i]['archived'];if(!$s['routines'][$i]['archived']){$today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');while($s['routines'][$i]['nextDate']<$today)$s['routines'][$i]['nextDate']=self::nextOccurrence($s['routines'][$i]);}break;
                 case 'routine.generate':
                     $today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');$generated=0;
                     foreach($s['routines']??[] as $ri=>$rule){if($rule['archived'])continue;$li=self::listIndex($s,$rule['listId'],true);if($s['lists'][$li]['archived'])continue;
                         while($rule['nextDate']<=$today&&$generated<100){$date=$rule['nextDate'];$key=$rule['id'].':'.$date;$exists=false;foreach($s['tasks'] as $t)if(($t['recurrenceKey']??'')===$key)$exists=true;
                             if(!$exists){if(count($s['tasks'])>=5000)throw new LifeError('Task limit reached. Archive old routines before adding more.');$s['tasks'][]=['id'=>self::id(),'title'=>$rule['title'],'listId'=>$rule['listId'],'position'=>count($s['tasks']),'notes'=>'','priority'=>'normal','labels'=>['Routine'],'dueDate'=>$date,'blocker'=>'','checklist'=>[],'archived'=>false,'recurrenceKey'=>$key,'createdAt'=>self::now(),'updatedAt'=>self::now()];}$generated++;
-                            $d=new DateTimeImmutable($date);if($rule['frequency']==='monthly'){$next=$d->modify('first day of next month');$day=min((int)substr($rule['startDate'],8,2),(int)$next->format('t'));$rule['nextDate']=$next->setDate((int)$next->format('Y'),(int)$next->format('m'),$day)->format('Y-m-d');}else{$rule['nextDate']=$d->modify($rule['frequency']==='daily'?'+1 day':'+7 days')->format('Y-m-d');}
+                            $rule['nextDate']=self::nextOccurrence($rule);
                         }$s['routines'][$ri]=$rule;
                     }break;
                 case 'quarter.review':
@@ -226,6 +226,7 @@ final class LifeStore {
             $this->db->commit(); return $this->read();
         } catch (Throwable $e) { if ($this->db->inTransaction()) $this->db->rollBack(); throw $e; }
     }
+    private static function nextOccurrence(array $rule): string {$d=new DateTimeImmutable($rule['nextDate']);if($rule['frequency']!=='monthly')return $d->modify($rule['frequency']==='daily'?'+1 day':'+7 days')->format('Y-m-d');$next=$d->modify('first day of next month');$day=min((int)substr($rule['startDate'],8,2),(int)$next->format('t'));return $next->setDate((int)$next->format('Y'),(int)$next->format('m'),$day)->format('Y-m-d');}
     private static function validDate(mixed $date): string {if(!is_string($date)||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)||!checkdate((int)substr($date,5,2),(int)substr($date,8,2),(int)substr($date,0,4)))throw new LifeError('Choose a valid date.');return $date;}
     private static function validWeek(mixed $week): string {
         if (!is_string($week) || !preg_match('/^\d{4}-\d{2}-\d{2}$/',$week)) throw new LifeError('Choose a valid sprint week.');

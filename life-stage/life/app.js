@@ -126,7 +126,7 @@ function render() {
     const end=new Date(`${selectedWeek}T12:00:00+01:00`); end.setUTCDate(end.getUTCDate()+6);
     $('week-range').textContent=`${dayLabel(selectedWeek)} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Africa/Lagos'})}`;
     const selected=data.state.tasks.filter(t=>inWeek.has(t.id)); const done=selected.filter(t=>data.state.lists.find(l=>l.id===t.listId)?.isDone).length;
-    if(document.activeElement!==$('week-capacity'))$('week-capacity').value=(sprint().capacityMinutes||0)/60;const effort=selected.reduce((sum,t)=>sum+(t.effortMinutes||0),0),capacity=sprint().capacityMinutes||0;$('capacity-summary').textContent=`${(effort/60).toFixed(1)} hours estimated / ${(capacity/60).toFixed(1)} hours available${capacity&&effort>capacity?' · Over capacity':''}`;
+    if(document.activeElement!==$('week-capacity'))$('week-capacity').value=(sprint().capacityMinutes||0)/60;const effort=selected.reduce((sum,t)=>sum+(t.effortMinutes||0),0),capacity=sprint().capacityMinutes||0;$('capacity-summary').textContent=`${(effort/60).toFixed(1)} hours estimated / ${(capacity/60).toFixed(1)} hours available${capacity&&effort>capacity?' · Over capacity':''}${selected.filter(t=>!t.effortMinutes).length?' · '+selected.filter(t=>!t.effortMinutes).length+' tasks need estimates':''}`;
     $('sprint-progress').textContent=`${done} of ${selected.length} tasks complete`;
   }
 }
