@@ -61,13 +61,29 @@ final class LifeStore {
         array_splice($indices,max(0,min($position,count($indices))),0,[$moving]);
         foreach ($indices as $p=>$i) { $items[$i]['position']=$p; $items[$i]['updatedAt']=self::now(); }
     }
-    public function mutate(int $version, string $action, array $args): array {
+    public function mutate(int $version, string $action, array $args, string $role = 'owner', string $actor = 'owner'): array {
         $this->db->beginTransaction();
         try {
             $current=$this->read();
             if ($current['version']!==$version) throw new LifeError('This board changed in another tab. Your draft is preserved. Reload the latest board before saving again.',409);
             $s=$current['state']; $id=$args['id']??'';
+            if($role==='partner'&&!in_array($action,['goal.approve','task.approve'],true))throw new LifeError('Partners can review goals and approve reviewed tasks. Editing belongs to the owner.',403);
+            if($role==='owner'&&in_array($action,['goal.approve','task.approve'],true))throw new LifeError('A partner must approve this item.',403);
+            if(($s['accountabilityEnabled']??false)&&$role==='owner') {
+                $destination=$args['listId']??'';if($action==='task.restore'&&$destination==='')foreach($s['tasks'] as $task)if($task['id']===$id)$destination=$task['listId']; $toDone=false;foreach($s['lists'] as $list)if($list['id']===$destination&&$list['isDone'])$toDone=true;
+                if(($action==='task.complete'&&($args['done']??false))||(in_array($action,['task.save','task.move','task.restore'],true)&&$toDone))throw new LifeError('Move this task to Review. Your partner will approve it into Done.',403);
+                if($action==='goal.save'&&($args['completed']??false))throw new LifeError('Your partner must approve goal completion.',403);
+            }
+
             switch ($action) {
+                case 'goal.approve':
+                    $i=self::index($s['goals']??[],$id);if($s['goals'][$i]['archived'])throw new LifeError('This goal is archived.');
+                    $s['goals'][$i]['completed']=true;$s['goals'][$i]['approval']=['by'=>$actor,'at'=>self::now()];break;
+                case 'task.approve':
+                    $i=self::index($s['tasks'],$id);$li=self::listIndex($s,$s['tasks'][$i]['listId']);
+                    if($s['tasks'][$i]['archived']||$s['lists'][$li]['name']!=='Review')throw new LifeError('Only tasks in Review can be approved.');
+                    $done=null;foreach($s['lists'] as $l)if(!$l['archived']&&$l['isDone'])$done=$l['id'];if(!$done)throw new LifeError('The Done list is missing.');
+                    $s['tasks'][$i]['listId']=$done;$s['tasks'][$i]['approval']=['by'=>$actor,'at'=>self::now()];self::reorder($s['tasks'],$id,count($s['tasks']),$done);break;
                 case 'task.complete':
                     $i=self::index($s['tasks'],$id);if($s['tasks'][$i]['archived'])throw new LifeError('Restore this task before editing.');
                     if (!is_bool($args['done']??null)) throw new LifeError('Choose a completion state.');
@@ -162,12 +178,13 @@ final class LifeStore {
                     if ($id==='') {
                         if (count($s['lists'])>=50) throw new LifeError('The board has reached its list limit.');
                         $s['lists'][]=['id'=>self::id(),'name'=>$name,'position'=>count($s['lists']),'archived'=>false,'isDone'=>false,'createdAt'=>self::now(),'updatedAt'=>self::now()];
-                    } else { $i=self::listIndex($s,$id); $s['lists'][$i]['name']=$name; $s['lists'][$i]['updatedAt']=self::now(); }
+                    } else { $i=self::listIndex($s,$id); if(($s['accountabilityEnabled']??false)&&$s['lists'][$i]['name']==='Review'&&$name!=='Review')throw new LifeError('Keep the Review list for partner approval.');$s['lists'][$i]['name']=$name; $s['lists'][$i]['updatedAt']=self::now(); }
                     break;
                 case 'list.move': self::listIndex($s,$id); self::reorder($s['lists'],$id,(int)($args['position']??0)); break;
                 case 'list.archive': case 'list.restore':
                     $i=self::listIndex($s,$id,true);
                     if ($action==='list.archive') {
+                        if(($s['accountabilityEnabled']??false)&&$s['lists'][$i]['name']==='Review')throw new LifeError('Keep Review active for your partner.');
                         if ($s['lists'][$i]['isDone']) throw new LifeError('Keep the completion list active. You can rename it.');
                         foreach ($s['tasks'] as $t) if ($t['listId']===$id && !$t['archived']) throw new LifeError('Move or archive the tasks in this list first.');
                     }
