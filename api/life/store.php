@@ -40,7 +40,7 @@ final class LifeStore {
     public function read(): array {
         $row = $this->db->query('SELECT version,state FROM life_board WHERE id=1')->fetch(PDO::FETCH_ASSOC);
         if (!$row) throw new LifeError('The board has not been initialized.', 503);
-        return ['version'=>(int)$row['version'],'state'=>json_decode($row['state'],true,512,JSON_THROW_ON_ERROR),'week'=>self::week()];
+        $state=json_decode($row['state'],true,512,JSON_THROW_ON_ERROR);$state['boards']??=[$state['board']+['archived'=>false]];return ['version'=>(int)$row['version'],'state'=>$state,'week'=>self::week()];
     }
     private static function index(array $items, string $id): int {
         foreach ($items as $i=>$item) if ($item['id']===$id) return $i;
@@ -76,18 +76,38 @@ final class LifeStore {
             }
 
             switch ($action) {
+                case 'board.save':
+                    $name=self::text($args['name']??'',80,true);
+                    if($id===''){if(count($s['boards'])>=20)throw new LifeError('Board limit reached.');$bid=self::id();$s['boards'][]=['id'=>$bid,'name'=>$name,'archived'=>false];foreach(['Idea Box','In Progress','Review','Blocked','Done'] as $position=>$name)$s['lists'][]=['id'=>self::id(),'boardId'=>$bid,'name'=>$name,'position'=>$position,'archived'=>false,'isDone'=>$name==='Done','createdAt'=>self::now(),'updatedAt'=>self::now()];}
+                    else{$i=self::index($s['boards'],$id);$s['boards'][$i]['name']=$name;}break;
+                case 'routine.save':
+                    $list=self::text($args['listId']??'',32,true);$li=self::listIndex($s,$list);if($s['lists'][$li]['isDone'])throw new LifeError('Choose an unfinished list.');
+                    $frequency=$args['frequency']??'';if(!in_array($frequency,['daily','weekly','monthly'],true))throw new LifeError('Choose a recurrence.');$date=self::validDate($args['startDate']??'');
+                    $s['routines']??=[];if(count($s['routines'])>=100)throw new LifeError('Routine limit reached.');$s['routines'][]=['id'=>self::id(),'title'=>self::text($args['title']??'',200,true),'listId'=>$list,'frequency'=>$frequency,'startDate'=>$date,'nextDate'=>$date,'archived'=>false,'createdAt'=>self::now()];break;
+                case 'routine.toggle':
+                    $i=self::index($s['routines']??[],$id);$s['routines'][$i]['archived']=!$s['routines'][$i]['archived'];if(!$s['routines'][$i]['archived']){$today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');while($s['routines'][$i]['nextDate']<$today)$s['routines'][$i]['nextDate']=self::nextOccurrence($s['routines'][$i]);}break;
+                case 'routine.generate':
+                    $today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');$generated=0;
+                    foreach($s['routines']??[] as $ri=>$rule){if($rule['archived'])continue;$li=self::listIndex($s,$rule['listId'],true);if($s['lists'][$li]['archived'])continue;
+                        while($rule['nextDate']<=$today&&$generated<100){$date=$rule['nextDate'];$key=$rule['id'].':'.$date;$exists=false;foreach($s['tasks'] as $t)if(($t['recurrenceKey']??'')===$key)$exists=true;
+                            if(!$exists){if(count($s['tasks'])>=5000)throw new LifeError('Task limit reached. Archive old routines before adding more.');$s['tasks'][]=['id'=>self::id(),'title'=>$rule['title'],'listId'=>$rule['listId'],'position'=>count($s['tasks']),'notes'=>'','priority'=>'normal','labels'=>['Routine'],'dueDate'=>$date,'blocker'=>'','checklist'=>[],'archived'=>false,'recurrenceKey'=>$key,'createdAt'=>self::now(),'updatedAt'=>self::now()];}$generated++;
+                            $rule['nextDate']=self::nextOccurrence($rule);
+                        }$s['routines'][$ri]=$rule;
+                    }break;
+                case 'quarter.review':
+                    $quarter=self::text($args['quarter']??'',7,true);if(!preg_match('/^\d{4}-Q[1-4]$/',$quarter))throw new LifeError('Choose a quarter.');$s['quarterReviews'][$quarter]=['quarter'=>$quarter,'wins'=>self::text($args['wins']??'',10000),'lessons'=>self::text($args['lessons']??'',10000),'next'=>self::text($args['next']??'',10000),'updatedAt'=>self::now()];break;
                 case 'goal.approve':
                     $i=self::index($s['goals']??[],$id);if($s['goals'][$i]['archived'])throw new LifeError('This goal is archived.');
                     $s['goals'][$i]['completed']=true;$s['goals'][$i]['approval']=['by'=>$actor,'at'=>self::now()];break;
                 case 'task.approve':
                     $i=self::index($s['tasks'],$id);$li=self::listIndex($s,$s['tasks'][$i]['listId']);
                     if($s['tasks'][$i]['archived']||$s['lists'][$li]['name']!=='Review')throw new LifeError('Only tasks in Review can be approved.');
-                    $done=null;foreach($s['lists'] as $l)if(!$l['archived']&&$l['isDone'])$done=$l['id'];if(!$done)throw new LifeError('The Done list is missing.');
+                    $done=null;foreach($s['lists'] as $l)if(!$l['archived']&&$l['isDone']&&($l['boardId']??$s['board']['id'])===($s['lists'][$li]['boardId']??$s['board']['id']))$done=$l['id'];if(!$done)throw new LifeError('The Done list is missing.');
                     $s['tasks'][$i]['listId']=$done;$s['tasks'][$i]['approval']=['by'=>$actor,'at'=>self::now()];self::reorder($s['tasks'],$id,count($s['tasks']),$done);break;
                 case 'task.complete':
                     $i=self::index($s['tasks'],$id);if($s['tasks'][$i]['archived'])throw new LifeError('Restore this task before editing.');
                     if (!is_bool($args['done']??null)) throw new LifeError('Choose a completion state.');
-                    $destination=null;foreach($s['lists'] as $list)if(!$list['archived']&&$list['isDone']===$args['done']){$destination=$list['id'];break;}
+                    $destination=null;foreach($s['lists'] as $list)if(!$list['archived']&&$list['isDone']===$args['done']&&($list['boardId']??$s['board']['id'])===($s['lists'][self::listIndex($s,$s['tasks'][$i]['listId'])]['boardId']??$s['board']['id'])){$destination=$list['id'];break;}
                     if($destination===null)throw new LifeError('No destination list is available.');
                     $s['tasks'][$i]['listId']=$destination;self::reorder($s['tasks'],$id,count($s['tasks']),$destination);break;
                 case 'goal.save':
@@ -125,6 +145,7 @@ final class LifeStore {
                     $s['tasks'][$i]['checklist'][$j]['done']=$args['done'];$s['tasks'][$i]['updatedAt']=self::now();break;
                 case 'task.save':
                     $listId=self::text($args['listId']??'',32,true); self::listIndex($s,$listId);
+                    $effort=$args['effortMinutes']??null;if($effort!==null&&(!is_int($effort)||$effort<0||$effort>10080))throw new LifeError('Estimate between 0 and 10080 minutes.');
                     $priority=$args['priority']??'normal';
                     if (!in_array($priority,['low','normal','high'],true)) throw new LifeError('Choose a valid priority.');
                     $due=$args['dueDate']??'';
@@ -135,6 +156,7 @@ final class LifeStore {
                     $checklist=array_map(fn($v)=>['id'=>is_string($v['id']??null) && preg_match('/^[a-f0-9]{32}$/',$v['id']) ? $v['id'] : self::id(),'text'=>self::text($v['text']??'',300,true),'done'=>($v['done']??false)===true],$checklist);
                     if (count(array_unique(array_column($checklist,'id')))!==count($checklist)) throw new LifeError('Checklist item IDs must be unique.');
                     $item=['title'=>self::text($args['title']??'',200,true),'notes'=>self::text($args['notes']??'',20000),'blocker'=>self::text($args['blocker']??'',2000),'priority'=>$priority,'labels'=>$labels,'checklist'=>$checklist,'dueDate'=>$due,'listId'=>$listId,'updatedAt'=>self::now()];
+                    if($effort!==null)$item['effortMinutes']=$effort;
                     if (isset($args['goalId'])) {$goalId=self::text($args['goalId'],32);if($goalId!==''){ $gi=self::index($s['goals']??[],$goalId);if($s['goals'][$gi]['archived'])throw new LifeError('Choose an active goal.');}$item['goalId']=$goalId;}
                     if ($id==='') {
                         if (count($s['tasks'])>=5000) throw new LifeError('The board has reached its task limit.');
@@ -177,7 +199,7 @@ final class LifeStore {
                     $name=self::text($args['name']??'',80,true);
                     if ($id==='') {
                         if (count($s['lists'])>=50) throw new LifeError('The board has reached its list limit.');
-                        $s['lists'][]=['id'=>self::id(),'name'=>$name,'position'=>count($s['lists']),'archived'=>false,'isDone'=>false,'createdAt'=>self::now(),'updatedAt'=>self::now()];
+                        $boardId=$args['boardId']??$s['board']['id'];self::index($s['boards'],$boardId);$s['lists'][]=['id'=>self::id(),'boardId'=>$boardId,'name'=>$name,'position'=>count($s['lists']),'archived'=>false,'isDone'=>false,'createdAt'=>self::now(),'updatedAt'=>self::now()];
                     } else { $i=self::listIndex($s,$id); if(($s['accountabilityEnabled']??false)&&$s['lists'][$i]['name']==='Review'&&$name!=='Review')throw new LifeError('Keep the Review list for partner approval.');$s['lists'][$i]['name']=$name; $s['lists'][$i]['updatedAt']=self::now(); }
                     break;
                 case 'list.move': self::listIndex($s,$id); self::reorder($s['lists'],$id,(int)($args['position']??0)); break;
@@ -194,7 +216,8 @@ final class LifeStore {
                     $ids=$args['taskIds']??[];
                     if (!is_array($ids) || count($ids)>500) throw new LifeError('Choose valid sprint tasks.');
                     foreach ($ids as $taskId) self::index($s['tasks'],$taskId);
-                    $s['sprints'][$week]=['id'=>$s['sprints'][$week]['id']??self::id(),'week'=>$week,'goal'=>self::text($args['goal']??'',2000),'taskIds'=>array_values(array_unique($ids)),'updatedAt'=>self::now()]; break;
+                    $capacity=$args['capacityMinutes']??($s['sprints'][$week]['capacityMinutes']??0);if(!is_int($capacity)||$capacity<0||$capacity>10080)throw new LifeError('Choose a weekly capacity between 0 and 168 hours.');
+                    $s['sprints'][$week]=['capacityMinutes'=>$capacity,'id'=>$s['sprints'][$week]['id']??self::id(),'week'=>$week,'goal'=>self::text($args['goal']??'',2000),'taskIds'=>array_values(array_unique($ids)),'updatedAt'=>self::now()]; break;
                 default: throw new LifeError('Unknown board action.',400);
             }
             $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=1 AND version=?');
@@ -203,6 +226,8 @@ final class LifeStore {
             $this->db->commit(); return $this->read();
         } catch (Throwable $e) { if ($this->db->inTransaction()) $this->db->rollBack(); throw $e; }
     }
+    private static function nextOccurrence(array $rule): string {$d=new DateTimeImmutable($rule['nextDate']);if($rule['frequency']!=='monthly')return $d->modify($rule['frequency']==='daily'?'+1 day':'+7 days')->format('Y-m-d');$next=$d->modify('first day of next month');$day=min((int)substr($rule['startDate'],8,2),(int)$next->format('t'));return $next->setDate((int)$next->format('Y'),(int)$next->format('m'),$day)->format('Y-m-d');}
+    private static function validDate(mixed $date): string {if(!is_string($date)||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)||!checkdate((int)substr($date,5,2),(int)substr($date,8,2),(int)substr($date,0,4)))throw new LifeError('Choose a valid date.');return $date;}
     private static function validWeek(mixed $week): string {
         if (!is_string($week) || !preg_match('/^\d{4}-\d{2}-\d{2}$/',$week)) throw new LifeError('Choose a valid sprint week.');
         $d=DateTimeImmutable::createFromFormat('!Y-m-d',$week,new DateTimeZone('Africa/Lagos'));

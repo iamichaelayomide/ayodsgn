@@ -1,6 +1,7 @@
+import {createRoutines} from './routines.js?v=1';
 import {createAccountability} from './accountability.js?v=1';
 import {emptyState} from './empty-states.js?v=1';
-import {createGoals} from './goals.js?v=2';
+import {createGoals} from './goals.js?v=3';
 import {installNavigation} from './navigation.js?v=1';
 installNavigation();
 import {createCalendar} from './calendar.js?v=3';
@@ -8,11 +9,12 @@ import {installSelects} from './selects.js?v=1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
-let suspendedDialog = '', role='owner';
+let suspendedDialog = '', role='owner', selectedBoard='';
+try{selectedBoard=localStorage.getItem('life.board')||'';}catch{}
 const inviteParams=new URLSearchParams(location.search);let inviteToken=inviteParams.get('invite');const partnerId=inviteParams.get('partner');
 const API = new URL('../api/life/',import.meta.url).pathname;
 const order = (items) => [...items].sort((a,b) => a.position-b.position);
-const activeLists = () => order(data.state.lists.filter(l => !l.archived));
+const activeLists = () => order(data.state.lists.filter(l => !l.archived&&(l.boardId||data.state.board.id)===selectedBoard));
 const sprint = () => data.state.sprints[selectedWeek] || {goal:'',taskIds:[]};
 const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function announce(message) { $('announcement').textContent=message; setTimeout(()=>{$('announcement').textContent='';},4000); }
@@ -41,8 +43,8 @@ async function mutate(action,args) {
   finally { saving=false; document.body.classList.remove('saving'); }
 }
 async function loadBoard() {
-  data=await request('board'); selectedWeek ||= data.week; conflict=false; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
-  $('auth').hidden=true; $('workspace').hidden=false; if(role==='owner'&&data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
+  data=await request('board'); selectedWeek ||= data.week; conflict=false;selectedBoard=(data.state.boards||[data.state.board]).some(b=>b.id===selectedBoard)?selectedBoard:data.state.board.id; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
+  $('auth').hidden=true; $('workspace').hidden=false; if(role==='owner'&&data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); if(role==='owner'&&(data.state.routines||[]).some(r=>!r.archived&&r.nextDate<=today()))await mutate('routine.generate',{});render(); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
 async function start() {
   try {
@@ -78,9 +80,12 @@ function taskCard(task) {
   return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${role==='partner'?'disabled':''} ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
 }
 const planning = createCalendar({getData:()=>data,today,mutate,openTask,refreshSelects,escape});
+const routines=createRoutines({getData:()=>data,mutate,escape,refreshSelects,today});
 const accountability=createAccountability({getData:()=>data,request,mutate,escape,role:()=>role});
 const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
 function render() {
+  $('board-select').innerHTML=(data.state.boards||[data.state.board]).map(b=>`<option value="${b.id}">${escape(b.name)}</option>`).join('');$('board-select').value=selectedBoard;document.querySelector('.board-picker').hidden=!['board','week','archive'].includes(view);$('routines').hidden=view!=='routines';
+  if(view==='routines'){$('goals').hidden=true;$('accountability').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Routines';$('page-title').innerHTML='Build your <em>rhythm.</em>';$('page-description').textContent='Make the important things a little easier to repeat.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});routines.render();return;}
   $('accountability').hidden=view!=='accountability';
   if(view==='accountability'){$('goals').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Accountability';$('page-title').innerHTML='Better, <em>together.</em>';$('page-description').textContent='A trusted perspective. A little encouragement. Shared progress.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});accountability.render();return;}
   $('goals').hidden=view!=='goals';
@@ -101,7 +106,7 @@ function render() {
   if (!lists.some(l=>l.id===mobileList)) mobileList=lists[0]?.id;
   $('mobile-list').innerHTML=lists.map(l=>`<option value="${l.id}">${escape(l.name)}</option>`).join(''); $('mobile-list').value=mobileList;
   const inWeek=new Set(sprint().taskIds);
-  const tasks=order(data.state.tasks.filter(t=>!t.archived && matches(t) && (view!=='week' || inWeek.has(t.id))));
+  const tasks=order(data.state.tasks.filter(t=>!t.archived && lists.some(l=>l.id===t.listId) && matches(t) && (view!=='week' || inWeek.has(t.id))));
   $('task-count').textContent=`${tasks.length} task${tasks.length===1?'':'s'}`;
   $('clear-filters').hidden=!($('search').value || $('priority-filter').value || $('label-filter').value);
   $('board').hidden=view==='archive'; $('archive').hidden=view!=='archive'; $('sprint-panel').hidden=view!=='week'; $('new-list').hidden=view!=='board'; $('board-footnote').hidden=view==='archive';
@@ -121,6 +126,7 @@ function render() {
     const end=new Date(`${selectedWeek}T12:00:00+01:00`); end.setUTCDate(end.getUTCDate()+6);
     $('week-range').textContent=`${dayLabel(selectedWeek)} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Africa/Lagos'})}`;
     const selected=data.state.tasks.filter(t=>inWeek.has(t.id)); const done=selected.filter(t=>data.state.lists.find(l=>l.id===t.listId)?.isDone).length;
+    if(document.activeElement!==$('week-capacity'))$('week-capacity').value=(sprint().capacityMinutes||0)/60;const effort=selected.reduce((sum,t)=>sum+(t.effortMinutes||0),0),capacity=sprint().capacityMinutes||0;$('capacity-summary').textContent=`${(effort/60).toFixed(1)} hours estimated / ${(capacity/60).toFixed(1)} hours available${capacity&&effort>capacity?' · Over capacity':''}${selected.filter(t=>!t.effortMinutes).length?' · '+selected.filter(t=>!t.effortMinutes).length+' tasks need estimates':''}`;
     $('sprint-progress').textContent=`${done} of ${selected.length} tasks complete`;
   }
 }
@@ -140,7 +146,7 @@ function openTask(id='',listId='') {
   form.elements.listId.value=task?.listId||listId||mobileList||activeLists()[0].id;
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.labels.value=task?.labels.join(', ')||'';form.elements.inSprint.checked=task?sprint().taskIds.includes(task.id):view==='week';
-  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});$('task-dialog').showModal();form.elements.title.focus();
+  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';form.elements.effortMinutes.value=task?.effortMinutes||0;task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});$('task-dialog').showModal();form.elements.title.focus();
 }
 function openList(id='') {
   const list=data.state.lists.find(l=>l.id===id),form=$('list-form');form.reset();form.elements.id.value=id;form.elements.name.value=list?.name||'';
@@ -169,10 +175,10 @@ $('task-form').addEventListener('submit',async(e)=>{
   args.labels=f.elements.labels.value.split(',').map(l=>l.trim()).filter(Boolean);
   args.checklist=[...$('checklist').children].map(row=>({id:row.dataset.id,text:row.querySelector('[type=text]').value,done:row.querySelector('[type=checkbox]').checked}));
   args.sprintWeek=selectedWeek;args.inSprint=f.elements.inSprint.checked;
-  args.position=Number(f.elements.position.value)-1;
+  args.position=Number(f.elements.position.value)-1;args.effortMinutes=Number(f.elements.effortMinutes.value);
   try {await mutate('task.save',args);$('task-dialog').close();announce('Task saved');}catch(e){$('task-error').textContent=e.message;}finally{submit.disabled=false;}
 });
-$('list-form').addEventListener('submit',async(e)=>{e.preventDefault();const f=e.currentTarget,button=f.querySelector('[type=submit]');button.disabled=true;try{await mutate('list.save',{id:f.elements.id.value,name:f.elements.name.value});$('list-dialog').close();}catch(e){$('list-error').textContent=e.message;}finally{button.disabled=false;}});
+$('list-form').addEventListener('submit',async(e)=>{e.preventDefault();const f=e.currentTarget,button=f.querySelector('[type=submit]');button.disabled=true;try{await mutate('list.save',{id:f.elements.id.value,name:f.elements.name.value,boardId:selectedBoard});$('list-dialog').close();}catch(e){$('list-error').textContent=e.message;}finally{button.disabled=false;}});
 $('archive-task').addEventListener('click',async()=>{try{if(await confirmArchive('task.archive',$('task-form').elements.id.value))$('task-dialog').close();}catch(e){$('task-error').textContent=e.message;}});
 let cardOpenTimer;
 document.addEventListener('click',async(e)=>{
@@ -208,6 +214,11 @@ $('choose-tasks').addEventListener('click',()=>{
 $('sprint-form').addEventListener('submit',async(e)=>{e.preventDefault();const visible=[...$('sprint-choices').querySelectorAll('input:checked')].map(i=>i.value);const archived=sprint().taskIds.filter(id=>data.state.tasks.find(t=>t.id===id)?.archived);try{await mutate('sprint.save',{week:selectedWeek,goal:sprint().goal,taskIds:[...visible,...archived]});$('sprint-dialog').close();}catch(e){$('sprint-error').textContent=e.message;}});
 document.querySelectorAll('#reload,[data-reload]').forEach(button=>button.addEventListener('click',async()=>{try{await loadBoard();const message='Latest board loaded. Review your preserved draft before saving.';pageError(message);document.querySelectorAll('dialog[open] .error').forEach(el=>el.textContent=message);}catch(e){pageError(e.message);}}));
 window.addEventListener('beforeunload',(e)=>{if(saving||$('sprint-goal').dataset.dirty||document.querySelector('dialog[open] form')){e.preventDefault();e.returnValue='';}});
+$('board-select').addEventListener('change',()=>{selectedBoard=$('board-select').value;try{localStorage.setItem('life.board',selectedBoard);}catch{}render();});
+function openBoard(id=''){const f=$('board-form');f.reset();f.elements.id.value=id;f.elements.name.value=(data.state.boards||[]).find(b=>b.id===id)?.name||'';$('board-dialog').showModal();f.elements.name.focus();}
+$('new-board').addEventListener('click',()=>openBoard());$('rename-board').addEventListener('click',()=>openBoard(selectedBoard));$('board-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;try{await mutate('board.save',Object.fromEntries(new FormData(f)));if(!f.elements.id.value){selectedBoard=data.state.boards.at(-1).id;try{localStorage.setItem('life.board',selectedBoard);}catch{}render();}$('board-dialog').close();}catch(err){f.querySelector('.error').textContent=err.message;}});
+$('save-capacity').addEventListener('click',async()=>{try{await mutate('sprint.save',{week:selectedWeek,goal:sprint().goal,taskIds:sprint().taskIds,capacityMinutes:Math.round(Number($('week-capacity').value)*60)});}catch(err){pageError(err.message);}});
+
 start();
 
 // Touch dragging uses a dedicated handle, leaving the rest of the board free to swipe.
