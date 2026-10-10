@@ -10,7 +10,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="./life.css?v=4"><script type="module" src="./app.js?v=4"></script>
+  <link rel="stylesheet" href="./life.css?v=5"><script type="module" src="./app.js?v=5"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
@@ -43,7 +43,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <section class="toolbar" aria-label="Board filters"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find a task…" aria-label="Search tasks"></label><label><span class="sr-only">Priority filter</span><select id="priority-filter"><option value="">All priorities</option><option value="high">High priority</option><option value="normal">Normal priority</option><option value="low">Low priority</option></select></label><label><span class="sr-only">Label filter</span><select id="label-filter"><option value="">All labels</option></select></label><button id="clear-filters" hidden>Clear filters</button><span id="task-count"></span><button id="new-list">+ Add list</button><label class="mobile-list"><span class="sr-only">Visible list</span><select id="mobile-list"></select></label></section>
       <div id="board" class="board" aria-label="Task board"></div>
       <div id="archive" hidden></div>
-      <p class="board-footnote" id="board-footnote">Drag cards to move them, or open a task and choose its list.</p>
+      <p class="board-footnote" id="board-footnote">Swipe across lists. Drag a card or its grip to move it, or open the task and choose its list.</p>
       <div id="page-error" class="error" role="alert" hidden></div>
       <button id="reload" class="reload" hidden>Load latest board — keep my draft</button>
     </main>
@@ -58,7 +58,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <label>What's blocking this?<textarea name="blocker" rows="2" maxlength="2000" placeholder="Optional — name the thing in your way"></textarea></label>
       <div class="checklist-heading"><h3>Checklist</h3><button type="button" id="add-checklist">+ Add item</button></div><div id="checklist"></div>
       <label class="checkbox-label"><input name="inSprint" type="checkbox"> Include in the selected week's sprint</label>
-      <p id="task-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" id="archive-task" class="danger" hidden>Archive task</button><button type="button" data-close>Cancel</button><button type="submit" class="primary">Save task</button></div>
+      <p id="task-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" id="archive-task" class="danger" hidden><img class="action-icon" src="./icons/archive.svg" alt=""> Archive task</button><button type="button" data-close>Cancel</button><button type="submit" class="primary">Save task</button></div>
     </form>
   </dialog>
   <dialog id="list-dialog" aria-labelledby="list-dialog-title"><form id="list-form"><div class="dialog-heading"><h2 id="list-dialog-title">Add list</h2><button type="button" data-close aria-label="Close list">×</button></div><input type="hidden" name="id"><label>List name<input name="name" required maxlength="80"></label><p id="list-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save list</button></div></form></dialog>

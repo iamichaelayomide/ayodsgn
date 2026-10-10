@@ -66,7 +66,7 @@ function dayLabel(value) {
 function today() { return new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Lagos',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
 function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
-  return `<button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong>${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>`;
+  return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong>${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button></div>`;
 }
 function render() {
   const lists=activeLists(), selectedLabel=$('label-filter').value;
@@ -85,7 +85,7 @@ function render() {
   if(view==='archive') { renderArchive(); refreshSelects(); return; }
   $('board').innerHTML=lists.map((list,index)=>{
     const cards=tasks.filter(t=>t.listId===list.id);
-    return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2>${escape(list.name)}</h2><span class="column-count">${cards.length}</span></div><div class="column-controls"><button data-list-edit="${list.id}" aria-label="Rename ${escape(list.name)}">Rename</button><button data-list-move="${list.id}" data-position="${index-1}" ${index===0?'disabled':''} aria-label="Move ${escape(list.name)} left">←</button><button data-list-move="${list.id}" data-position="${index+1}" ${index===lists.length-1?'disabled':''} aria-label="Move ${escape(list.name)} right">→</button>${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}">Archive</button>`:''}</div><div class="cards">${cards.length?cards.map(taskCard).join(''):'<p class="empty-column">A little space for your next step.</p>'}</div><button class="add-card" data-add-task="${list.id}">+ Add a task</button></section>`;
+    return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2>${escape(list.name)}</h2><span class="column-count">${cards.length}</span></div><div class="column-controls"><button data-list-edit="${list.id}" aria-label="Rename ${escape(list.name)}">Rename</button>${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}" title="Archive list"><img src="./icons/archive.svg" alt="" class="action-icon"></button>`:''}</div><div class="cards">${cards.length?cards.map(taskCard).join(''):'<p class="empty-column">A little space for your next step.</p>'}</div><button class="add-card" data-add-task="${list.id}">+ Add a task</button></section>`;
   }).join('');
   refreshSelects();
   if(view==='week') {
@@ -103,7 +103,7 @@ function renderArchive() {
 }
 function checklistRow(item={text:'',done:false,id:''}) {
   const row=document.createElement('div');row.className='check-row';row.dataset.id=item.id||'';
-  row.innerHTML=`<input type="checkbox" aria-label="Checklist item completed" ${item.done?'checked':''}><input type="text" aria-label="Checklist item text" maxlength="300" value="${escape(item.text)}" required><button type="button" aria-label="Remove checklist item">×</button>`;
+  row.innerHTML=`<input type="checkbox" aria-label="Checklist item completed" ${item.done?'checked':''}><input type="text" aria-label="Checklist item text" maxlength="300" value="${escape(item.text)}" required><button type="button" aria-label="Remove checklist item" title="Delete checklist item"><img class="action-icon" src="./icons/trash.svg" alt=""></button>`;
   row.querySelector('button').addEventListener('click',()=>row.remove());$('checklist').append(row);return row;
 }
 function openTask(id='',listId='') {
@@ -131,7 +131,7 @@ async function confirmArchive(action,id) {
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.view;render();}));
 ['search','priority-filter','label-filter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
-$('mobile-list').addEventListener('change',()=>{mobileList=$('mobile-list').value;render();});
+$('mobile-list').addEventListener('change',()=>{mobileList=$('mobile-list').value;render();document.querySelector(`[data-list="${mobileList}"]`)?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});});
 $('clear-filters').addEventListener('click',()=>{['search','priority-filter','label-filter'].forEach(id=>$(id).value='');render();});
 $('new-task').addEventListener('click',()=>openTask());$('new-list').addEventListener('click',()=>openList());
 $('add-checklist').addEventListener('click',()=>checklistRow().querySelector('input[type=text]').focus());
@@ -181,3 +181,37 @@ $('sprint-form').addEventListener('submit',async(e)=>{e.preventDefault();const v
 document.querySelectorAll('#reload,[data-reload]').forEach(button=>button.addEventListener('click',async()=>{try{await loadBoard();const message='Latest board loaded. Review your preserved draft before saving.';pageError(message);document.querySelectorAll('dialog[open] .error').forEach(el=>el.textContent=message);}catch(e){pageError(e.message);}}));
 window.addEventListener('beforeunload',(e)=>{if(saving||$('sprint-goal').dataset.dirty||document.querySelector('dialog[open] form')){e.preventDefault();e.returnValue='';}});
 start();
+
+// Touch dragging uses a dedicated handle, leaving the rest of the board free to swipe.
+let touchMove=null, dragFrame=0;
+const boardElement=$('board');
+function finishTouch(cancel=false){
+  if(!touchMove)return;const current=touchMove;touchMove=null;cancelAnimationFrame(dragFrame);
+  current.handle.classList.remove('is-dragging');document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));
+  if(!cancel&&current.target&&current.moved){
+    const cards=order(data.state.tasks.filter(t=>!t.archived&&t.listId===current.target.dataset.list&&t.id!==current.id));
+    const position=current.card?cards.findIndex(t=>t.id===current.card.dataset.task):cards.length;
+    mutate('task.move',{id:current.id,listId:current.target.dataset.list,position:position<0?cards.length:position}).catch(e=>pageError(e.message));
+  }
+}
+boardElement.addEventListener('pointerdown',event=>{
+  const handle=event.target.closest('[data-drag-task]');if(!handle||saving||event.button!==0)return;
+  event.preventDefault();handle.setPointerCapture(event.pointerId);handle.classList.add('is-dragging');
+  touchMove={id:handle.dataset.dragTask,handle,pointer:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false,target:null,card:null};
+  function tick(){if(!touchMove)return;const r=boardElement.getBoundingClientRect();
+    if(touchMove.moved){if(touchMove.x<r.left+48)boardElement.scrollLeft-=9;else if(touchMove.x>r.right-48)boardElement.scrollLeft+=9;
+      const hit=document.elementFromPoint(touchMove.x,touchMove.y);touchMove.target=hit?.closest('[data-list]');touchMove.card=hit?.closest('[data-task]');
+      document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));touchMove.target?.classList.add('drop-target');}
+    dragFrame=requestAnimationFrame(tick);
+  }dragFrame=requestAnimationFrame(tick);
+});
+boardElement.addEventListener('pointermove',event=>{if(touchMove&&touchMove.pointer===event.pointerId){touchMove.x=event.clientX;touchMove.y=event.clientY;touchMove.moved ||=Math.hypot(event.clientX-touchMove.startX,event.clientY-touchMove.startY)>8;}});
+boardElement.addEventListener('pointerup',()=>finishTouch());boardElement.addEventListener('pointercancel',()=>finishTouch(true));
+
+let boardScrollFrame=0;
+boardElement.addEventListener('scroll',()=>{cancelAnimationFrame(boardScrollFrame);boardScrollFrame=requestAnimationFrame(()=>{
+  if(innerWidth>480||!data)return;const left=boardElement.getBoundingClientRect().left+20;
+  const nearest=[...boardElement.querySelectorAll('[data-list]')].sort((a,b)=>Math.abs(a.getBoundingClientRect().left-left)-Math.abs(b.getBoundingClientRect().left-left))[0];
+  if(nearest&&mobileList!==nearest.dataset.list){mobileList=nearest.dataset.list;$('mobile-list').value=mobileList;refreshSelects();}
+});},{passive:true});
+boardElement.addEventListener('keydown',event=>{const handle=event.target.closest('[data-drag-task]');if(handle&&['Enter',' '].includes(event.key)){event.preventDefault();openTask(handle.dataset.dragTask);}});
