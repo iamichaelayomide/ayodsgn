@@ -1,3 +1,5 @@
+import {installNavigation} from './navigation.js?v=1';
+installNavigation();
 import {createCalendar} from './calendar.js?v=1';
 import {installSelects} from './selects.js?v=1';
 const refreshSelects = installSelects();
