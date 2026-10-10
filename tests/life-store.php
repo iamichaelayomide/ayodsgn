@@ -32,5 +32,13 @@ $d=$store->mutate($d['version'],'list.move',['id'=>$new,'position'=>0]);check(en
 $d=$store->mutate($d['version'],'list.archive',['id'=>$new]);$d=$store->mutate($d['version'],'list.restore',['id'=>$new]);check(!end($d['state']['lists'])['archived'],'List restored');
 rejects(fn()=>$store->mutate($d['version'],'sprint.save',['week'=>'2026-10-11','goal'=>'Wrong weekday','taskIds'=>[]]),422);
 $copy=json_decode(json_encode($store->read(),JSON_THROW_ON_ERROR),true,512,JSON_THROW_ON_ERROR);check($copy['state']['tasks'][0]['notes']==='Notes survive','Export round trip');
+$before=$store->read();$due=$before['state']['tasks'][0]['dueDate'];
+$d=$store->mutate($before['version'],'task.schedule',['id'=>$id,'date'=>'2026-10-14','time'=>'10:30','minutes'=>90]);
+check($d['state']['tasks'][0]['schedule']['date']==='2026-10-14','Work date persisted');check($d['state']['tasks'][0]['dueDate']===$due,'Scheduling preserves deadline');
+rejects(fn()=>$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'2026-02-30','time'=>'09:00','minutes'=>60]),422);
+rejects(fn()=>$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'2026-10-14','time'=>'24:00','minutes'=>60]),422);
+rejects(fn()=>$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'2026-10-14','time'=>'23:30','minutes'=>60]),422);
+rejects(fn()=>$store->mutate($before['version'],'task.schedule',['id'=>$id,'date'=>'2026-10-14','time'=>'09:00','minutes'=>60]),409);
+$d=$store->mutate($d['version'],'task.schedule',['id'=>$id,'date'=>'','time'=>'09:00','minutes'=>60]);check($d['state']['tasks'][0]['schedule']===null,'Work block removed');check($d['state']['tasks'][0]['dueDate']===$due,'Removal preserves deadline');
 for($i=0;$i<5;$i++)$store->throttle('test-address');rejects(fn()=>$store->throttle('test-address'),429);
 echo "$checks backend checks passed\n";
