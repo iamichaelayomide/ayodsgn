@@ -1,3 +1,5 @@
+import {installSelects} from './selects.js?v=1';
+const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
 let suspendedDialog = '';
@@ -80,11 +82,12 @@ function render() {
   $('breadcrumb').textContent=view==='board'?'My board':view==='week'?'This week':'Archive';
   $('page-description').textContent=view==='board'?'Capture the thought. Take the next step. Keep the bigger picture close.':view==='week'?'A clear goal, a considered shortlist, and space to make progress.':'Your archived tasks and lists are kept here until you need them again.';
   document.querySelectorAll('[data-view]').forEach(b=>{ if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current'); });
-  if(view==='archive') { renderArchive(); return; }
+  if(view==='archive') { renderArchive(); refreshSelects(); return; }
   $('board').innerHTML=lists.map((list,index)=>{
     const cards=tasks.filter(t=>t.listId===list.id);
     return `<section class="column ${list.id!==mobileList?'mobile-hidden':''}" data-list="${list.id}" aria-label="${escape(list.name)} list"><div class="column-header"><h2>${escape(list.name)}</h2><span class="column-count">${cards.length}</span></div><div class="column-controls"><button data-list-edit="${list.id}" aria-label="Rename ${escape(list.name)}">Rename</button><button data-list-move="${list.id}" data-position="${index-1}" ${index===0?'disabled':''} aria-label="Move ${escape(list.name)} left">←</button><button data-list-move="${list.id}" data-position="${index+1}" ${index===lists.length-1?'disabled':''} aria-label="Move ${escape(list.name)} right">→</button>${!list.isDone?`<button data-list-archive="${list.id}" aria-label="Archive ${escape(list.name)}">Archive</button>`:''}</div><div class="cards">${cards.length?cards.map(taskCard).join(''):'<p class="empty-column">A little space for your next step.</p>'}</div><button class="add-card" data-add-task="${list.id}">+ Add a task</button></section>`;
   }).join('');
+  refreshSelects();
   if(view==='week') {
     // Keep a goal draft intact when unrelated tasks are saved.
     if(document.activeElement!==$('sprint-goal') && !$('sprint-goal').dataset.dirty) $('sprint-goal').value=sprint().goal;
@@ -110,7 +113,7 @@ function openTask(id='',listId='') {
   form.elements.listId.value=task?.listId||listId||mobileList||activeLists()[0].id;
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.labels.value=task?.labels.join(', ')||'';form.elements.inSprint.checked=task?sprint().taskIds.includes(task.id):view==='week';
-  task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';$('task-dialog').showModal();form.elements.title.focus();
+  task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-dialog').showModal();form.elements.title.focus();
 }
 function openList(id='') {
   const list=data.state.lists.find(l=>l.id===id),form=$('list-form');form.reset();form.elements.id.value=id;form.elements.name.value=list?.name||'';
