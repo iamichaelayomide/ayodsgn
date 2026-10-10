@@ -10,7 +10,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="./life.css?v=5"><script type="module" src="./app.js?v=5"></script>
+  <link rel="stylesheet" href="./life.css?v=6"><script type="module" src="./app.js?v=6"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
@@ -30,6 +30,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <p class="eyebrow">PERSONAL WORKSPACE</p>
       <nav aria-label="Planner views">
         <button data-view="board" aria-current="page"><span aria-hidden="true">▦</span> My board</button>
+        <button data-view="today">Today</button><button data-view="calendar">Calendar</button>
         <button data-view="week"><span aria-hidden="true">▤</span> This week</button>
         <button data-view="archive"><span aria-hidden="true">▱</span> Archive</button>
       </nav>
@@ -42,7 +43,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <section id="sprint-panel" class="sprint-panel" hidden><div><p class="eyebrow">THIS WEEK'S INTENTION</p><label for="sprint-goal">What would make this a good week?</label><textarea id="sprint-goal" rows="2" maxlength="2000" placeholder="Write one clear sprint goal…"></textarea><button id="save-goal" class="primary">Save sprint goal</button></div><div><div class="week-switch"><button id="previous-week" aria-label="Previous week">←</button><span id="week-range"></span><button id="next-week" aria-label="Next week">→</button></div><p id="sprint-progress"></p><button id="choose-tasks">Choose sprint tasks</button><button id="current-week">Back to this week</button></div></section>
       <section class="toolbar" aria-label="Board filters"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find a task…" aria-label="Search tasks"></label><label><span class="sr-only">Priority filter</span><select id="priority-filter"><option value="">All priorities</option><option value="high">High priority</option><option value="normal">Normal priority</option><option value="low">Low priority</option></select></label><label><span class="sr-only">Label filter</span><select id="label-filter"><option value="">All labels</option></select></label><button id="clear-filters" hidden>Clear filters</button><span id="task-count"></span><button id="new-list">+ Add list</button><label class="mobile-list"><span class="sr-only">Visible list</span><select id="mobile-list"></select></label></section>
       <div id="board" class="board" aria-label="Task board"></div>
-      <div id="archive" hidden></div>
+      <div id="archive" hidden></div><section id="planning" hidden aria-label="Daily and calendar planning"></section>
       <p class="board-footnote" id="board-footnote">Swipe across lists. Drag a card or its grip to move it, or open the task and choose its list.</p>
       <div id="page-error" class="error" role="alert" hidden></div>
       <button id="reload" class="reload" hidden>Load latest board — keep my draft</button>
@@ -63,5 +64,6 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   </dialog>
   <dialog id="list-dialog" aria-labelledby="list-dialog-title"><form id="list-form"><div class="dialog-heading"><h2 id="list-dialog-title">Add list</h2><button type="button" data-close aria-label="Close list">×</button></div><input type="hidden" name="id"><label>List name<input name="name" required maxlength="80"></label><p id="list-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save list</button></div></form></dialog>
   <dialog id="sprint-dialog" aria-labelledby="sprint-dialog-title"><form id="sprint-form"><div class="dialog-heading"><h2 id="sprint-dialog-title">Choose sprint tasks</h2><button type="button" data-close aria-label="Close sprint selection">×</button></div><p>Choose what you will focus on. These remain the same tasks on your board.</p><div id="sprint-choices"></div><p id="sprint-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" data-close>Cancel</button><button class="primary" type="submit">Save selection</button></div></form></dialog>
+  <dialog id="schedule-dialog" aria-labelledby="schedule-title"><form id="schedule-form"><div class="dialog-heading"><h2 id="schedule-title">Make time for a task</h2><button type="button" data-close aria-label="Close scheduling">×</button></div><p>A work block is time you plan to spend. It does not change the task deadline. All times use Africa/Lagos.</p><label>Task<select name="taskId" required></select></label><div class="field-row"><label>Work date<input name="date" type="date" required></label><label>Start time<input name="time" type="time" required value="09:00"></label></div><label>Duration in minutes<input name="minutes" type="number" min="5" max="1440" required value="60"></label><p id="schedule-error" class="error" role="alert"></p><button type="button" data-reload hidden>Load latest board — keep my draft</button><div class="dialog-actions"><button type="button" id="unschedule-task" class="danger">Remove work block</button><button type="button" data-close>Cancel</button><button type="submit" class="primary">Save work block</button></div></form></dialog>
   <dialog id="confirm-dialog" aria-labelledby="confirm-title"><div class="dialog-heading"><h2 id="confirm-title">Archive this item?</h2></div><p>You can restore it from Archive.</p><div class="dialog-actions"><button id="confirm-cancel">Cancel</button><button id="confirm-yes" class="primary">Archive</button></div></dialog>
 </body></html>

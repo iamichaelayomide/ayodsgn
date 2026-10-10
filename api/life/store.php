@@ -97,6 +97,16 @@ final class LifeStore {
                         $sprint['updatedAt']=self::now(); $s['sprints'][$week]=$sprint;
                     }
                     break;
+                case 'task.schedule':
+                    $i=self::index($s['tasks'],$id);
+                    if ($s['tasks'][$i]['archived']) throw new LifeError('Restore this task before scheduling it.');
+                    $date=$args['date']??''; $time=$args['time']??''; $minutes=$args['minutes']??60;
+                    if (!is_string($date) || ($date!=='' && (!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date) || !checkdate((int)substr($date,5,2),(int)substr($date,8,2),(int)substr($date,0,4))))) throw new LifeError('Choose a valid work date.');
+                    if ($date!=='' && (!is_string($time) || !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/',$time))) throw new LifeError('Choose a valid start time.');
+                    if (!is_int($minutes) || $minutes<5 || $minutes>1440) throw new LifeError('Work blocks must be between 5 and 1440 minutes.');
+                    if ($date!=='' && (int)substr($time,0,2)*60+(int)substr($time,3,2)+$minutes>1440) throw new LifeError('Keep this work block within one day.');
+                    $s['tasks'][$i]['schedule']=$date===''?null:['date'=>$date,'time'=>$time,'minutes'=>$minutes];
+                    $s['tasks'][$i]['updatedAt']=self::now(); break;
                 case 'task.move':
                     $i=self::index($s['tasks'],$id); $listId=self::text($args['listId']??'',32,true); self::listIndex($s,$listId);
                     if ($s['tasks'][$i]['archived']) throw new LifeError('Restore this task before moving it.');

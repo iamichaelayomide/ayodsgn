@@ -1,3 +1,4 @@
+import {createCalendar} from './calendar.js?v=1';
 import {installSelects} from './selects.js?v=1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
@@ -68,7 +69,19 @@ function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
   return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong>${escape(task.title)}</strong>${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button></div>`;
 }
+const planning = createCalendar({getData:()=>data,today,mutate,openTask,refreshSelects,escape});
 function render() {
+  const isPlanning=view==='today'||view==='calendar';
+  $('planning').hidden=!isPlanning;
+  document.querySelector('.toolbar').hidden=isPlanning;
+  if(isPlanning){
+    $('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;
+    $('breadcrumb').textContent=view==='today'?'Today':'Calendar';
+    $('page-title').innerHTML=view==='today'?'Make today <em>count.</em>':'Make room for <em>your plans.</em>';
+    $('page-description').textContent=view==='today'?'Your work blocks, deadlines, and overdue tasks in one place.':'Plan time separately from deadlines. Your board and calendar share the same tasks.';
+    document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+    planning.render(view);return;
+  }
   const lists=activeLists(), selectedLabel=$('label-filter').value;
   $('label-filter').innerHTML='<option value="">All labels</option>'+[...new Set(data.state.tasks.filter(t=>!t.archived).flatMap(t=>t.labels))].sort().map(l=>`<option value="${escape(l)}">${escape(l)}</option>`).join(''); $('label-filter').value=selectedLabel;
   if (!lists.some(l=>l.id===mobileList)) mobileList=lists[0]?.id;
