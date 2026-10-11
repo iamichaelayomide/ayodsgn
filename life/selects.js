@@ -11,7 +11,7 @@ export function installSelects() {
   function sync(control) {
     const {select, button} = control;
     button.textContent = select.multiple ? ([...select.selectedOptions].map(o=>o.textContent).join(', ')||'No dependencies') : select.selectedOptions[0]?.textContent || 'Choose…';
-    button.disabled = select.disabled;
+    button.disabled = select.disabled || select.options.length===0;
     button.setAttribute('aria-description',`Selected: ${button.textContent}`);
     const label = select.getAttribute('aria-label') || [...(select.labels || [])].map(l => {const copy=l.cloneNode(true);copy.querySelectorAll('select,button').forEach(el=>el.remove());return copy.textContent.trim();}).join(' ');
     button.setAttribute('aria-label', label || select.name || 'Choose an option');
