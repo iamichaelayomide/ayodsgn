@@ -10,7 +10,7 @@ export function installSelects() {
   }
   function sync(control) {
     const {select, button} = control;
-    button.textContent = select.selectedOptions[0]?.textContent || 'Choose…';
+    button.textContent = select.multiple ? ([...select.selectedOptions].map(o=>o.textContent).join(', ')||'No dependencies') : select.selectedOptions[0]?.textContent || 'Choose…';
     button.disabled = select.disabled;
     button.setAttribute('aria-description',`Selected: ${button.textContent}`);
     const label = select.getAttribute('aria-label') || [...(select.labels || [])].map(l => {const copy=l.cloneNode(true);copy.querySelectorAll('select,button').forEach(el=>el.remove());return copy.textContent.trim();}).join(' ');
@@ -22,11 +22,12 @@ export function installSelects() {
     const menu = document.createElement('div'); menu.className = 'select-menu';
     menu.id = button.getAttribute('aria-controls'); menu.setAttribute('role', 'listbox');
     menu.setAttribute('aria-label', button.getAttribute('aria-label'));
+    if(select.multiple)menu.setAttribute('aria-multiselectable','true');
     control.menu = menu; opened = control;
     const options = [...select.options];
     const choose = index => {
       if (options[index].disabled) return;
-      select.selectedIndex = index; close(true); sync(control);
+      if(select.multiple){options[index].selected=!options[index].selected;menu.querySelectorAll('[role=option]')[index].setAttribute('aria-selected',String(options[index].selected));}else{select.selectedIndex = index; close(true);} sync(control);
       select.dispatchEvent(new Event('change', {bubbles:true})); refresh();
     };
     const items = options.map((option,index) => {

@@ -76,6 +76,35 @@ final class LifeStore {
             }
 
             switch ($action) {
+                case 'attachment.add':
+                    self::index($s['tasks'],self::text($args['taskId']??'',32,true));$s['attachments']??=[];if(count($s['attachments'])>=500)throw new LifeError('Attachment limit reached.');$s['attachments'][]=['id'=>self::text($id,32,true),'taskId'=>$args['taskId'],'name'=>self::text($args['name']??'',200,true),'mime'=>self::text($args['mime']??'',100,true),'size'=>(int)($args['size']??0),'archived'=>false,'createdAt'=>self::now()];break;
+                case 'attachment.archive':
+                    $i=self::index($s['attachments']??[],$id);$s['attachments'][$i]['archived']=true;break;
+                case 'note.save':
+                    $s['notes']??=[];$record=['title'=>self::text($args['title']??'',200,true),'body'=>self::text($args['body']??'',20000),'kind'=>in_array($args['kind']??'',['idea','note'],true)?$args['kind']:'note','group'=>self::text($args['group']??'',80),'updatedAt'=>self::now()];
+                    if($id===''){if(count($s['notes'])>=2000)throw new LifeError('Note limit reached.');$s['notes'][]=$record+['id'=>self::id(),'archived'=>false,'createdAt'=>self::now()];}else{$i=self::index($s['notes'],$id);$s['notes'][$i]=array_merge($s['notes'][$i],$record);}break;
+                case 'note.archive': case 'note.restore':
+                    $i=self::index($s['notes']??[],$id);$s['notes'][$i]['archived']=$action==='note.archive';break;
+                case 'note.convert':
+                    $i=self::index($s['notes']??[],$id);$note=$s['notes'][$i];if(!empty($note['linkedId']))throw new LifeError('This idea already has a linked item.');$newId=self::id();
+                    if(($args['target']??'')==='task'){$li=self::listIndex($s,self::text($args['listId']??'',32,true));if($s['lists'][$li]['isDone'])throw new LifeError('Choose an unfinished list.');$s['tasks'][]=['id'=>$newId,'title'=>$note['title'],'notes'=>$note['body'],'listId'=>$s['lists'][$li]['id'],'position'=>count($s['tasks']),'priority'=>'normal','labels'=>[],'dueDate'=>'','blocker'=>'','checklist'=>[],'archived'=>false,'createdAt'=>self::now(),'updatedAt'=>self::now(),'sourceNoteId'=>$id];}
+                    elseif(($args['target']??'')==='goal'){$s['goals']??=[];$s['goals'][]=['id'=>$newId,'title'=>$note['title'],'notes'=>$note['body'],'type'=>'adhoc','period'=>'','category'=>$note['group']?:'Personal','parentId'=>'','completed'=>false,'archived'=>false,'createdAt'=>self::now(),'updatedAt'=>self::now(),'sourceNoteId'=>$id];}else throw new LifeError('Choose task or goal.');$s['notes'][$i]['linkedId']=$newId;$s['notes'][$i]['linkedType']=$args['target'];break;
+                case 'map.save':
+                    $s['mapNodes']??=[];$kind=$args['kind']??'idea';if(!in_array($kind,['goal','milestone','task','idea','question'],true))throw new LifeError('Choose a node type.');$ref=self::text($args['recordId']??'',32);if($ref!=='')self::index(in_array($kind,['goal','milestone'],true)?($s['goals']??[]):($kind==='task'?$s['tasks']:($s['notes']??[])),$ref);
+                    $r=['title'=>self::text($args['title']??'',200,true),'kind'=>$kind,'recordId'=>$ref,'group'=>self::text($args['group']??'',80),'x'=>max(0,min(1800,(int)($args['x']??40))),'y'=>max(0,min(1800,(int)($args['y']??40))),'updatedAt'=>self::now()];if($id===''){if(count($s['mapNodes'])>=500)throw new LifeError('Map limit reached.');$s['mapNodes'][]=$r+['id'=>self::id(),'archived'=>false];}else{$i=self::index($s['mapNodes'],$id);$s['mapNodes'][$i]=array_merge($s['mapNodes'][$i],$r);}break;
+                case 'map.archive':
+                    $i=self::index($s['mapNodes']??[],$id);$s['mapNodes'][$i]['archived']=true;$s['mapEdges']=array_values(array_filter($s['mapEdges']??[],fn($e)=>$e['from']!==$id&&$e['to']!==$id));break;
+                case 'map.connect':
+                    $from=self::text($args['from']??'',32,true);$to=self::text($args['to']??'',32,true);if($from===$to)throw new LifeError('Connect two different nodes.');foreach([$from,$to] as $node){$ni=self::index($s['mapNodes']??[],$node);if($s['mapNodes'][$ni]['archived'])throw new LifeError('Choose active nodes.');}$s['mapEdges']??=[];foreach($s['mapEdges'] as $edge)if($edge['from']===$from&&$edge['to']===$to)throw new LifeError('These nodes are already connected.');$s['mapEdges'][]=['id'=>self::id(),'from'=>$from,'to'=>$to];break;
+                case 'map.disconnect':
+                    $i=self::index($s['mapEdges']??[],$id);array_splice($s['mapEdges'],$i,1);break;
+                case 'task.dependencies':
+                    $i=self::index($s['tasks'],$id);$deps=$args['ids']??[];if(!is_array($deps)||count($deps)>50)throw new LifeError('Choose up to 50 dependencies.');foreach($deps as $dep){self::index($s['tasks'],$dep);$seen=[];$queue=[$dep];while($queue){$next=array_pop($queue);if($next===$id)throw new LifeError('Dependencies cannot form a cycle.');if(isset($seen[$next]))continue;$seen[$next]=true;$ti=self::index($s['tasks'],$next);foreach($s['tasks'][$ti]['dependencies']??[] as $other)$queue[]=$other;}}$s['tasks'][$i]['dependencies']=array_values(array_unique($deps));break;
+                case 'template.save':
+                    if(isset($args['lists'])&&!is_array($args['lists']))throw new LifeError('Choose valid board lists.');
+                    $s['templates']??=[];if(count($s['templates'])>=100)throw new LifeError('Template limit reached.');$kind=$args['kind']??'';if(!in_array($kind,['board','week','review'],true))throw new LifeError('Choose a template type.');$template=['id'=>self::id(),'name'=>self::text($args['name']??'',100,true),'kind'=>$kind,'text'=>self::text($args['text']??'',2000),'lists'=>[]];if($kind==='board'){foreach($args['lists']??[] as $name)$template['lists'][]=self::text($name,80,true);if(count($template['lists'])<1||count($template['lists'])>20)throw new LifeError('Choose 1–20 lists.');}$s['templates'][]=$template;break;
+                case 'template.apply':
+                    $i=self::index($s['templates']??[],$id);$tpl=$s['templates'][$i];if($tpl['kind']==='board'){if(count($s['boards'])>=20)throw new LifeError('Board limit reached.');$bid=self::id();$s['boards'][]=['id'=>$bid,'name'=>$tpl['name'],'archived'=>false];foreach($tpl['lists'] as $pos=>$name)$s['lists'][]=['id'=>self::id(),'boardId'=>$bid,'name'=>$name,'position'=>$pos,'archived'=>false,'isDone'=>$name==='Done','createdAt'=>self::now(),'updatedAt'=>self::now()];}elseif($tpl['kind']==='week'){$week=self::validWeek($args['week']??'');$s['sprints'][$week]=array_merge(['id'=>self::id(),'week'=>$week,'taskIds'=>[],'capacityMinutes'=>0],$s['sprints'][$week]??[],['goal'=>$tpl['text'],'updatedAt'=>self::now()]);}else{$week=self::validWeek($args['week']??'');$s['reviews'][$week]=array_merge($s['reviews'][$week]??[],['week'=>$week,'wins'=>$tpl['text'],'updatedAt'=>self::now()]);}break;
                 case 'board.save':
                     $name=self::text($args['name']??'',80,true);
                     if($id===''){if(count($s['boards'])>=20)throw new LifeError('Board limit reached.');$bid=self::id();$s['boards'][]=['id'=>$bid,'name'=>$name,'archived'=>false];foreach(['Idea Box','In Progress','Review','Blocked','Done'] as $position=>$name)$s['lists'][]=['id'=>self::id(),'boardId'=>$bid,'name'=>$name,'position'=>$position,'archived'=>false,'isDone'=>$name==='Done','createdAt'=>self::now(),'updatedAt'=>self::now()];}
@@ -220,6 +249,7 @@ final class LifeStore {
                     $s['sprints'][$week]=['capacityMinutes'=>$capacity,'id'=>$s['sprints'][$week]['id']??self::id(),'week'=>$week,'goal'=>self::text($args['goal']??'',2000),'taskIds'=>array_values(array_unique($ids)),'updatedAt'=>self::now()]; break;
                 default: throw new LifeError('Unknown board action.',400);
             }
+            $s['activity']??=[];$s['activity'][]=['id'=>self::id(),'action'=>$action,'recordId'=>$id,'actor'=>$actor,'at'=>self::now()];$s['activity']=array_slice($s['activity'],-2000);
             $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=1 AND version=?');
             $q->execute([json_encode($s,JSON_THROW_ON_ERROR),self::now(),$version]);
             if ($q->rowCount()!==1) throw new LifeError('The board changed while saving. Reload the latest board.',409);
