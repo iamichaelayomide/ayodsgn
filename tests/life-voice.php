@@ -11,4 +11,6 @@ try{$voice->save(['sessionId'=>'missing','turnId'=>'turn']);checkVoice(false);}c
 $session2=$voice->start(['version'=>$saved['version'],'temporary'=>true]);$before=$ai->read();$voice->save(['sessionId'=>$session2['sessionId'],'turnId'=>'temp','user'=>'Do not save']);checkVoice($ai->read()['version']===$before['version']);
 try{$voice->start(['version'=>$before['version'],'temporary'=>true]);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===429);}
 $r=$ai->read();$s=$r['state'];$s['voiceSessions'][0]['expiresAt']=time()-400;$ai->write($r['version'],$s);try{$voice->save(['sessionId'=>$session['sessionId'],'turnId'=>'late','user'=>'Late']);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===409);}
+$r=$ai->read();$s=$r['state'];$s['voiceSessions'][1]['startedAt']=time()-12;$r=$ai->write($r['version'],$s);$settled=$voice->finish(['sessionId'=>$session2['sessionId']]);checkVoice($settled['state']['voiceUsage'][$r['day']]>=612&&$settled['state']['voiceUsage'][$r['day']]<615);checkVoice($settled['state']['voiceSessions'][1]['settled']);checkVoice($voice->finish(['sessionId'=>$session2['sessionId']])['version']===$settled['version']);
+$expired=$voice->finish(['sessionId'=>$session['sessionId']]);checkVoice($expired['state']['voiceSessions'][0]['chargedSeconds']===600);
 echo "$checks voice checks passed\n";

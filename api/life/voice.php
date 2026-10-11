@@ -20,10 +20,22 @@ final class LifeVoice {
             $ch=curl_init('https://generativelanguage.googleapis.com/v1beta/auth_tokens');curl_setopt_array($ch,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>20,CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_HTTPHEADER=>['Content-Type: application/json','x-goog-api-key: '.$this->config['key']],CURLOPT_POSTFIELDS=>json_encode($payload,JSON_THROW_ON_ERROR)]);$body=curl_exec($ch);$status=curl_getinfo($ch,CURLINFO_RESPONSE_CODE);curl_close($ch);if($status===429)throw new LifeError('Google’s free voice quota is unavailable. No paid fallback is enabled. Use text or try later.',429);if($status!==200||!is_string($body))throw new LifeError('Voice could not connect. Your typed conversation remains available.',503);$token=json_decode($body,true,128,JSON_THROW_ON_ERROR);
         }
         if(empty($token['name']))throw new LifeError('Voice authentication was not issued.',503);
-        $id=LifeStore::id();$s['voiceUsage'][$day]=$reserved+$seconds;$s['voiceUsage']=array_slice($s['voiceUsage'],-32,null,true);$s['voiceSessions']=array_values(array_filter($s['voiceSessions']??[],fn($v)=>$v['expiresAt']>time()-86400));$s['voiceSessions'][]=['id'=>$id,'conversationId'=>$cid,'temporary'=>$temporary,'expiresAt'=>time()+$seconds,'turnIds'=>[],'screen'=>$args['screen']??[],'boardVersion'=>$this->store->read()['version']];$this->ai->write($r['version'],$s);
+        $id=LifeStore::id();$s['voiceUsage'][$day]=$reserved+$seconds;$s['voiceUsage']=array_slice($s['voiceUsage'],-32,null,true);$s['voiceSessions']=array_values(array_filter($s['voiceSessions']??[],fn($v)=>$v['expiresAt']>time()-86400));$s['voiceSessions'][]=['id'=>$id,'conversationId'=>$cid,'temporary'=>$temporary,'expiresAt'=>time()+$seconds,'startedAt'=>time(),'day'=>$day,'reservedSeconds'=>$seconds,'settled'=>false,'turnIds'=>[],'screen'=>$args['screen']??[],'boardVersion'=>$this->store->read()['version']];$this->ai->write($r['version'],$s);
         return ['token'=>$token['name'],'setup'=>$setup,'sessionId'=>$id,'expiresAt'=>$expires,'seconds'=>$seconds];
     }
-    private function session(array $args):array {$r=$this->ai->read();foreach($r['state']['voiceSessions']??[] as $v)if($v['id']===($args['sessionId']??'')&&$v['expiresAt']>=time())return $v;throw new LifeError('Voice session expired. Start again.',409);}
+    public function finish(array $args):array {
+        $r=$this->ai->read();$s=$r['state'];$found=false;
+        $s['voiceSessions']??=[];foreach($s['voiceSessions'] as &$v){if($v['id']!==($args['sessionId']??''))continue;$found=true;
+            if($v['settled']??false)return $r;
+            // Legacy reservations have no trustworthy start time: never refund historical usage.
+            if(isset($v['startedAt'],$v['reservedSeconds'],$v['day'])){
+                $charged=time()>$v['expiresAt']?(int)$v['reservedSeconds']:min((int)$v['reservedSeconds'],max(0,time()-(int)$v['startedAt']));
+                $s['voiceUsage'][$v['day']]=max(0,(int)($s['voiceUsage'][$v['day']]??0)-((int)$v['reservedSeconds']-$charged));$v['chargedSeconds']=$charged;
+            }
+            $v['settled']=true;$v['finishedAt']=time();break;
+        }unset($v);if(!$found)throw new LifeError('Voice session not found.',404);return $this->ai->write($r['version'],$s);
+    }
+    private function session(array $args):array {$r=$this->ai->read();foreach($r['state']['voiceSessions']??[] as $v)if($v['id']===($args['sessionId']??'')&&$v['expiresAt']>=time()&&!($v['settled']??false))return $v;throw new LifeError('Voice session expired. Start again.',409);}
     public function context(array $args):array {$v=$this->session($args);return ['planner'=>LifeCommands::context($this->store->read()['state']),'screen'=>$args['screen']??$v['screen']??[],'boardVersion'=>$this->store->read()['version']];}
     public function command(array $args):array {$v=$this->session($args);if($v['temporary'])throw new LifeError('Temporary rambles cannot change your planner.',403);$r=$this->ai->read();$text=LifeStore::text($args['text']??'',6000,true);return LifeCommands::execute($this->store,$this->ai,$r['version'],(int)($args['boardVersion']??0),$text,$args['plan']??[],LifeStore::text($args['requestId']??'',64,true));}
     public function save(array $args):array {
