@@ -17,8 +17,8 @@ final class LifeCommands {
     public static function confirmation(array $actions,array $board):string {
         $messages=[];$today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');$tomorrow=(new DateTimeImmutable('tomorrow',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');
         foreach($actions as $action){$op=$action['operation'];$a=$action['arguments']??[];if(is_string($a))$a=json_decode($a,true)??[];$title=$a['title']??'';
-            $type=str_starts_with($op,'goal.')?'goals':(str_starts_with($op,'task.')?'tasks':null);if($type&&isset($a['id']))foreach($board[$type]??[] as $row)if($row['id']===$a['id'])$title=$row['title'];
-            $name=$title!==''?'“'.$title.'”':'the item';$verb=match($op){'task.save','goal.save'=>empty($a['id'])?'Added':'Updated','task.move'=>'Moved','task.schedule'=>'Scheduled','task.complete'=>($a['done']??false)?'Completed':'Reopened','task.archive','goal.archive'=>'Archived','task.restore','goal.restore'=>'Restored','map.create'=>'Created mind map',default=>'Saved'};
+            $type=str_starts_with($op,'goal.')?'goals':(str_starts_with($op,'task.')||str_starts_with($op,'checklist.')?'tasks':null);if($type&&isset($a['id']))foreach($board[$type]??[] as $row)if($row['id']===$a['id'])$title=$row['title'];
+            $name=$title!==''?'“'.$title.'”':'the item';$verb=match($op){'task.save','goal.save'=>empty($a['id'])?'Added':'Updated','task.move'=>'Moved','task.schedule'=>'Scheduled','checklist.toggle'=>($a['done']??false)?'Checked an item on':'Unchecked an item on','task.complete'=>($a['done']??false)?'Completed':'Reopened','task.archive','goal.archive'=>'Archived','task.restore','goal.restore'=>'Restored','map.create'=>'Created mind map',default=>'Saved'};
             $text=$verb.' '.($op==='goal.save'?'goal ':'').$name;
             if($op==='task.move')foreach($board['lists'] as $l)if($l['id']===($a['listId']??''))$text.=' to '.$l['name'];
             if(!empty($a['dueDate']))$text.=' for '.($a['dueDate']===$today?'today':($a['dueDate']===$tomorrow?'tomorrow':$a['dueDate']));
