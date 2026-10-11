@@ -1,6 +1,6 @@
 import {installPolish} from './polish.js?v=2';
-import {createCompanion} from './companion.js?v=4';
-import {createThinking} from './thinking.js?v=4';
+import {createCompanion} from './companion.js?v=5';
+import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=2';
 import {createAccountability} from './accountability.js?v=3';
 import {emptyState} from './empty-states.js?v=2';
@@ -142,11 +142,11 @@ function render() {
   }
 }
 function renderArchive() {
- const lists=data.state.lists.filter(l=>l.archived),tasks=data.state.tasks.filter(t=>t.archived&&(t.title+' '+t.notes).toLowerCase().includes($('search').value.toLowerCase())),notes=(data.state.notes||[]).filter(n=>n.archived&&n.title.toLowerCase().includes($('search').value.toLowerCase()));
+ const lists=data.state.lists.filter(l=>l.archived),tasks=data.state.tasks.filter(t=>t.archived&&(t.title+' '+t.notes).toLowerCase().includes($('search').value.toLowerCase())),notes=(data.state.notes||[]).filter(n=>n.archived&&n.title.toLowerCase().includes($('search').value.toLowerCase())),archivedGoals=(data.state.goals||[]).filter(g=>g.archived&&g.title.toLowerCase().includes($('search').value.toLowerCase()));
  const available=order(data.state.lists.filter(l=>!l.archived));
- $('task-count').textContent=`${lists.length+tasks.length+notes.length} archived items`;
+ $('task-count').textContent=`${lists.length+tasks.length+notes.length+archivedGoals.length} archived items`;
  const section=(title,items)=>items.length?`<section class="archive-section"><h2>${title}<span>${items.length}</span></h2>${items.join('')}</section>`:'';
- $('archive').innerHTML=section('Lists',lists.map(l=>`<div class="archive-row"><span class="archive-kind"><img class="action-icon" src="./icons/archive.svg" alt=""></span><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore</button></div>`))+section('Tasks',tasks.map(t=>`<div class="archive-row"><span class="archive-kind">Task</span><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${available.map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}" ${available.length?'':'disabled'}>Restore</button></div>`))+section('Thoughts',notes.map(n=>`<div class="archive-row"><span class="archive-kind">${n.kind==='idea'?'Idea':'Note'}</span><strong>${escape(n.title)}</strong><button data-note-restore="${n.id}">Restore</button></div>`))||emptyState('archive','Nothing archived yet. Your saved work will be here when you need it.');
+ $('archive').innerHTML=section('Lists',lists.map(l=>`<div class="archive-row"><span class="archive-kind"><img class="action-icon" src="./icons/archive.svg" alt=""></span><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore</button></div>`))+section('Tasks',tasks.map(t=>`<div class="archive-row"><span class="archive-kind">Task</span><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${available.map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}" ${available.length?'':'disabled'}>Restore</button></div>`))+section('Thoughts',notes.map(n=>`<div class="archive-row"><span class="archive-kind">${n.kind==='idea'?'Idea':'Note'}</span><strong>${escape(n.title)}</strong><button data-note-restore="${n.id}">Restore</button></div>`))+section('Goals',archivedGoals.map(g=>`<div class="archive-row"><span class="archive-kind">Goal</span><strong>${escape(g.title)}</strong><button data-goal-restore="${g.id}">Restore</button></div>`))||emptyState('archive','Nothing archived yet. Your saved work will be here when you need it.');
 }
 
 function checklistRow(item={text:'',done:false,id:''}) {
@@ -206,7 +206,7 @@ document.addEventListener('click',async(e)=>{
     else if(b.dataset.listEdit)openList(b.dataset.listEdit);
     else if(b.dataset.listMove)await mutate('list.move',{id:b.dataset.listMove,position:Number(b.dataset.position)});
     else if(b.dataset.listArchive)await confirmArchive('list.archive',b.dataset.listArchive);
-    else if(b.dataset.noteRestore)await mutate('note.restore',{id:b.dataset.noteRestore});
+    else if(b.dataset.goalRestore)await mutate('goal.restore',{id:b.dataset.goalRestore});else if(b.dataset.noteRestore)await mutate('note.restore',{id:b.dataset.noteRestore});
     else if(b.dataset.listRestore)await mutate('list.restore',{id:b.dataset.listRestore});
     else if(b.dataset.taskRestore){const id=b.dataset.taskRestore;await mutate('task.restore',{id,listId:document.querySelector(`[data-restore-list="${id}"]`).value});}
   }catch(e){pageError(e.message);}

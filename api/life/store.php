@@ -139,6 +139,8 @@ final class LifeStore {
                     $destination=null;foreach($s['lists'] as $list)if(!$list['archived']&&$list['isDone']===$args['done']&&($list['boardId']??$s['board']['id'])===($s['lists'][self::listIndex($s,$s['tasks'][$i]['listId'])]['boardId']??$s['board']['id'])){$destination=$list['id'];break;}
                     if($destination===null)throw new LifeError('No destination list is available.');
                     $s['tasks'][$i]['listId']=$destination;self::reorder($s['tasks'],$id,count($s['tasks']),$destination);break;
+                case 'goal.archive': case 'goal.restore':
+                    $i=self::index($s['goals']??[],$id);if($action==='goal.archive'){foreach($s['goals'] as $child)if(!$child['archived']&&$child['parentId']===$id)throw new LifeError('Archive linked goals first.');}$s['goals'][$i]['archived']=$action==='goal.archive';$s['goals'][$i]['updatedAt']=self::now();break;
                 case 'goal.save':
                     $goals=$s['goals']??[];$type=$args['type']??'quarter';
                     if (!in_array($type,['quarter','month','week','adhoc'],true)) throw new LifeError('Choose a goal period.');
