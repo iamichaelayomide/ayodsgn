@@ -1,8 +1,8 @@
 import {installPolish} from './polish.js?v=1';
 import {createCompanion} from './companion.js?v=3';
-import {createThinking} from './thinking.js?v=3';
+import {createThinking} from './thinking.js?v=4';
 import {createRoutines} from './routines.js?v=2';
-import {createAccountability} from './accountability.js?v=2';
+import {createAccountability} from './accountability.js?v=3';
 import {emptyState} from './empty-states.js?v=2';
 import {createGoals} from './goals.js?v=3';
 import {installNavigation} from './navigation.js?v=2';
@@ -90,7 +90,7 @@ const thinking=createThinking({getData:()=>data,mutate,escape,refreshSelects,rol
 installPolish();
 const companion=createCompanion({request,escape,getBoard:()=>data,refreshSelects,role:()=>role,reloadBoard:loadBoard,openSource:(type,id)=>{if(type==='tasks'){openTask(id);return;}view=type==='goals'?'goals':type==='mapNodes'?'mindmap':'notes';render();if(type==='goals')goals.open(id);else thinking.open(type,id);}});
 function render() {
- $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Companion';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
+ $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Ramble';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
 
  $('thinking').hidden=!['notes','mindmap','templates','history'].includes(view);
  if(!$('thinking').hidden){for(const id of ['board','archive','routines','accountability','goals','planning','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent={notes:'Thoughts',mindmap:'Mind map',templates:'Templates',history:'Activity'}[view];$('page-title').textContent={notes:'Room to think.',mindmap:'Connect your thinking.',templates:'Your rhythm, repeated.',history:'Every step counts.'}[view];$('page-description').textContent='Your ideas, plans and progress, all in one place.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});thinking.render(view);return;}
@@ -121,9 +121,9 @@ function render() {
   $('task-count').textContent=`${tasks.length} task${tasks.length===1?'':'s'}`;
   $('clear-filters').hidden=!($('search').value || $('priority-filter').value || $('label-filter').value);
   $('board').hidden=view==='archive'; $('archive').hidden=view!=='archive'; $('sprint-panel').hidden=view!=='week'; $('new-list').hidden=view!=='board'; $('board-footnote').hidden=view==='archive';
-  $('page-title').innerHTML=view==='board'?'Your life, <em>in motion.</em>':view==='week'?'A week with <em>intention.</em>':'Room for <em>what’s next.</em>';
+  $('page-title').innerHTML=view==='board'?'Your life, <em>in motion.</em>':view==='week'?'A week with <em>intention.</em>':'Your <em>archive.</em>';
   $('breadcrumb').textContent=view==='board'?'My board':view==='week'?'This week':'Archive';
-  $('page-description').textContent=view==='board'?'Capture the thought. Take the next step. Keep the bigger picture close.':view==='week'?'A clear goal, a considered shortlist, and space to make progress.':'Your archived tasks and lists are kept here until you need them again.';
+  $('page-description').textContent=view==='board'?'Capture the thought. Take the next step. Keep the bigger picture close.':view==='week'?'A clear goal, a considered shortlist, and space to make progress.':'Lists, tasks and thoughts. Restore whenever you’re ready.';
   document.querySelectorAll('[data-view]').forEach(b=>{ if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current'); });
   if(view==='archive') { renderArchive(); refreshSelects(); return; }
   $('board').innerHTML=lists.map((list,index)=>{
@@ -142,9 +142,13 @@ function render() {
   }
 }
 function renderArchive() {
-  const lists=data.state.lists.filter(l=>l.archived),tasks=data.state.tasks.filter(t=>t.archived&&matches(t));
-  $('archive').innerHTML=`<h2>Archived lists</h2>${lists.length?lists.map(l=>`<div class="archive-row"><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore list</button></div>`).join(''):emptyState('archive','No archived lists.')}<h2>Archived tasks</h2>${tasks.length?tasks.map(t=>`<div class="archive-row"><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${activeLists().map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}">Restore task</button></div>`).join(''):emptyState('archive','No archived tasks match these filters.')}`;
+ const lists=data.state.lists.filter(l=>l.archived),tasks=data.state.tasks.filter(t=>t.archived&&(t.title+' '+t.notes).toLowerCase().includes($('search').value.toLowerCase())),notes=(data.state.notes||[]).filter(n=>n.archived&&n.title.toLowerCase().includes($('search').value.toLowerCase()));
+ const available=order(data.state.lists.filter(l=>!l.archived));
+ $('task-count').textContent=`${lists.length+tasks.length+notes.length} archived items`;
+ const section=(title,items)=>items.length?`<section class="archive-section"><h2>${title}<span>${items.length}</span></h2>${items.join('')}</section>`:'';
+ $('archive').innerHTML=section('Lists',lists.map(l=>`<div class="archive-row"><span class="archive-kind"><img class="action-icon" src="./icons/archive.svg" alt=""></span><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore</button></div>`))+section('Tasks',tasks.map(t=>`<div class="archive-row"><span class="archive-kind">Task</span><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${available.map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}" ${available.length?'':'disabled'}>Restore</button></div>`))+section('Thoughts',notes.map(n=>`<div class="archive-row"><span class="archive-kind">${n.kind==='idea'?'Idea':'Note'}</span><strong>${escape(n.title)}</strong><button data-note-restore="${n.id}">Restore</button></div>`))||emptyState('archive','Nothing archived yet. Your saved work will be here when you need it.');
 }
+
 function checklistRow(item={text:'',done:false,id:''}) {
   const row=document.createElement('div');row.className='check-row';row.dataset.id=item.id||'';
   row.innerHTML=`<input type="checkbox" aria-label="Checklist item completed" ${item.done?'checked':''}><input type="text" aria-label="Checklist item text" maxlength="300" value="${escape(item.text)}" required><button type="button" aria-label="Remove checklist item" title="Delete checklist item"><img class="action-icon" src="./icons/trash.svg" alt=""></button>`;
@@ -202,6 +206,7 @@ document.addEventListener('click',async(e)=>{
     else if(b.dataset.listEdit)openList(b.dataset.listEdit);
     else if(b.dataset.listMove)await mutate('list.move',{id:b.dataset.listMove,position:Number(b.dataset.position)});
     else if(b.dataset.listArchive)await confirmArchive('list.archive',b.dataset.listArchive);
+    else if(b.dataset.noteRestore)await mutate('note.restore',{id:b.dataset.noteRestore});
     else if(b.dataset.listRestore)await mutate('list.restore',{id:b.dataset.listRestore});
     else if(b.dataset.taskRestore){const id=b.dataset.taskRestore;await mutate('task.restore',{id,listId:document.querySelector(`[data-restore-list="${id}"]`).value});}
   }catch(e){pageError(e.message);}
