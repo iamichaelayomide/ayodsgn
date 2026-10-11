@@ -1,4 +1,4 @@
-import {installPolish} from './polish.js?v=6';
+import {installPolish} from './polish.js?v=7';
 import {createCompanion} from './companion.js?v=10';
 import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=2';
