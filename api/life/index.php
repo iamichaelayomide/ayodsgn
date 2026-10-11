@@ -15,15 +15,16 @@ try {
     if ($method==='GET') {
         if ($action==='session') life_json(['authenticated'=>$signed,'role'=>$role,'setupRequired'=>$store->owner()===null,'csrf'=>$_SESSION['csrf']]);
         if (!$signed) throw new LifeError('Sign in to access your planner.',401);
+        if($action==='ai'){if($role!=='owner')throw new LifeError('AI conversations belong to the owner.',403);require __DIR__.'/ai-routes.php';life_ai_route($store,$method,$action,[]);}
         if ($action==='attachment') {require __DIR__.'/attachments.php';$id=LifeStore::text($_GET['id']??'',32,true);$record=null;foreach($store->read()['state']['attachments']??[] as $a)if($a['id']===$id&&!$a['archived'])$record=$a;if(!$record||!preg_match('/^[a-f0-9]{32}$/',$id))throw new LifeError('File not found.',404);$path=life_attachment_dir($config).'/'.$id;if(!is_file($path))throw new LifeError('File not found.',404);header('Content-Type: '.$record['mime']);header("Content-Disposition: attachment; filename*=UTF-8''".rawurlencode($record['name']));readfile($path);exit;}
         if ($action==='board') life_json($store->read()+['role'=>$role]);
         if ($action==='partners'&&$role==='owner')life_json(['partners'=>(new LifePartners($store))->list()]);
-        if ($action==='backup') {if($role!=='owner')throw new LifeError('Only the owner can back up the planner.',403);require __DIR__.'/attachments.php';if(!class_exists('ZipArchive'))throw new LifeError('Archive support is unavailable. Download JSON and attachments separately.',503);$tmp=tempnam(life_attachment_dir($config),'backup-');try{$zip=new ZipArchive();if($zip->open($tmp,ZipArchive::OVERWRITE)!==true)throw new LifeError('Backup could not be created.',503);$snapshot=$store->read();$zip->addFromString('planner.json',json_encode(['format'=>'ayodsgn-life','schema'=>1,'exportedAt'=>LifeStore::now()]+$snapshot,JSON_THROW_ON_ERROR));foreach($snapshot['state']['attachments']??[] as $a){if(!preg_match('/^[a-f0-9]{32}$/',$a['id']))continue;$path=life_attachment_dir($config).'/'.$a['id'];if(is_file($path))$zip->addFile($path,'files/'.$a['id']);}$zip->close();header('Content-Type: application/zip');header('Content-Disposition: attachment; filename="ayodsgn-life-backup.zip"');readfile($tmp);}finally{unlink($tmp);}exit;}
+        if ($action==='backup') {if($role!=='owner')throw new LifeError('Only the owner can back up the planner.',403);require __DIR__.'/attachments.php';if(!class_exists('ZipArchive'))throw new LifeError('Archive support is unavailable. Download JSON and attachments separately.',503);$tmp=tempnam(life_attachment_dir($config),'backup-');try{$zip=new ZipArchive();if($zip->open($tmp,ZipArchive::OVERWRITE)!==true)throw new LifeError('Backup could not be created.',503);$snapshot=$store->read();require_once __DIR__.'/ai.php';$zip->addFromString('ai.json',json_encode((new LifeAI($store))->read()['state'],JSON_THROW_ON_ERROR));$zip->addFromString('planner.json',json_encode(['format'=>'ayodsgn-life','schema'=>1,'exportedAt'=>LifeStore::now()]+$snapshot,JSON_THROW_ON_ERROR));foreach($snapshot['state']['attachments']??[] as $a){if(!preg_match('/^[a-f0-9]{32}$/',$a['id']))continue;$path=life_attachment_dir($config).'/'.$a['id'];if(is_file($path))$zip->addFile($path,'files/'.$a['id']);}$zip->close();header('Content-Type: application/zip');header('Content-Disposition: attachment; filename="ayodsgn-life-backup.zip"');readfile($tmp);}finally{unlink($tmp);}exit;}
         if ($action==='calendar-export') {require __DIR__.'/calendar-export.php';header('Content-Type: text/calendar; charset=utf-8');header('Content-Disposition: attachment; filename="ayodsgn-life.ics"');echo life_ical($store->read()['state']);exit;}
         if ($action==='export') {
             if($role!=='owner')throw new LifeError('Only the owner can export the planner.',403);
             header('Content-Disposition: attachment; filename="ayodsgn-life-'.gmdate('Y-m-d').'.json"');
-            life_json(['format'=>'ayodsgn-life','schema'=>1,'exportedAt'=>LifeStore::now()]+$store->read());
+            require_once __DIR__.'/ai.php';life_json(['ai'=>(new LifeAI($store))->read()['state'],'format'=>'ayodsgn-life','schema'=>1,'exportedAt'=>LifeStore::now()]+$store->read());
         }
         throw new LifeError('Unknown request.',404);
     }
@@ -56,6 +57,7 @@ try {
         life_json(['authenticated'=>true,'csrf'=>$_SESSION['csrf']]);
     }
     if (!$signed) throw new LifeError('Sign in to access your planner.',401);
+    if(str_starts_with($action,'ai.')){if($role!=='owner')throw new LifeError('AI conversations belong to the owner.',403);require __DIR__.'/ai-routes.php';life_ai_route($store,$method,$action,$input);}
     if ($action==='logout') {
         $_SESSION=[]; session_destroy(); setcookie('ayolife','',['expires'=>time()-3600,'path'=>'/','secure'=>($_SERVER['HTTPS']??'')==='on','httponly'=>true,'samesite'=>'Strict']); life_json(['authenticated'=>false]);
     }
