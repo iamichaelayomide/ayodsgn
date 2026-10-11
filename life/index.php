@@ -10,7 +10,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <base href="/life/"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="./life.css?v=20"><script type="module" src="./app.js?v=21"></script>
+  <link rel="stylesheet" href="./life.css?v=22"><script type="module" src="./app.js?v=22"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
