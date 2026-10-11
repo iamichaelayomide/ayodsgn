@@ -1,12 +1,13 @@
 export function installPolish(){
  const form=document.getElementById('task-form');
+ const sizeTitle=()=>{const title=form.elements.title;if(!document.getElementById('task-dialog').open)return;title.style.height='auto';title.style.height=Math.min(180,Math.max(60,title.scrollHeight))+'px';};form.elements.title.addEventListener('input',sizeTitle);document.addEventListener('life:task-open',()=>requestAnimationFrame(sizeTitle));window.addEventListener('resize',sizeTitle);
  const sections=[...form.querySelectorAll('[data-task-step]')];sections.forEach(s=>s.hidden=false);
  document.getElementById('task-step-label').hidden=true;form.querySelector('.task-step-actions').hidden=true;
  const actions=document.createElement('div');actions.className='task-detail-actions';sections[0].after(actions);
  const panels=document.createElement('div');panels.className='task-detail-panels';actions.after(panels);
  function panel(name,icon,nodes){const button=document.createElement('button');button.type='button';button.innerHTML=`<img class="action-icon" src="./icons/${icon}.svg" alt=""> ${name}`;button.setAttribute('aria-expanded','false');const area=document.createElement('section');area.hidden=true;area.id='task-panel-'+name.toLowerCase();button.setAttribute('aria-controls',area.id);nodes.filter(Boolean).forEach(n=>area.append(n));actions.append(button);panels.append(area);button.onclick=()=>{const open=area.hidden;area.hidden=!open;button.setAttribute('aria-expanded',String(open));};return area;}
  const field=name=>form.elements[name]?.closest('label');
- panel('Dates','nav-calendar',[field('dueDate'),field('inSprint')]);
+ panel('Dates','calendar',[field('dueDate'),field('inSprint')]);
  const description=field('notes');description.classList.add('task-description');panels.before(description);const descriptionToggle=document.createElement('button');descriptionToggle.type='button';descriptionToggle.className='description-toggle';descriptionToggle.textContent='Add description';description.before(descriptionToggle);descriptionToggle.onclick=()=>{description.hidden=false;descriptionToggle.hidden=true;form.elements.notes.focus();};
  const checklist=panel('Checklist','tick-square',[form.querySelector('.checklist-heading'),document.getElementById('checklist')]);
  const files=document.createElement('section');files.className='task-existing-files';files.hidden=true;files.innerHTML='<h3>Attachments</h3>';files.append(document.getElementById('attachment-list'));panels.after(files);
