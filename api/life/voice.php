@@ -41,7 +41,7 @@ final class LifeVoice {
         $v=$this->session($args);if($v['temporary'])throw new LifeError('Temporary rambles cannot change your planner.',403);$r=$this->ai->read();$text=LifeStore::text($args['text']??'',6000,true);$plan=$args['plan']??[];$ci=null;
         foreach($r['state']['conversations'] as $i=>$c)if($c['id']===$v['conversationId'])$ci=$i;
         $pending=$ci===null?null:($r['state']['conversations'][$ci]['pendingRequest']??null);
-        if($pending&&($pending['expiresAt']??0)>time()&&!LifeCommands::explicit($text,$text)&&!preg_match('/\b(cancel|stop|never|do not|don[’\x{0027}]?t|maybe|instead|thinking)\b|\?/iu',$text)){$text=$pending['text'].'\nDetails supplied now: '.$text;$plan['authorization']=$text;}
+        if($pending&&($pending['expiresAt']??0)>time()&&!LifeCommands::explicit($text,$text)&&!preg_match('/\b(no|nope|not now|not yet|cancel|stop|never|do not|don[’\x{0027}]?t|maybe|instead|thinking)\b|\?/iu',$text)){$text=$pending['text'].'\nDetails supplied now: '.$text;$plan['authorization']=$text;}
         $result=LifeCommands::execute($this->store,$this->ai,$r['version'],(int)($args['boardVersion']??0),$text,$plan,LifeStore::text($args['requestId']??'',64,true));
         if($ci!==null&&isset($result['state']['conversations'][$ci]['pendingRequest'])){$s=$result['state'];unset($s['conversations'][$ci]['pendingRequest']);$updated=$this->ai->write($result['version'],$s);$result=array_replace($result,$updated);}return $result;
     }
@@ -54,7 +54,7 @@ final class LifeVoice {
         foreach(['user','assistant'] as $who){$text=LifeStore::text($args[$who]??'',20000);if($text==='')continue;$s['conversations'][$ci]['messages'][]=['id'=>LifeStore::id(),'role'=>$who,'text'=>$text,'at'=>LifeStore::now(),'voice'=>true,'commandId'=>$who==='assistant'&&array_filter($s['commands']??[],fn($c)=>$c['id']===($args['commandId']??''))?($args['commandId']??null):null,'proposals'=>[],'sources'=>[],'memoryEpoch'=>$s['memoryEpoch']??0];}
         $user=LifeStore::text($args['user']??'',6000);$assistant=LifeStore::text($args['assistant']??'',20000);
         if(empty($args['commandId'])&&LifeCommands::explicit($user,$user)&&preg_match('/\b(add|create|make|put)\b.*\b(task|to-do|todo|goal)\b/iu',$user)&&preg_match('/[?]|what.*(?:task|goal|title|name)|which.*(?:task|goal)/iu',$assistant))$s['conversations'][$ci]['pendingRequest']=['text'=>$user,'expiresAt'=>time()+600];
-        elseif(preg_match('/\b(cancel|stop|do not|never|don[’\x{0027}]?t)\b/iu',$user))unset($s['conversations'][$ci]['pendingRequest']);
+        elseif(preg_match('/\b(no|nope|not now|not yet|cancel|stop|do not|never|don[’\x{0027}]?t)\b/iu',$user))unset($s['conversations'][$ci]['pendingRequest']);
         if(($s['conversations'][$ci]['title']==='A spoken ramble'||str_starts_with($s['conversations'][$ci]['title'],'New chat'))&&trim($args['user']??'')!=='')$s['conversations'][$ci]['title']=mb_substr(trim($args['user']),0,80);$v['turnIds'][]=$turnId;unset($v);return $this->ai->write($r['version'],$s);
     }
 }
