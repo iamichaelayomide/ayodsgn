@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require __DIR__.'/../api/life/bootstrap.php';
 life_headers();
-header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://generativelanguage.googleapis.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
 ?>
 <!doctype html>
 <html lang="en">
@@ -10,7 +10,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <base href="/life/"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="./life.css?v=18"><script type="module" src="./app.js?v=18"></script>
+  <link rel="stylesheet" href="./life.css?v=19"><script type="module" src="./app.js?v=19"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>

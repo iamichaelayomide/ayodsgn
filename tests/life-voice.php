@@ -1,0 +1,14 @@
+<?php
+require '/app/api/life/store.php';require '/app/api/life/ai.php';require '/app/api/life/voice.php';
+$db=new PDO('sqlite::memory:');$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);$db->exec(file_get_contents('/app/api/life/schema.sql'));$store=new LifeStore($db);$store->initialize('disposable-voice-test');$ai=new LifeAI($store,['key'=>'test-only','freeOnly'=>true]);$checks=0;function checkVoice($ok){global $checks;if(!$ok)throw new Exception('Voice check failed '.$checks);$checks++;}
+$captured=[];$voice=new LifeVoice($store,$ai,['key'=>'test-only'],function($p)use(&$captured){$captured[]=$p;return ['name'=>'ephemeral-test-only'];});
+$r=$ai->read();try{$voice->start(['version'=>$r['version']]);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===403);}
+$r=$ai->mutate($r['version'],'consent',['accepted'=>true]);$r=$ai->mutate($r['version'],'conversation.new',['title'=>'Voice test']);$cid=$r['state']['conversations'][0]['id'];
+try{$voice->start(['version'=>$r['version']-1,'conversationId'=>$cid]);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===409);}
+$session=$voice->start(['version'=>$r['version'],'conversationId'=>$cid,'manual'=>true]);checkVoice($session['seconds']===600);checkVoice($captured[0]['uses']===1);checkVoice($captured[0]['bidiGenerateContentSetup']['realtimeInputConfig']['automaticActivityDetection']['disabled']);checkVoice(!str_contains(json_encode($ai->read()),'ephemeral-test-only'));checkVoice($ai->read()['state']['voiceUsage'][$r['day']]===600);
+$args=['sessionId'=>$session['sessionId'],'turnId'=>'turn-one','user'=>'I have six hours.','assistant'=>'What matters most?'];$saved=$voice->save($args);checkVoice(count($saved['state']['conversations'][0]['messages'])===2);checkVoice(count($saved['state']['memories'])===0);checkVoice(count($store->read()['state']['tasks'])===0);$again=$voice->save($args);checkVoice($again['version']===$saved['version']);
+try{$voice->save(['sessionId'=>'missing','turnId'=>'turn']);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===404);}
+$session2=$voice->start(['version'=>$saved['version'],'temporary'=>true]);$before=$ai->read();$voice->save(['sessionId'=>$session2['sessionId'],'turnId'=>'temp','user'=>'Do not save']);checkVoice($ai->read()['version']===$before['version']);
+try{$voice->start(['version'=>$before['version'],'temporary'=>true]);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===429);}
+$r=$ai->read();$s=$r['state'];$s['voiceSessions'][0]['expiresAt']=time()-400;$ai->write($r['version'],$s);try{$voice->save(['sessionId'=>$session['sessionId'],'turnId'=>'late','user'=>'Late']);checkVoice(false);}catch(LifeError $e){checkVoice($e->status===409);}
+echo "$checks voice checks passed\n";

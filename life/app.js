@@ -1,5 +1,5 @@
-import {installPolish} from './polish.js?v=1';
-import {createCompanion} from './companion.js?v=3';
+import {installPolish} from './polish.js?v=2';
+import {createCompanion} from './companion.js?v=4';
 import {createThinking} from './thinking.js?v=4';
 import {createRoutines} from './routines.js?v=2';
 import {createAccountability} from './accountability.js?v=3';
@@ -88,7 +88,7 @@ const accountability=createAccountability({getData:()=>data,request,mutate,escap
 const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
 const thinking=createThinking({getData:()=>data,mutate,escape,refreshSelects,role:()=>role,openTask,week:()=>selectedWeek});
 installPolish();
-const companion=createCompanion({request,escape,getBoard:()=>data,refreshSelects,role:()=>role,reloadBoard:loadBoard,openSource:(type,id)=>{if(type==='tasks'){openTask(id);return;}view=type==='goals'?'goals':type==='mapNodes'?'mindmap':'notes';render();if(type==='goals')goals.open(id);else thinking.open(type,id);}});
+const companion=createCompanion({request,escape,uploadAudio:async file=>{const body=new FormData();body.append("audio",file);const response=await fetch(API+"?action=ai.audio",{method:"POST",credentials:"same-origin",headers:{"X-CSRF-Token":csrf},body});const result=await response.json();if(!response.ok)throw new Error(result.error||"Audio could not be transcribed.");return result;},getBoard:()=>data,refreshSelects,role:()=>role,reloadBoard:loadBoard,openSource:(type,id)=>{if(type==='tasks'){openTask(id);return;}view=type==='goals'?'goals':type==='mapNodes'?'mindmap':'notes';render();if(type==='goals')goals.open(id);else thinking.open(type,id);}});
 function render() {
  $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Ramble';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
 
