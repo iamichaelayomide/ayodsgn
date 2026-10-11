@@ -6,6 +6,8 @@ final class LifeError extends RuntimeException {
     public function __construct(string $message, int $status = 422) { parent::__construct($message); $this->status = $status; }
 }
 
+require_once __DIR__.'/task-fields.php';
+
 final class LifeStore {
     public function __construct(public PDO $db) {}
     public static function id(): string { return bin2hex(random_bytes(16)); }
@@ -187,6 +189,15 @@ final class LifeStore {
                     $checklist=array_map(fn($v)=>['id'=>is_string($v['id']??null) && preg_match('/^[a-f0-9]{32}$/',$v['id']) ? $v['id'] : self::id(),'text'=>self::text($v['text']??'',300,true),'done'=>($v['done']??false)===true],$checklist);
                     if (count(array_unique(array_column($checklist,'id')))!==count($checklist)) throw new LifeError('Checklist item IDs must be unique.');
                     $item=['title'=>self::text($args['title']??'',200,true),'notes'=>self::text($args['notes']??'',20000),'blocker'=>self::text($args['blocker']??'',2000),'priority'=>$priority,'labels'=>$labels,'checklist'=>$checklist,'dueDate'=>$due,'listId'=>$listId,'updatedAt'=>self::now()];
+                    if(array_key_exists('notesDelta',$args))$item['notesDelta']=life_task_delta($args['notesDelta'],$item['notes']);
+                    elseif(array_key_exists('notes',$args)&&$id!==''){$old=$s['tasks'][self::index($s['tasks'],$id)];if(($old['notes']??'')!==$item['notes'])$item['notesDelta']=null;}
+                    $prior=$id!==''?$s['tasks'][self::index($s['tasks'],$id)]:[];
+                    $time=$args['dueTime']??($prior['dueTime']??'');$reminder=array_key_exists('reminderMinutes',$args)?$args['reminderMinutes']:($prior['reminderMinutes']??null);
+                    if(!is_string($time)||($time!==''&&!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/',$time)))throw new LifeError('Choose a valid due time.');
+                    if($reminder!==null&&(!is_int($reminder)||!in_array($reminder,[0,5,15,30,60,1440],true)))throw new LifeError('Choose a valid reminder.');
+                    if($due===''){$time='';$reminder=null;}
+                    if($reminder!==null&&$time==='')throw new LifeError('Choose a due date and time for the reminder.');
+                    $item['dueTime']=$time;$item['reminderMinutes']=$reminder;
                     if($effort!==null)$item['effortMinutes']=$effort;
                     if (isset($args['goalId'])) {$goalId=self::text($args['goalId'],32);if($goalId!==''){ $gi=self::index($s['goals']??[],$goalId);if($s['goals'][$gi]['archived'])throw new LifeError('Choose an active goal.');}$item['goalId']=$goalId;}
                     if ($id==='') {
