@@ -1,4 +1,4 @@
-import {createVoice} from './voice.js?v=2';
+import {createVoice} from './voice.js?v=3';
 import {emptyState} from './empty-states.js?v=2';
 export function createCompanion({request,escape,uploadAudio,getBoard,refreshSelects,role,reloadBoard,openSource}){
  const root=document.getElementById('companion');let data=null,conversation='',mode='chat',temporary=false,temporaryMessages=[],sending=false,draft='',requestId='';

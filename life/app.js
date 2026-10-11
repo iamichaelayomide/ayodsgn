@@ -1,5 +1,5 @@
 import {installPolish} from './polish.js?v=2';
-import {createCompanion} from './companion.js?v=5';
+import {createCompanion} from './companion.js?v=6';
 import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=2';
 import {createAccountability} from './accountability.js?v=3';
