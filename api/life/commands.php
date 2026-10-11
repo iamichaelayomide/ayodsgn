@@ -8,10 +8,10 @@ final class LifeCommands {
         if($quote===''||!str_contains(mb_strtolower($message),mb_strtolower($quote)))return false;
         // Conservative: exploratory, conditional and negative instructions stay discussion.
         if(preg_match('/\b(don[’\x{0027}]?t|do not|never|not yet|without|instead of|if|could|would|should|maybe|might|thinking|consider|suggest|propose|example|imagine|hypothetical)\b/iu',$message))return false;
-        return (bool)preg_match('/^(?:(?:hi|hello|hey|just|okay|ok|yes|now|then|and|also|please|go ahead)[,\s.!:]*)*(?:(?:can|will) you\s+(?:help me\s+)?)?(?:please\s+)?(add|create|make|put|move|rename|change|update|edit|set|schedule|reschedule|link|archive|remove|restore|save|remember|forget|mark|complete|organize|turn|convert|connect|disconnect|undo)\b/iu',trim($quote));
+        return (bool)preg_match('/^(?:(?:hi|hello|hey|just|okay|ok|yes|now|then|and|also|please|go ahead)[,\s.!:]*)*(?:(?:can|will) you\s+(?:help me\s+)?)?(?:please\s+)?(add|create|make|put|move|rename|change|update|edit|set|schedule|reschedule|remind|link|archive|remove|restore|save|remember|forget|mark|complete|organize|turn|convert|connect|disconnect|undo)\b/iu',trim($quote));
     }
     public static function context(array $s):array {
-        $index=[];foreach(['boards','lists','goals','tasks','notes','mapNodes','routines'] as $type){$rows=$s[$type]??[];$index[$type]=array_map(function($r){return array_intersect_key($r,array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','schedule','group','kind','nextDate','priority','blocker','checklist']));},array_slice($rows,0,500));$index['counts'][$type]=count($rows);}
+        $index=[];foreach(['boards','lists','goals','tasks','notes','mapNodes','routines'] as $type){$rows=$s[$type]??[];$index[$type]=array_map(function($r){return array_intersect_key($r,array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','dueTime','reminderMinutes','schedule','group','kind','nextDate','priority','blocker','checklist']));},array_slice($rows,0,500));$index['counts'][$type]=count($rows);}
         $index['sprints']=$s['sprints']??[];$index['quarterReviews']=array_slice($s['quarterReviews']??[],-2,null,true);$index['week']=LifeStore::week();$index['date']=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');return $index;
     }
     public static function confirmation(array $actions,array $board):string {
@@ -32,7 +32,7 @@ final class LifeCommands {
             $scored=[];foreach($s[$type]??[] as $row){$title=mb_strtolower(($row['title']??$row['name']??'').' '.($row['notes']??''));$score=in_array($row['id']??'', $selected,true)?1000:0;foreach($words as $w)if(str_contains($title,$w))$score+=10;
                 if($type==='goals'&&!($row['archived']??false)&&!($row['completed']??false))$score+=2;
                 if($score>0)$scored[]=['score'=>$score,'row'=>$row];}
-            usort($scored,fn($a,$b)=>$b['score']<=>$a['score']);$out[$type]=array_map(fn($r)=>array_intersect_key($r['row'],array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','schedule','group','kind','priority','blocker','checklist'])),array_slice($scored,0,32));
+            usort($scored,fn($a,$b)=>$b['score']<=>$a['score']);$out[$type]=array_map(fn($r)=>array_intersect_key($r['row'],array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','dueTime','reminderMinutes','schedule','group','kind','priority','blocker','checklist'])),array_slice($scored,0,32));
         }
         $week=LifeStore::week();$out['sprints']=[$week=>$s['sprints'][$week]??['goal'=>'','taskIds'=>[]]];return $out;
     }
@@ -46,7 +46,7 @@ final class LifeCommands {
           if($op==='map.create'){$nodes=$args['nodes']??[];if(!is_array($nodes)||count($nodes)<1||count($nodes)>30)throw new LifeError('A mind map needs one to thirty nodes.');$group=LifeStore::text($args['title']??'My thinking',60,true).' · '.substr(LifeStore::id(),0,6);$ids=[];foreach($nodes as $i=>$n){$board=$store->mutate($board['version'],'map.save',['title'=>$n['title']??'','kind'=>$n['kind']??'idea','group'=>$group,'x'=>80+($i%4)*400,'y'=>80+(int)floor($i/4)*260]);$ids[]=end($board['state']['mapNodes'])['id'];$parent=(int)($n['parent']??-1);if($parent>=0&&$parent<$i)$board=$store->mutate($board['version'],'map.connect',['from'=>$ids[$parent],'to'=>$ids[$i]]);}$changed[]='map.create';continue;}
           // Patch existing records rather than resetting omitted notes/checklists/goal fields.
           $type=match($op){'task.save'=>'tasks','goal.save'=>'goals','note.save'=>'notes','map.save'=>'mapNodes','routine.save'=>'routines',default=>null};
-          if($type&&($args['id']??'')!==''){$old=null;foreach($board['state'][$type]??[] as $record)if($record['id']===$args['id'])$old=$record;if(!$old)throw new LifeError('That record is no longer available.',404);$args=array_merge($old,$args);}
+          if($type&&($args['id']??'')!==''){$old=null;foreach($board['state'][$type]??[] as $record)if($record['id']===$args['id'])$old=$record;if(!$old)throw new LifeError('That record is no longer available.',404);if($type==='tasks'&&isset($args['notes'])&&$args['notes']!==($old['notes']??'')&&!array_key_exists('notesDelta',$args))$args['notesDelta']=null;$args=array_merge($old,$args);}
           if($op==='sprint.save'){$week=$args['week']??LifeStore::week();$args=array_merge($board['state']['sprints'][$week]??['goal'=>'','taskIds'=>[]],$args,['week'=>$week]);}
           $board=$store->mutate($board['version'],$op,$args);$changed[]=$op;
         }
