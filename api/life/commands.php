@@ -8,7 +8,7 @@ final class LifeCommands {
         if($quote===''||!str_contains(mb_strtolower($message),mb_strtolower($quote)))return false;
         // Conservative: exploratory, conditional and negative instructions stay discussion.
         if(preg_match('/\b(don[’\x{0027}]?t|do not|never|not yet|without|instead of|if|could|would|should|maybe|might|thinking|consider|suggest|propose|example|imagine|hypothetical)\b/iu',$message))return false;
-        return (bool)preg_match('/^(?:(?:okay|ok|yes|now|then|and|also|please|go ahead)[,\s.!:]*)*(?:(?:can|will) you\s+)?(?:please\s+)?(add|create|make|put|move|rename|change|update|edit|set|schedule|reschedule|link|archive|remove|restore|save|remember|forget|mark|complete|organize|turn|convert|connect|disconnect|undo)\b/iu',trim($quote));
+        return (bool)preg_match('/^(?:(?:hi|hello|hey|just|okay|ok|yes|now|then|and|also|please|go ahead)[,\s.!:]*)*(?:(?:can|will) you\s+(?:help me\s+)?)?(?:please\s+)?(add|create|make|put|move|rename|change|update|edit|set|schedule|reschedule|link|archive|remove|restore|save|remember|forget|mark|complete|organize|turn|convert|connect|disconnect|undo)\b/iu',trim($quote));
     }
     public static function context(array $s):array {
         $index=[];foreach(['boards','lists','goals','tasks','notes','mapNodes','routines'] as $type){$rows=$s[$type]??[];$index[$type]=array_map(function($r){return array_intersect_key($r,array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','schedule','group','kind','nextDate','priority','blocker','checklist']));},array_slice($rows,0,500));$index['counts'][$type]=count($rows);}

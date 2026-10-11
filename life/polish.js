@@ -1,10 +1,19 @@
 export function installPolish(){
- const form=document.getElementById('task-form');let step=0;
- function show(n){step=Math.max(0,Math.min(2,n));form.querySelectorAll('[data-task-step]').forEach(s=>s.hidden=Number(s.dataset.taskStep)!==step);document.getElementById('task-step-label').textContent=`${step+1} of 3 · ${['The essentials','A little context','Optional extras'][step]}`;document.getElementById('task-back').hidden=step===0;document.getElementById('task-next').hidden=step===2;}
- document.getElementById('task-next').onclick=()=>{if(!form.elements.title.value.trim()){show(0);form.elements.title.reportValidity();return;}show(step+1);form.querySelector(`[data-task-step="${step}"] input:not([type=hidden]),[data-task-step="${step}"] textarea`)?.focus();};
- document.getElementById('task-back').onclick=()=>show(step-1);
- document.addEventListener('life:task-open',e=>{show(0);form.querySelector('.task-more').open=false;document.getElementById('task-attachments').hidden=!e.detail.existing;});
- form.addEventListener('invalid',e=>{const section=e.target.closest('[data-task-step]');if(section)show(Number(section.dataset.taskStep));const detail=e.target.closest('details');if(detail)detail.open=true;},true);
+ const form=document.getElementById('task-form');
+ const sections=[...form.querySelectorAll('[data-task-step]')];sections.forEach(s=>s.hidden=false);
+ document.getElementById('task-step-label').hidden=true;form.querySelector('.task-step-actions').hidden=true;
+ const actions=document.createElement('div');actions.className='task-detail-actions';sections[0].after(actions);
+ const panels=document.createElement('div');panels.className='task-detail-panels';actions.after(panels);
+ function panel(name,icon,nodes){const button=document.createElement('button');button.type='button';button.innerHTML=`<img class="action-icon" src="./icons/${icon}.svg" alt=""> ${name}`;button.setAttribute('aria-expanded','false');const area=document.createElement('section');area.hidden=true;area.id='task-panel-'+name.toLowerCase();button.setAttribute('aria-controls',area.id);nodes.filter(Boolean).forEach(n=>area.append(n));actions.append(button);panels.append(area);button.onclick=()=>{const open=area.hidden;area.hidden=!open;button.setAttribute('aria-expanded',String(open));};return area;}
+ const field=name=>form.elements[name]?.closest('label');
+ panel('Dates','nav-calendar',[field('dueDate'),field('inSprint')]);
+ panel('Details','edit',[field('goalId'),field('notes')]);
+ const checklist=panel('Checklist','nav-today',[form.querySelector('.checklist-heading'),document.getElementById('checklist')]);
+ const attachments=panel('Attachment','archive',[document.getElementById('task-attachments')]);
+ panel('More','more',[field('effortMinutes'),field('labels'),field('blocker'),field('dependencies')]);
+ sections.slice(1).forEach(s=>s.hidden=true);
+ document.addEventListener('life:task-open',e=>{panels.querySelectorAll(':scope>section').forEach(p=>p.hidden=true);actions.querySelectorAll('button').forEach(b=>b.setAttribute('aria-expanded','false'));document.getElementById('task-attachments').hidden=!e.detail.existing;attachments.querySelector('.new-attachment-note')?.remove();if(!e.detail.existing){const note=document.createElement('p');note.className='new-attachment-note';note.textContent='Save the task first, then attach a file.';attachments.append(note);}if(document.getElementById('checklist').children.length){checklist.hidden=false;actions.querySelector('[aria-controls="task-panel-checklist"]').setAttribute('aria-expanded','true');}});
+ form.addEventListener('invalid',e=>{const area=e.target.closest('.task-detail-panels>section');if(area){area.hidden=false;actions.querySelector(`[aria-controls="${area.id}"]`)?.setAttribute('aria-expanded','true');}},true);
  const picker=document.querySelector('.board-picker'),toolbar=document.querySelector('.toolbar');
  const options=document.createElement('details');options.className='board-options';options.innerHTML='<summary aria-label="Board options"><img class="action-icon" src="./icons/more.svg" alt=""></summary><div class="board-options-items"></div>';
  ['new-board','rename-board','new-list'].forEach(id=>options.querySelector('div').append(document.getElementById(id)));picker.append(document.getElementById('new-task'),options);
