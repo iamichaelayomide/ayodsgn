@@ -62,6 +62,7 @@ try {
     if($action==='partner.invite'||$action==='partner.revoke'){if($role!=='owner')throw new LifeError('Only the owner manages partners.',403);$partners=new LifePartners($store);if($action==='partner.invite')life_json($partners->invite(LifeStore::text($input['name']??'',100,true)));$partners->revoke(LifeStore::text($input['id']??'',32,true));life_json(['ok'=>true]);}
     if ($action==='mutate') {
         if (!is_int($input['version']??null) || !is_string($input['action']??null) || !is_array($input['args']??null)) throw new LifeError('Invalid board update.',400);
+        if($input['action']==='attachment.add')throw new LifeError('Use the authenticated file upload.',403);
         life_json($store->mutate($input['version'],$input['action'],$input['args'],$role,$_SESSION['partner']??'owner'));
     }
     throw new LifeError('Unknown request.',404);
