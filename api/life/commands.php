@@ -14,6 +14,17 @@ final class LifeCommands {
         $index=[];foreach(['boards','lists','goals','tasks','notes','mapNodes','routines'] as $type){$rows=$s[$type]??[];$index[$type]=array_map(function($r){return array_intersect_key($r,array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','schedule','group','kind','nextDate','priority','blocker','checklist']));},array_slice($rows,0,500));$index['counts'][$type]=count($rows);}
         $index['sprints']=$s['sprints']??[];$index['quarterReviews']=array_slice($s['quarterReviews']??[],-2,null,true);$index['week']=LifeStore::week();$index['date']=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');return $index;
     }
+    public static function confirmation(array $actions,array $board):string {
+        $messages=[];$today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');$tomorrow=(new DateTimeImmutable('tomorrow',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');
+        foreach($actions as $action){$op=$action['operation'];$a=$action['arguments']??[];if(is_string($a))$a=json_decode($a,true)??[];$title=$a['title']??'';
+            $type=str_starts_with($op,'goal.')?'goals':(str_starts_with($op,'task.')?'tasks':null);if($type&&isset($a['id']))foreach($board[$type]??[] as $row)if($row['id']===$a['id'])$title=$row['title'];
+            $name=$title!==''?'“'.$title.'”':'the item';$verb=match($op){'task.save','goal.save'=>empty($a['id'])?'Added':'Updated','task.move'=>'Moved','task.schedule'=>'Scheduled','task.complete'=>($a['done']??false)?'Completed':'Reopened','task.archive','goal.archive'=>'Archived','task.restore','goal.restore'=>'Restored','map.create'=>'Created mind map',default=>'Saved'};
+            $text=$verb.' '.($op==='goal.save'?'goal ':'').$name;
+            if($op==='task.move')foreach($board['lists'] as $l)if($l['id']===($a['listId']??''))$text.=' to '.$l['name'];
+            if(!empty($a['dueDate']))$text.=' for '.($a['dueDate']===$today?'today':($a['dueDate']===$tomorrow?'tomorrow':$a['dueDate']));
+            if($op==='task.schedule'&&!empty($a['date']))$text.=' for '.($a['date']===$today?'today':($a['date']===$tomorrow?'tomorrow':$a['date'])).(!empty($a['time'])?' at '.$a['time']:'');if($op==='goal.save'&&!empty($a['period']))$text.=' for '.$a['period'];$messages[]=$text.'.';
+        }return implode(' ',array_slice($messages,0,20));
+    }
     public static function relevant(array $s,string $query,array $screen=[]):array {
         $selected=[];array_walk_recursive($screen,function($v)use(&$selected){if(is_string($v))$selected[]=$v;});
         $words=preg_split('/[^\pL\pN]+/u',mb_strtolower($query));$words=array_filter($words,fn($w)=>mb_strlen($w)>2);
@@ -39,7 +50,7 @@ final class LifeCommands {
           if($op==='sprint.save'){$week=$args['week']??LifeStore::week();$args=array_merge($board['state']['sprints'][$week]??['goal'=>'','taskIds'=>[]],$args,['week'=>$week]);}
           $board=$store->mutate($board['version'],$op,$args);$changed[]=$op;
         }
-        $r=$ai->read();$state=$r['state'];$receipt=['id'=>LifeStore::id(),'requestId'=>$requestId,'operations'=>$changed,'afterVersion'=>$board['version'],'at'=>LifeStore::now(),'undone'=>false,'before'=>$before,'beforeMemories'=>$memories,'afterMemories'=>$state['memories']];$state['commands'][]=$receipt;$state['commands']=array_slice($state['commands'],-10);$updated=$ai->write($r['version'],$state);$db->commit();unset($receipt['before'],$receipt['beforeMemories']);return $updated+['board'=>$board,'receipt'=>$receipt];
+        $r=$ai->read();$state=$r['state'];$receipt=['id'=>LifeStore::id(),'requestId'=>$requestId,'operations'=>$changed,'afterVersion'=>$board['version'],'at'=>LifeStore::now(),'undone'=>false,'summary'=>self::confirmation($actions,$board['state']),'before'=>$before,'beforeMemories'=>$memories,'afterMemories'=>$state['memories']];$state['commands'][]=$receipt;$state['commands']=array_slice($state['commands'],-10);$updated=$ai->write($r['version'],$state);$db->commit();unset($receipt['before'],$receipt['beforeMemories']);return $updated+['board'=>$board,'receipt'=>$receipt];
         }catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}
     }
     public static function undo(LifeStore $store,LifeAI $ai,int $version,string $id):array {
