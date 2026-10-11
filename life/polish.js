@@ -6,5 +6,5 @@ export function installPolish(){
  document.addEventListener('life:task-open',e=>{show(0);form.querySelector('.task-more').open=false;document.getElementById('task-attachments').hidden=!e.detail.existing;});
  form.addEventListener('invalid',e=>{const section=e.target.closest('[data-task-step]');if(section)show(Number(section.dataset.taskStep));const detail=e.target.closest('details');if(detail)detail.open=true;},true);
  const button=document.createElement('button');button.id='voice-preview';button.className='voice-fab';button.type='button';button.setAttribute('aria-label','Voice conversation preview');button.title='Voice conversation';button.innerHTML='<img src="./icons/microphone.svg" alt=""><span class="visually-hidden">Voice conversation</span>';
- document.getElementById('workspace').append(button);button.setAttribute('aria-label','Talk to Ramble');button.onclick=()=>{document.querySelector('[data-view="companion"]').click();document.dispatchEvent(new Event('life:voice-open'));};
+ document.getElementById('workspace').append(button);button.setAttribute('aria-label','Talk to Ramble');button.onclick=()=>{document.dispatchEvent(new Event('life:voice-open'));};
 }
