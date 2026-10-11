@@ -29,6 +29,6 @@ final class LifeVoice {
         $ci=null;foreach($s['conversations'] as $i=>$c)if($c['id']===$v['conversationId']&&!$c['archived'])$ci=$i;if($ci===null)throw new LifeError('This conversation was archived. Copy your transcript before closing.',409);
         if(count($s['conversations'][$ci]['messages'])>=2000)throw new LifeError('Conversation full. Copy your transcript.',429);
         foreach(['user','assistant'] as $who){$text=LifeStore::text($args[$who]??'',20000);if($text==='')continue;$s['conversations'][$ci]['messages'][]=['id'=>LifeStore::id(),'role'=>$who,'text'=>$text,'at'=>LifeStore::now(),'voice'=>true,'proposals'=>[],'sources'=>[],'memoryEpoch'=>$s['memoryEpoch']??0];}
-        $v['turnIds'][]=$turnId;unset($v);return $this->ai->write($r['version'],$s);
+        if(($s['conversations'][$ci]['title']==='A spoken ramble'||str_starts_with($s['conversations'][$ci]['title'],'New chat'))&&trim($args['user']??'')!=='')$s['conversations'][$ci]['title']=mb_substr(trim($args['user']),0,80);$v['turnIds'][]=$turnId;unset($v);return $this->ai->write($r['version'],$s);
     }
 }
