@@ -14,6 +14,17 @@ final class LifeCommands {
         $index=[];foreach(['boards','lists','goals','tasks','notes','mapNodes','routines'] as $type){$rows=$s[$type]??[];$index[$type]=array_map(function($r){return array_intersect_key($r,array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','schedule','group','kind','nextDate','priority','blocker','checklist']));},array_slice($rows,0,500));$index['counts'][$type]=count($rows);}
         $index['sprints']=$s['sprints']??[];$index['quarterReviews']=array_slice($s['quarterReviews']??[],-2,null,true);$index['week']=LifeStore::week();$index['date']=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');return $index;
     }
+    public static function relevant(array $s,string $query,array $screen=[]):array {
+        $selected=[];array_walk_recursive($screen,function($v)use(&$selected){if(is_string($v))$selected[]=$v;});
+        $words=preg_split('/[^\pL\pN]+/u',mb_strtolower($query));$words=array_filter($words,fn($w)=>mb_strlen($w)>2);
+        $out=self::context($s);foreach(['tasks','goals','notes','mapNodes','routines'] as $type){
+            $scored=[];foreach($s[$type]??[] as $row){$title=mb_strtolower(($row['title']??$row['name']??'').' '.($row['notes']??''));$score=in_array($row['id']??'', $selected,true)?1000:0;foreach($words as $w)if(str_contains($title,$w))$score+=10;
+                if($type==='goals'&&!($row['archived']??false)&&!($row['completed']??false))$score+=2;
+                if($score>0)$scored[]=['score'=>$score,'row'=>$row];}
+            usort($scored,fn($a,$b)=>$b['score']<=>$a['score']);$out[$type]=array_map(fn($r)=>array_intersect_key($r['row'],array_flip(['id','title','name','archived','boardId','listId','goalId','parentId','type','period','completed','dueDate','schedule','group','kind','priority','blocker','checklist'])),array_slice($scored,0,32));
+        }
+        $week=LifeStore::week();$out['sprints']=[$week=>$s['sprints'][$week]??['goal'=>'','taskIds'=>[]]];return $out;
+    }
     public static function execute(LifeStore $store,LifeAI $ai,int $version,int $boardVersion,string $message,array $plan,string $requestId):array {
         if(!self::explicit($message,LifeStore::text($plan['authorization']??'',6000)))throw new LifeError('Tell me explicitly what you want changed. Your planner has not been changed.',422);
         $actions=$plan['actions']??[];if(!is_array($actions)||count($actions)<1||count($actions)>20)throw new LifeError('Ask for between one and twenty changes at a time.',422);
