@@ -35,7 +35,7 @@ try {
     if (!is_array($input)) throw new LifeError('Invalid request.',400);
     if (!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??'')) throw new LifeError('Your session changed. Reload and try again.',403);
     if ($action==='partner.accept') {
-        $store->throttle($_SERVER['REMOTE_ADDR']??'unknown');$p=(new LifePartners($store))->accept(LifeStore::text($input['id']??'',32,true),LifeStore::text($input['token']??'',64,true),LifeStore::text($input['password']??'',200,true));session_regenerate_id(true);$_SESSION=['partner'=>$p['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time(),'credential'=>hash('sha256',$p['password_hash'])];life_json(['authenticated'=>true,'role'=>'partner','csrf'=>$_SESSION['csrf']]);
+        $store->throttle($_SERVER['REMOTE_ADDR']??'unknown');$p=(new LifePartners($store))->accept(LifeStore::text($input['id']??'',32,true),LifeStore::text($input['token']??'',64,true),LifeStore::text($input['password']??'',200,true));$store->clearThrottle($_SERVER['REMOTE_ADDR']??'unknown');session_regenerate_id(true);$_SESSION=['partner'=>$p['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time(),'credential'=>hash('sha256',$p['password_hash'])];life_json(['authenticated'=>true,'role'=>'partner','csrf'=>$_SESSION['csrf']]);
     }
     if ($action==='login' || $action==='setup') {
         $store->throttle($_SERVER['REMOTE_ADDR']??'unknown');
@@ -46,13 +46,13 @@ try {
             if (!is_string($token) || !hash_equals($config['setup_token_hash'],hash('sha256',$token))) throw new LifeError('The setup key is invalid.',403);
             $store->initialize($password);
         } elseif(!empty($input['partnerId'])) {
-            $p=(new LifePartners($store))->find(LifeStore::text($input['partnerId'],32,true));if(!$p||$p['revoked']||!password_verify($password,$p['password_hash']??''))throw new LifeError('Check your partner ID and password.',401);session_regenerate_id(true);$_SESSION=['partner'=>$p['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time(),'credential'=>hash('sha256',$p['password_hash'])];life_json(['authenticated'=>true,'role'=>'partner','csrf'=>$_SESSION['csrf']]);
+            $p=(new LifePartners($store))->find(LifeStore::text($input['partnerId'],32,true));if(!$p||$p['revoked']||!password_verify($password,$p['password_hash']??''))throw new LifeError('Check your partner ID and password.',401);$store->clearThrottle($_SERVER['REMOTE_ADDR']??'unknown');session_regenerate_id(true);$_SESSION=['partner'=>$p['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time(),'credential'=>hash('sha256',$p['password_hash'])];life_json(['authenticated'=>true,'role'=>'partner','csrf'=>$_SESSION['csrf']]);
         } else {
             $owner=$store->owner();
             $hash=$owner['password_hash']??'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.';
             if (!password_verify($password,$hash) || !$owner) throw new LifeError('The password is incorrect.',401);
         }
-        session_regenerate_id(true); $_SESSION=['owner'=>1,'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time(),'credential'=>hash('sha256',$store->owner()['password_hash'])];
+        $store->clearThrottle($_SERVER['REMOTE_ADDR']??'unknown');session_regenerate_id(true); $_SESSION=['owner'=>1,'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time(),'credential'=>hash('sha256',$store->owner()['password_hash'])];
         life_json(['authenticated'=>true,'csrf'=>$_SESSION['csrf']]);
     }
     if (!$signed) throw new LifeError('Sign in to access your planner.',401);

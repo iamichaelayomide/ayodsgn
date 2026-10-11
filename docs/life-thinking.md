@@ -14,7 +14,7 @@ Local tests restore a complete exported state into a disposable database. Hosted
 
 ## Release checks
 
-88 PHP checks; 17 hosted thinking/file/backup checks; 14 hosted partner checks; 23 hosted board/routine checks. Desktop and 390px phone workflows verify owner login, navigation, thought capture, idea conversion, map editing, outline, and private attachments. Final production smoke results and release commit are recorded in the continuation checkpoint.
+90 PHP checks; 17 hosted thinking/file/backup checks; 14 hosted partner checks; 23 hosted board/routine checks. Desktop and 390px phone workflows verify owner login, navigation, thought capture, idea conversion, map editing, outline, and private attachments. Final production smoke results and release commit are recorded in the continuation checkpoint.
 
 ## Phase two boundary
 

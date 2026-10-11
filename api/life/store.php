@@ -264,6 +264,7 @@ final class LifeStore {
         if (!$d || $d->format('Y-m-d')!==$week || $d->format('N')!=='1') throw new LifeError('Sprints start on Monday.');
         return $week;
     }
+    public function clearThrottle(string $ip): void {$this->db->prepare('DELETE FROM life_login_attempt WHERE ip_hash=?')->execute([hash('sha256',$ip)]);}
     public function throttle(string $ip): void {
         $key=hash('sha256',$ip); $since=time()-900;
         $q=$this->db->prepare('SELECT COUNT(*) FROM life_login_attempt WHERE attempted_at>?');
