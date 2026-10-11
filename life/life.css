@@ -105,3 +105,5 @@
 .partner-mode .today-row input{pointer-events:auto}
 .goal-create-card>.illustrated-empty,.today-capture-card>.illustrated-empty{display:flex;align-items:center;text-align:left;background:transparent;border:0;margin:0;padding:0;min-height:0;flex:1;gap:20px}.goal-create-card>.illustrated-empty p,.today-capture-card>.illustrated-empty p{margin:0;text-align:left;max-width:none}.goal-create-card>.illustrated-empty svg,.today-capture-card>.illustrated-empty svg{width:92px;height:92px;flex:none}.today-capture-card>.illustrated-empty{flex-basis:100%}@media(max-width:900px){.goal-create-card>.illustrated-empty svg,.today-capture-card>.illustrated-empty svg{width:64px;height:64px}}
 .goal-create-card>.illustrated-empty,.today-capture-card>.illustrated-empty{flex-direction:row;justify-content:flex-start;width:auto}.goal-create-card>.illustrated-empty p,.today-capture-card>.illustrated-empty p{text-align:left!important}.nav-group summary::after,.sidebar-tools summary::after{background-image:url('./icons/chevron-down.svg')}
+
+.goal-create-card>.primary{margin-right:64px}
