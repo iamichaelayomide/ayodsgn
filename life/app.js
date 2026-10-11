@@ -1,13 +1,14 @@
-import {createCompanion} from './companion.js?v=2';
-import {createThinking} from './thinking.js?v=2';
+import {installPolish} from './polish.js?v=1';
+import {createCompanion} from './companion.js?v=3';
+import {createThinking} from './thinking.js?v=3';
 import {createRoutines} from './routines.js?v=2';
 import {createAccountability} from './accountability.js?v=2';
 import {emptyState} from './empty-states.js?v=2';
 import {createGoals} from './goals.js?v=3';
-import {installNavigation} from './navigation.js?v=1';
+import {installNavigation} from './navigation.js?v=2';
 installNavigation();
 import {createCalendar} from './calendar.js?v=3';
-import {installSelects} from './selects.js?v=2';
+import {installSelects} from './selects.js?v=3';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
@@ -86,6 +87,7 @@ const routines=createRoutines({getData:()=>data,mutate,escape,refreshSelects,tod
 const accountability=createAccountability({getData:()=>data,request,mutate,escape,role:()=>role});
 const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
 const thinking=createThinking({getData:()=>data,mutate,escape,refreshSelects,role:()=>role,openTask,week:()=>selectedWeek});
+installPolish();
 const companion=createCompanion({request,escape,getBoard:()=>data,refreshSelects,role:()=>role,reloadBoard:loadBoard,openSource:(type,id)=>{if(type==='tasks'){openTask(id);return;}view=type==='goals'?'goals':type==='mapNodes'?'mindmap':'notes';render();if(type==='goals')goals.open(id);else thinking.open(type,id);}});
 function render() {
  $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Companion';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
@@ -157,7 +159,7 @@ function openTask(id='',listId='') {
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.dependencies.innerHTML=data.state.tasks.filter(t=>!t.archived&&t.id!==id).map(t=>`<option value="${t.id}" ${(task?.dependencies||[]).includes(t.id)?'selected':''}>${escape(t.title)}</option>`).join('');
   form.elements.labels.value=task?.labels.join(', ')||'';form.elements.inSprint.checked=task?sprint().taskIds.includes(task.id):view==='week';
-  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';form.elements.effortMinutes.value=task?.effortMinutes||0;task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});$('task-dialog').showModal();form.elements.title.focus();
+  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';form.elements.effortMinutes.value=task?.effortMinutes||0;task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});document.dispatchEvent(new CustomEvent('life:task-open',{detail:{existing:!!id}}));$('task-dialog').showModal();form.elements.title.focus();
 }
 function openList(id='') {
   const list=data.state.lists.find(l=>l.id===id),form=$('list-form');form.reset();form.elements.id.value=id;form.elements.name.value=list?.name||'';
