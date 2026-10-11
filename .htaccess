@@ -1,6 +1,12 @@
 RewriteEngine On
-# Keep repository internals private.
 RewriteRule ^\.git(?:/|$) - [F,L]
-# Life shares the authenticated application and database.
+# One canonical planner origin. Keep old bookmarks and invitations working.
+RewriteCond %{HTTP_HOST} ^(?:www\.)?ayodsgn\.com$ [NC]
+RewriteRule ^life(?:/index\.php)?/?$ https://life.ayodsgn.com/ [R=308,L,NE]
+RewriteCond %{HTTP_HOST} ^(?:www\.)?ayodsgn\.com$ [NC]
+RewriteRule ^api/life/(.*)$ https://life.ayodsgn.com/api/life/$1 [R=308,L,NE]
+RewriteCond %{HTTP_HOST} ^life\.ayodsgn\.com$ [NC]
+RewriteCond %{THE_REQUEST} \s/+life/(?:index\.php)?(?:[?\s]) [NC]
+RewriteRule ^life/(?:index\.php)?$ / [R=308,L]
 RewriteCond %{HTTP_HOST} ^life\.ayodsgn\.com$ [NC]
 RewriteRule ^$ life/index.php [L]
