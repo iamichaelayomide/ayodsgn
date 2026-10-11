@@ -69,11 +69,9 @@ final class LifeStore {
             $current=$this->read();
             if ($current['version']!==$version) throw new LifeError('This board changed in another tab. Your draft is preserved. Reload the latest board before saving again.',409);
             $s=$current['state']; $id=$args['id']??'';
-            if($role==='partner'&&!in_array($action,['goal.approve','task.approve'],true))throw new LifeError('Partners can review goals and approve reviewed tasks. Editing belongs to the owner.',403);
+            if($role==='partner'&&!in_array($action,['goal.approve','task.approve','task.complete'],true))throw new LifeError('Partners can review goals and approve reviewed tasks. Editing belongs to the owner.',403);
             if($role==='owner'&&in_array($action,['goal.approve','task.approve'],true))throw new LifeError('A partner must approve this item.',403);
             if(($s['accountabilityEnabled']??false)&&$role==='owner') {
-                $destination=$args['listId']??'';if($action==='task.restore'&&$destination==='')foreach($s['tasks'] as $task)if($task['id']===$id)$destination=$task['listId']; $toDone=false;foreach($s['lists'] as $list)if($list['id']===$destination&&$list['isDone'])$toDone=true;
-                if(($action==='task.complete'&&($args['done']??false))||(in_array($action,['task.save','task.move','task.restore'],true)&&$toDone))throw new LifeError('Move this task to Review. Your partner will approve it into Done.',403);
                 if($action==='goal.save'&&($args['completed']??false))throw new LifeError('Your partner must approve goal completion.',403);
             }
 
@@ -140,7 +138,7 @@ final class LifeStore {
                     if (!is_bool($args['done']??null)) throw new LifeError('Choose a completion state.');
                     $destination=null;foreach($s['lists'] as $list)if(!$list['archived']&&$list['isDone']===$args['done']&&($list['boardId']??$s['board']['id'])===($s['lists'][self::listIndex($s,$s['tasks'][$i]['listId'])]['boardId']??$s['board']['id'])){$destination=$list['id'];break;}
                     if($destination===null)throw new LifeError('No destination list is available.');
-                    $s['tasks'][$i]['listId']=$destination;self::reorder($s['tasks'],$id,count($s['tasks']),$destination);break;
+                    $s['tasks'][$i]['listId']=$destination;$s['tasks'][$i]['completedAt']=$args['done']?self::now():null;if($role==='partner'&&$args['done'])$s['tasks'][$i]['approval']=['by'=>$actor,'at'=>self::now()];else unset($s['tasks'][$i]['approval']);self::reorder($s['tasks'],$id,count($s['tasks']),$destination);break;
                 case 'goal.archive': case 'goal.restore':
                     $i=self::index($s['goals']??[],$id);if($action==='goal.archive'){foreach($s['goals'] as $child)if(!$child['archived']&&$child['parentId']===$id)throw new LifeError('Archive linked goals first.');}$s['goals'][$i]['archived']=$action==='goal.archive';$s['goals'][$i]['updatedAt']=self::now();break;
                 case 'goal.save':
