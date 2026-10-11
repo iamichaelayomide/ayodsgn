@@ -62,7 +62,7 @@ final class LifeStore {
         foreach ($indices as $p=>$i) { $items[$i]['position']=$p; $items[$i]['updatedAt']=self::now(); }
     }
     public function mutate(int $version, string $action, array $args, string $role = 'owner', string $actor = 'owner'): array {
-        $this->db->beginTransaction();
+        $ownsTransaction=!$this->db->inTransaction();if($ownsTransaction)$this->db->beginTransaction();
         try {
             $current=$this->read();
             if ($current['version']!==$version) throw new LifeError('This board changed in another tab. Your draft is preserved. Reload the latest board before saving again.',409);
@@ -253,8 +253,8 @@ final class LifeStore {
             $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=1 AND version=?');
             $q->execute([json_encode($s,JSON_THROW_ON_ERROR),self::now(),$version]);
             if ($q->rowCount()!==1) throw new LifeError('The board changed while saving. Reload the latest board.',409);
-            $this->db->commit(); return $this->read();
-        } catch (Throwable $e) { if ($this->db->inTransaction()) $this->db->rollBack(); throw $e; }
+            $ownsTransaction&&$this->db->commit(); return $this->read();
+        } catch (Throwable $e) { if ($ownsTransaction&&$this->db->inTransaction()) $this->db->rollBack(); throw $e; }
     }
     private static function nextOccurrence(array $rule): string {$d=new DateTimeImmutable($rule['nextDate']);if($rule['frequency']!=='monthly')return $d->modify($rule['frequency']==='daily'?'+1 day':'+7 days')->format('Y-m-d');$next=$d->modify('first day of next month');$day=min((int)substr($rule['startDate'],8,2),(int)$next->format('t'));return $next->setDate((int)$next->format('Y'),(int)$next->format('m'),$day)->format('Y-m-d');}
     private static function validDate(mixed $date): string {if(!is_string($date)||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)||!checkdate((int)substr($date,5,2),(int)substr($date,8,2),(int)substr($date,0,4)))throw new LifeError('Choose a valid date.');return $date;}

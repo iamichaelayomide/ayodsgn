@@ -1,5 +1,0 @@
-Options -Indexes
-<FilesMatch "^(bootstrap|store)\.php$|\.sql$">
-    Require all denied
-</FilesMatch>
-DirectoryIndex index.php
