@@ -1,5 +1,5 @@
-import {installPolish} from './polish.js?v=5';
-import {createCompanion} from './companion.js?v=9';
+import {installPolish} from './polish.js?v=6';
+import {createCompanion} from './companion.js?v=10';
 import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=2';
 import {createAccountability} from './accountability.js?v=3';
@@ -167,7 +167,7 @@ function openTask(id='',listId='') {
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.dependencies.innerHTML=data.state.tasks.filter(t=>!t.archived&&t.id!==id).map(t=>`<option value="${t.id}" ${(task?.dependencies||[]).includes(t.id)?'selected':''}>${escape(t.title)}</option>`).join('');
   form.elements.labels.value=task?.labels.join(', ')||'';form.elements.inSprint.checked=task?sprint().taskIds.includes(task.id):view==='week';
-  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';form.elements.effortMinutes.value=task?.effortMinutes||0;task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});document.dispatchEvent(new CustomEvent('life:task-open',{detail:{existing:!!id}}));$('task-dialog').showModal();form.elements.title.focus();
+  form.elements.goalId.innerHTML='<option value="">Ad hoc — no linked goal</option>'+(data.state.goals||[]).filter(g=>!g.archived).map(g=>`<option value="${g.id}">${escape(g.title)} · ${escape(g.period||'Ad hoc')}</option>`).join('');form.elements.goalId.value=task?.goalId||'';form.elements.effortMinutes.value=task?.effortMinutes||0;task?.checklist.forEach(checklistRow);$('archive-task').hidden=!task;$('task-dialog-title').textContent=task?'Your next step':'New task';refreshSelects();$('task-form').querySelectorAll('input,textarea,select,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=role==='partner';});document.dispatchEvent(new CustomEvent('life:task-open',{detail:{existing:!!id,done:!!data.state.lists.find(l=>l.id===task?.listId)?.isDone,accountability:!!data.state.accountabilityEnabled}}));$('task-dialog').showModal();form.elements.title.focus();
 }
 function openList(id='') {
   const list=data.state.lists.find(l=>l.id===id),form=$('list-form');form.reset();form.elements.id.value=id;form.elements.name.value=list?.name||'';
@@ -190,6 +190,7 @@ $('clear-filters').addEventListener('click',()=>{['search','priority-filter','la
 $('new-task').addEventListener('click',()=>openTask());$('new-list').addEventListener('click',()=>openList());
 $('add-checklist').addEventListener('click',()=>checklistRow().querySelector('input[type=text]').focus());
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
+document.addEventListener('life:complete-open-task',()=>{if(role!=='owner')return;const f=$('task-form'),current=data.state.lists.find(l=>l.id===f.elements.listId.value);const target=data.state.lists.find(l=>!l.archived&&(l.boardId||data.state.board.id)===(current?.boardId||data.state.board.id)&&(current?.isDone?!l.isDone:data.state.accountabilityEnabled?l.name==='Review':l.isDone));if(!target){$('task-error').textContent='No destination list is available.';return;}f.elements.listId.value=target.id;refreshSelects();f.requestSubmit();});
 $('task-form').addEventListener('submit',async(e)=>{
   e.preventDefault();const f=e.currentTarget,submit=f.querySelector('[type=submit]');$('task-error').textContent='';submit.disabled=true;
   const args={};for(const key of ['id','title','notes','blocker','priority','dueDate','listId','goalId'])args[key]=f.elements[key].value;
