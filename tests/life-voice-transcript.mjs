@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import {createVoiceInbox} from '../life/voice-transcript.js';
+const inbox=createVoiceInbox(50);
+const tool=inbox.receive({toolCall:{}});
+const waiting=tool.wait('Add a task: Buy groceries.');
+inbox.receive({serverContent:{inputTranscription:{text:'Add a task '}}});
+inbox.receive({serverContent:{inputTranscription:{text:'buy groceries'},turnComplete:true}});
+assert.equal(await waiting,'Add a task buy groceries');
+const next=inbox.receive({toolCall:{}});
+await assert.rejects(next.wait('Add a task buy groceries'),/complete instruction/);
+inbox.typed('I want you to move it to Done');
+assert.equal(await next.wait('I want you to move it to Done'),'I want you to move it to Done');
+inbox.reset();
+await assert.rejects(inbox.receive({}).wait('Move it to Done'),/complete instruction/);
+const unrelated=inbox.receive({serverContent:{inputTranscription:{text:'Think through my priorities'}}});
+await assert.rejects(unrelated.wait('Archive all tasks'),/complete instruction/);
+inbox.receive({toolCallCancellation:{ids:['cancel-me']}});assert.equal(inbox.isCancelled('cancel-me'),true);inbox.reset();assert.equal(inbox.isCancelled('cancel-me'),false);
+console.log('7 transcript ordering, quote matching and turn isolation checks passed');

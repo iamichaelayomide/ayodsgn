@@ -1,5 +1,5 @@
 import {createEconomyVoice} from './economy-voice.js?v=1';
-import {createVoice} from './voice.js?v=8';
+import {createVoice} from './voice.js?v=9';
 import {emptyState} from './empty-states.js?v=2';
 export function createCompanion({request,escape,uploadAudio,sendStream,getBoard,getScreen,refreshSelects,role,reloadBoard,openSource}){
  const root=document.getElementById('companion');let data=null,conversation='',mode='chat',temporary=false,temporaryMessages=[],sending=false,draft='',requestId='',summaryError='',chatSelectTimer,voiceConversation='';
