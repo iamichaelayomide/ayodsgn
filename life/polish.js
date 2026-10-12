@@ -1,5 +1,5 @@
 export function installPolish(){
- const form=document.getElementById('task-form');
+ const form=document.getElementById('task-form');const weekSwitch=document.querySelector('.week-switch');weekSwitch.classList.add('week-picker-line');document.getElementById('sprint-panel').before(weekSwitch);
  const sizeTitle=()=>{const title=form.elements.title;if(!document.getElementById('task-dialog').open)return;title.style.height='auto';title.style.height=Math.min(180,Math.max(60,title.scrollHeight))+'px';};form.elements.title.addEventListener('input',sizeTitle);document.addEventListener('life:task-open',()=>requestAnimationFrame(sizeTitle));window.addEventListener('resize',sizeTitle);
  const sections=[...form.querySelectorAll('[data-task-step]')];sections.forEach(s=>s.hidden=false);
  document.getElementById('task-step-label').hidden=true;form.querySelector('.task-step-actions').hidden=true;

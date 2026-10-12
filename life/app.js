@@ -1,16 +1,18 @@
-import {createAnalytics} from './analytics.js?v=1';
+import {installUploadPolish} from './upload-polish.js?v=1';
+import {installDateControls,chooseDate} from './date-controls.js?v=1';
+import {createAnalytics} from './analytics.js?v=2';
 import {installReminders} from './reminders.js?v=1';
 import {installTaskEditor} from './task-editor.js?v=1';
-import {installPolish} from './polish.js?v=9';
+import {installPolish} from './polish.js?v=10';
 import {createCompanion} from './companion.js?v=11';
 import {createThinking} from './thinking.js?v=5';
-import {createRoutines} from './routines.js?v=2';
+import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
 import {createGoals} from './goals.js?v=4';
 import {installNavigation} from './navigation.js?v=2';
 installNavigation();
-import {createCalendar} from './calendar.js?v=4';
+import {createCalendar} from './calendar.js?v=5';
 import {installSelects} from './selects.js?v=3';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
@@ -91,12 +93,13 @@ const routines=createRoutines({getData:()=>data,mutate,escape,refreshSelects,tod
 const accountability=createAccountability({getData:()=>data,request,mutate,escape,role:()=>role});
 const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
 const thinking=createThinking({getData:()=>data,mutate,escape,refreshSelects,role:()=>role,openTask,week:()=>selectedWeek});
-installPolish();installTaskEditor({request,refreshSelects});installReminders({request,openTask,isOwner:()=>role==='owner'&&!!data});
+installPolish();installDateControls({refreshSelects});installTaskEditor({request,refreshSelects});installUploadPolish();installReminders({request,openTask,isOwner:()=>role==='owner'&&!!data});
 const analytics=createAnalytics({getData:()=>data,escape,week:()=>data.week,openGoal:id=>goals.open(id)});
 const companion=createCompanion({request,escape,uploadAudio:async file=>{const body=new FormData();body.append("audio",file);const response=await fetch(API+"?action=ai.audio",{method:"POST",credentials:"same-origin",headers:{"X-CSRF-Token":csrf},body});const result=await response.json();if(!response.ok)throw new Error(result.error||"Audio could not be transcribed.");return result;},sendStream:async(args,onPartial)=>{const response=await fetch(API+'?action=ai.send.stream',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(args)});if(!response.ok){const err=await response.json();throw Error(err.error||'Ramble could not respond.');}const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',result;while(true){const chunk=await reader.read();pending+=decoder.decode(chunk.value||new Uint8Array(),{stream:!chunk.done});let pos;while((pos=pending.indexOf('\n'))>=0){const line=pending.slice(0,pos);pending=pending.slice(pos+1);if(!line.trim())continue;const event=JSON.parse(line);if(event.error)throw Error(event.error);if(event.partial)onPartial(event.partial);if(event.result)result=event.result;}if(chunk.done)break;}if(!result)throw Error('Connection interrupted. Your draft is preserved.');return result;},getBoard:()=>data,getScreen:()=>({view,boardId:selectedBoard,taskId:$('task-dialog').open?$('task-form').elements.id.value:'',goalId:$('goal-dialog').open?$('goal-form').elements.id.value:'',mapGroup:$('map-group')?.value||''}),refreshSelects,role:()=>role,reloadBoard:async()=>{const scroll=window.scrollY,boardScroll=$('board').scrollLeft,previous=data;const drafts=[...document.querySelectorAll('dialog[open]')].map(d=>({dialog:d,id:d.querySelector('[name=id]')?.value}));await loadBoard();for(const draft of drafts){if(!draft.id)continue;const find=s=>['tasks','goals','notes','mapNodes'].flatMap(k=>s[k]||[]).find(r=>r.id===draft.id);if(JSON.stringify(find(previous.state))!==JSON.stringify(find(data.state))){draft.dialog.dataset.aiChanged=draft.id;let note=draft.dialog.querySelector('.ai-draft-warning');if(!note){note=document.createElement('p');note.className='error ai-draft-warning';note.setAttribute('role','alert');draft.dialog.prepend(note);}note.textContent='Ramble updated this record. Your open draft is preserved. Close and reopen to see the saved changes.';draft.dialog.addEventListener('close',()=>{delete draft.dialog.dataset.aiChanged;note.remove();},{once:true});}}$('board').scrollLeft=boardScroll;window.scrollTo(0,scroll);},openSource:(type,id)=>{if(type==='tasks'){openTask(id);return;}view=type==='goals'?'goals':type==='mapNodes'?'mindmap':'notes';render();if(type==='goals')goals.open(id);else thinking.open(type,id);}});
 function render() {
+ document.querySelector('.week-picker-line').hidden=view!=='week';
  $('analytics').hidden=view!=='analytics';
- $('workspace').dataset.view=view;const newTask=$('new-task');newTask.hidden=['today','goals','analytics','companion'].includes(view);(view==='board'?document.querySelector('.board-picker'):document.querySelector('.page-heading')).append(newTask);
+ $('workspace').dataset.view=view;const newTask=$('new-task');newTask.hidden=['today','goals','analytics','companion','calendar','routines','week'].includes(view);(view==='board'?document.querySelector('.board-picker'):document.querySelector('.page-heading')).append(newTask);
  document.dispatchEvent(new Event('life:board-toolbar'));
  $('workspace').classList.toggle('ramble-view',view==='companion');
  $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Ramble';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
@@ -148,7 +151,7 @@ function render() {
     $('week-range').textContent=`${dayLabel(selectedWeek)} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Africa/Lagos'})}`;
     const selected=data.state.tasks.filter(t=>inWeek.has(t.id)); const done=selected.filter(t=>data.state.lists.find(l=>l.id===t.listId)?.isDone).length;
     if(document.activeElement!==$('week-capacity'))$('week-capacity').value=(sprint().capacityMinutes||0)/60;const effort=selected.reduce((sum,t)=>sum+(t.effortMinutes||0),0),capacity=sprint().capacityMinutes||0;$('capacity-summary').textContent=`${(effort/60).toFixed(1)} hours estimated / ${(capacity/60).toFixed(1)} hours available${capacity&&effort>capacity?' · Over capacity':''}${selected.filter(t=>!t.effortMinutes).length?' · '+selected.filter(t=>!t.effortMinutes).length+' tasks need estimates':''}`;
-    $('sprint-progress').textContent=`${done} of ${selected.length} tasks complete`;
+    $('sprint-progress').textContent=selected.length?`${Math.round(done/selected.length*100)}% · ${done} of ${selected.length} tasks done`:'Choose a few tasks for your week.';
   }
 }
 function renderArchive() {
@@ -234,9 +237,10 @@ $('board').addEventListener('drop',async(e)=>{
 });
 function changeWeek(offset) {const d=new Date(`${selectedWeek}T12:00:00+01:00`);d.setUTCDate(d.getUTCDate()+offset);selectedWeek=d.toISOString().slice(0,10);delete $('sprint-goal').dataset.dirty;render();}
 $('previous-week').addEventListener('click',()=>changeWeek(-7));$('next-week').addEventListener('click',()=>changeWeek(7));
+$('week-range').onclick=()=>chooseDate({value:selectedWeek,title:'Choose a week',onSelect:value=>{if($('sprint-goal').dataset.dirty){pageError('Save your weekly intention before choosing another week.');return;}const d=new Date(value+'T12:00:00Z');d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));selectedWeek=d.toISOString().slice(0,10);delete $('sprint-goal').dataset.dirty;render();}});
 $('current-week').addEventListener('click',()=>{selectedWeek=data.week;delete $('sprint-goal').dataset.dirty;render();});
 $('sprint-goal').addEventListener('input',()=>{$('sprint-goal').dataset.dirty='true';$('save-status').textContent='Sprint goal not saved';});
-$('save-goal').addEventListener('click',async()=>{try{await mutate('sprint.save',{week:selectedWeek,goal:$('sprint-goal').value,taskIds:sprint().taskIds});delete $('sprint-goal').dataset.dirty;announce('Sprint goal saved');}catch(e){pageError(e.message);}});
+$('save-goal').addEventListener('click',async()=>{try{await mutate('sprint.save',{week:selectedWeek,goal:$('sprint-goal').value,taskIds:sprint().taskIds,capacityMinutes:Math.round(Number($('week-capacity').value)*60)});delete $('sprint-goal').dataset.dirty;announce('Sprint goal saved');}catch(e){pageError(e.message);}});
 $('choose-tasks').addEventListener('click',()=>{
   const selected=new Set(sprint().taskIds);$('sprint-error').textContent='';
   $('sprint-choices').innerHTML=data.state.tasks.filter(t=>!t.archived).map(t=>`<label class="sprint-choice"><input type="checkbox" name="task" value="${t.id}" ${selected.has(t.id)?'checked':''}><span>${escape(t.title)}</span></label>`).join('')||'<p>Add a task to your board first.</p>';$('sprint-dialog').showModal();
