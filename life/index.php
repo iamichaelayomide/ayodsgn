@@ -12,14 +12,13 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=39"><script type="module" src="./app.js?v=38"></script>
+  <link rel="stylesheet" href="./life.css?v=40"><script type="module" src="./app.js?v=40"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
   <section id="auth" class="auth-screen">
     <aside class="auth-visual" aria-label="Plan your life">
-      <div class="auth-visual-copy"><h2>Plan your <em>life.</em></h2><p>Turn your goals into everyday progress.</p></div>
-      <img class="auth-illustration" src="./images/auth-planning-3d.png" width="1280" height="1280" alt="" decoding="async" fetchpriority="high">
+      <img class="auth-illustration" src="./images/auth-life-3d-v2.png" width="1280" height="1280" alt="" decoding="async" fetchpriority="high">
     </aside>
     <div class="auth-form-pane"><div class="auth-card"><h1 id="auth-title">Create an <em>account.</em></h1>
     <p id="auth-copy">Your tasks, goals and plans, in one place.</p>

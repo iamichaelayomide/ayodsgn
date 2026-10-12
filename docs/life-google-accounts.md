@@ -54,3 +54,5 @@ Verification: 22 email-account checks, 22 existing isolation checks and 16 stage
 The public signup and login screen now has a cobalt blue illustration panel and a white form panel. A generated 3D planning illustration is committed at life/images/auth-planning-3d.png. The auth wordmark, Life planner eyebrow and password-storage note are removed. On phones the illustration becomes a compact header; the existing email, Google, consent and mode-switch behavior remains intact.
 
 Mobile onboarding refinement: hide the decorative blue panel at widths up to 800px and present the signup/login form alone. Desktop split layout remains.
+
+Navigation and onboarding polish: desktop sidebar follows document flow; mobile drawer scrolls as a whole. Account settings has a profile icon. Ramble data disclosure moved from its page banner to an explicit enable dialog. Desktop onboarding displays a new life goals/habits/time illustration without headline copy; mobile remains form-only.

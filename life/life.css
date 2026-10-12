@@ -130,3 +130,16 @@
 
 /* Mobile onboarding uses the form alone; the illustration stays on larger screens. */
 @media(max-width:800px){.auth-screen{display:block;min-height:100svh}.auth-visual{display:none}.auth-form-pane{min-height:100svh;padding:clamp(40px,8vh,72px) 24px 32px}}
+
+/* One continuous navigation flow, including account and export controls. */
+.sidebar{position:static;height:auto;max-height:none;overflow:visible;align-self:start}
+.sidebar nav{flex:none;overflow:visible;min-height:0;margin-bottom:16px}
+.sidebar-bottom{margin-top:0;display:grid;gap:4px;padding-top:12px}
+.sidebar-tools[open]{max-height:none;overflow:visible}
+.sidebar-brand{padding-bottom:20px}.workspace-badge{margin-bottom:24px}
+.nav-divider{margin-top:20px;margin-bottom:12px}.nav-group{margin-top:4px}
+.account-settings-trigger .nav-label{white-space:normal;line-height:1.35}
+.ramble-enable{margin-left:auto;font-size:12px;white-space:nowrap}
+#ramble-consent{max-width:440px}#ramble-consent p{line-height:1.6}
+.auth-visual{justify-content:center}.auth-illustration{margin:0;width:min(100%,620px)}
+@media(max-width:800px){.sidebar,.nav-collapsed .sidebar{position:fixed;height:calc(100dvh - 24px);overflow-y:auto;overflow-x:hidden;align-self:auto}.sidebar>*{flex-shrink:0}.sidebar nav{flex:none;overflow:visible}.sidebar-bottom{margin-top:0}.auth-visual{display:none}}
