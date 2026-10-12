@@ -58,3 +58,5 @@ Mobile onboarding refinement: hide the decorative blue panel at widths up to 800
 Navigation and onboarding polish: desktop sidebar follows document flow; mobile drawer scrolls as a whole. Account settings has a profile icon. Ramble data disclosure moved from its page banner to an explicit enable dialog. Desktop onboarding displays a new life goals/habits/time illustration without headline copy; mobile remains form-only.
 
 Ramble is available automatically when Gemini is configured. No activation dialog or consent flag gate; legacy consent records are preserved without inventing acceptance. Reading or opening the planner does not initiate model requests. User message/voice initiation is still required; quota, authentication, stale-record checks and planner command authorization remain.
+
+Desktop blue onboarding panel: subtle oversized looping ribbons behind the 3D scene, with ayo.life signature near the lower-right corner and italic life. Decorative SVG is hidden from assistive technology; mobile remains form-only.

@@ -12,13 +12,15 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=40"><script type="module" src="./app.js?v=41"></script>
+  <link rel="stylesheet" href="./life.css?v=42"><script type="module" src="./app.js?v=41"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
   <section id="auth" class="auth-screen">
     <aside class="auth-visual" aria-label="Plan your life">
+      <svg class="auth-playful-lines" viewBox="0 0 640 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path d="M-130 95C80 275 555 15 464-86C368-192 18 57 126 280C230 500 704 383 702 212C700 47 418 148 427 453C436 758 846 693 796 555M-172 604C-20 468 265 352 286 478C311 626-45 836-64 696C-89 528 301 653 335 834C369 1004-11 1113-92 953M239 1091C170 805 518 619 594 769C670 919 427 1055 419 910"/></svg>
       <img class="auth-illustration" src="./images/auth-life-3d-v2.png" width="1280" height="1280" alt="" decoding="async" fetchpriority="high">
+      <span class="auth-signature">ayo.<em>life</em></span>
     </aside>
     <div class="auth-form-pane"><div class="auth-card"><h1 id="auth-title">Create an <em>account.</em></h1>
     <p id="auth-copy">Your tasks, goals and plans, in one place.</p>
