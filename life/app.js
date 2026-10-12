@@ -1,4 +1,4 @@
-import {installEmailAuth} from './auth-entry.js?v=1';
+import {installEmailAuth} from './auth-entry.js?v=2';
 import {createAccountSettings,plannerTimezone} from './accounts.js?v=4';
 import {installUploadPolish} from './upload-polish.js?v=1';
 import {installDateControls,chooseDate} from './date-controls.js?v=1';

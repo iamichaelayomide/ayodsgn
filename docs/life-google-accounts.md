@@ -48,3 +48,7 @@ Matching emails are never sufficient to link accounts: an email/password user mu
 Privacy and Terms versions advance to 2026-10-12-v2 to cover email credentials. Existing owner data, recovery login, and the pause on partner onboarding are preserved.
 
 Verification: 22 email-account checks, 22 existing isolation checks and 16 staged HTTP checks passed. These cover signup, returning login, password hashing, failed login, logout, credential-bound sessions, policy acceptance and cross-account record protection. No real Google login was tested.
+
+## Split onboarding design — 12 October 2026
+
+The public signup and login screen now has a cobalt blue illustration panel and a white form panel. A generated 3D planning illustration is committed at life/images/auth-planning-3d.png. The auth wordmark, Life planner eyebrow and password-storage note are removed. On phones the illustration becomes a compact header; the existing email, Google, consent and mode-switch behavior remains intact.

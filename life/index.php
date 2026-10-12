@@ -12,13 +12,16 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=36"><script type="module" src="./app.js?v=37"></script>
+  <link rel="stylesheet" href="./life.css?v=38"><script type="module" src="./app.js?v=38"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
   <section id="auth" class="auth-screen">
-    <a class="wordmark" href="/">ayo.<span>dsgn</span></a>
-    <div class="auth-card"><p class="eyebrow">LIFE PLANNER</p><h1 id="auth-title">Plan your <em>life.</em></h1>
+    <aside class="auth-visual" aria-label="Plan your life">
+      <div class="auth-visual-copy"><h2>Plan your <em>life.</em></h2><p>Turn your goals into everyday progress.</p></div>
+      <img class="auth-illustration" src="./images/auth-planning-3d.png" width="1280" height="1280" alt="" decoding="async" fetchpriority="high">
+    </aside>
+    <div class="auth-form-pane"><div class="auth-card"><h1 id="auth-title">Create an <em>account.</em></h1>
     <p id="auth-copy">Your tasks, goals and plans, in one place.</p>
     <form id="email-auth-form" class="email-auth-form">
       <label>Email<input id="email-auth-email" name="email" type="email" autocomplete="username" required maxlength="254" placeholder="you@example.com"></label>
@@ -35,7 +38,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <label id="setup-label" hidden>One-time setup key<input name="token" type="password" autocomplete="off"></label>
       <details id="partner-login"><summary>Sign in as an accountability partner</summary><label>Partner ID<input name="partnerId" maxlength="32" autocomplete="username"></label></details><label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
       <button class="primary" id="auth-submit" type="submit" disabled>Loading…</button>
-    </form><p id="auth-mode-switch" class="auth-mode-switch"><span>Already have an account?</span> <button type="button">Log in</button></p><p id="policy-note" class="fine-print">Email passwords are stored as secure hashes. Google passwords stay with Google.</p></div>
+    </form><p id="auth-mode-switch" class="auth-mode-switch"><span>Already have an account?</span> <button type="button">Log in</button></p></div></div>
   </section>
   <div id="workspace" class="workspace" hidden>
     <button id="nav-backdrop" class="nav-backdrop" aria-label="Close navigation" hidden tabindex="-1"></button>
