@@ -6,7 +6,7 @@ header("Content-Security-Policy: default-src 'self'; style-src 'self' https://fo
 ?>
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Terms for using the ayo.dsgn Life planner."><title>Terms of Service · Life</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap"><link rel="stylesheet" href="/life/policy.css?v=2"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Terms for using the ayo.dsgn Life planner."><title>Terms of Service · Life</title><link rel="icon" href="/life/favicon.svg?v=1" type="image/svg+xml"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap"><link rel="stylesheet" href="/life/policy.css?v=2"></head>
 <body><header class="policy-header"><a class="policy-brand" href="/">ayo.<span>dsgn</span></a><a href="/life/">Back to Life sign in</a></header>
 <main class="policy-main"><p class="policy-eyebrow">A considered space for your plans</p><h1>Terms of Service</h1><p class="policy-updated">Effective 12 October 2026</p>
 <p>These Terms apply to your use of ayo.dsgn Life (“Life”), the personal planner available at life.ayodsgn.com. By accepting these Terms at sign-in, you agree to use Life under them and the <a href="/life/privacy.php">Privacy Policy</a>.</p>
