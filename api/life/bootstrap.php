@@ -24,11 +24,13 @@ function life_store(array $config): LifeStore {
 function life_session(): void {
     ini_set('session.use_strict_mode','1'); ini_set('session.use_only_cookies','1');
     session_name('ayolife');
-    session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>($_SERVER['HTTPS']??'')==='on','httponly'=>true,'samesite'=>'Strict']);
+    // OAuth returns through a top-level GET callback, so Lax preserves the session
+    // while keeping the cookie out of cross-site subrequests.
+    session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>($_SERVER['HTTPS']??'')==='on','httponly'=>true,'samesite'=>'Lax']);
     session_start();
-    if ((isset($_SESSION['owner'])||isset($_SESSION['partner'])) && time()-($_SESSION['last_activity']??0)>3600) { $_SESSION=[]; session_regenerate_id(true); }
+    if ((isset($_SESSION['owner'])||isset($_SESSION['partner'])||isset($_SESSION['userId'])) && time()-($_SESSION['last_activity']??0)>3600) { $_SESSION=[]; session_regenerate_id(true); }
     $_SESSION['csrf']??=bin2hex(random_bytes(32));
-    if ((isset($_SESSION['owner'])||isset($_SESSION['partner']))) $_SESSION['last_activity']=time();
+    if ((isset($_SESSION['owner'])||isset($_SESSION['partner'])||isset($_SESSION['userId']))) $_SESSION['last_activity']=time();
 }
 function life_json(array $value, int $status=200): never {
     http_response_code($status); header('Content-Type: application/json; charset=utf-8'); echo json_encode($value,JSON_THROW_ON_ERROR); exit;

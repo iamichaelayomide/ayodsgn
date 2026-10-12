@@ -9,11 +9,17 @@ final class LifeError extends RuntimeException {
 require_once __DIR__.'/task-fields.php';
 
 final class LifeStore {
-    public function __construct(public PDO $db) {}
+    public static string $timezone='Africa/Lagos';
+    public function __construct(public PDO $db, public readonly int $tenantId=1) {
+        if($tenantId<1)throw new LifeError('Invalid account.',403);
+        self::$timezone='Africa/Lagos';
+        try{$q=$db->prepare('SELECT timezone FROM life_account WHERE id=?');$q->execute([$tenantId]);$zone=$q->fetchColumn();if(is_string($zone)&&in_array($zone,DateTimeZone::listIdentifiers(),true))self::$timezone=$zone;}catch(PDOException $e){}
+        require_once __DIR__.'/google-sync.php';new LifeGoogleSync($this);
+    }
     public static function id(): string { return bin2hex(random_bytes(16)); }
     public static function now(): string { return gmdate('Y-m-d\TH:i:s\Z'); }
     public static function week(): string {
-        $d = new DateTimeImmutable('now', new DateTimeZone('Africa/Lagos'));
+        $d = new DateTimeImmutable('now', new DateTimeZone(self::$timezone));
         return $d->modify('-'.((int)$d->format('N') - 1).' days')->format('Y-m-d');
     }
     public static function text(mixed $value, int $max, bool $required = false): string {
@@ -25,6 +31,7 @@ final class LifeStore {
         return $row ?: null;
     }
     public function initialize(string $password): void {
+        if($this->tenantId!==1)throw new LifeError('Owner setup is unavailable for this account.',403);
         if (strlen($password) < 14 || strlen($password) > 200) throw new LifeError('Use a password or passphrase between 14 and 200 characters.');
         $this->db->beginTransaction();
         try {
@@ -35,12 +42,12 @@ final class LifeStore {
                 $lists[] = ['id'=>self::id(),'name'=>$name,'position'=>$position,'archived'=>false,'isDone'=>$name==='Done','createdAt'=>self::now(),'updatedAt'=>self::now()];
             }
             $state = ['schema'=>1,'board'=>['id'=>self::id(),'name'=>'My Life'],'lists'=>$lists,'tasks'=>[],'sprints'=>[]];
-            $this->db->prepare('INSERT INTO life_board (id,version,state,updated_at) VALUES (1,1,?,?)')->execute([json_encode($state, JSON_THROW_ON_ERROR),self::now()]);
+            $this->db->prepare('INSERT INTO life_board (id,version,state,updated_at) VALUES (?,1,?,?)')->execute([$this->tenantId,json_encode($state, JSON_THROW_ON_ERROR),self::now()]);
             $this->db->commit();
         } catch (Throwable $e) { if ($this->db->inTransaction()) $this->db->rollBack(); throw $e; }
     }
     public function read(): array {
-        $row = $this->db->query('SELECT version,state FROM life_board WHERE id=1')->fetch(PDO::FETCH_ASSOC);
+        $q=$this->db->prepare('SELECT version,state FROM life_board WHERE id=?');$q->execute([$this->tenantId]);$row=$q->fetch(PDO::FETCH_ASSOC);
         if (!$row) throw new LifeError('The board has not been initialized.', 503);
         $state=json_decode($row['state'],true,512,JSON_THROW_ON_ERROR);$state['boards']??=[$state['board']+['archived'=>false]];return ['version'=>(int)$row['version'],'state'=>$state,'week'=>self::week()];
     }
@@ -114,9 +121,9 @@ final class LifeStore {
                     $frequency=$args['frequency']??'';if(!in_array($frequency,['daily','weekly','monthly'],true))throw new LifeError('Choose a recurrence.');$date=self::validDate($args['startDate']??'');
                     $s['routines']??=[];if(count($s['routines'])>=100)throw new LifeError('Routine limit reached.');$s['routines'][]=['id'=>self::id(),'title'=>self::text($args['title']??'',200,true),'listId'=>$list,'frequency'=>$frequency,'startDate'=>$date,'nextDate'=>$date,'archived'=>false,'createdAt'=>self::now()];break;
                 case 'routine.toggle':
-                    $i=self::index($s['routines']??[],$id);$s['routines'][$i]['archived']=!$s['routines'][$i]['archived'];if(!$s['routines'][$i]['archived']){$today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');while($s['routines'][$i]['nextDate']<$today)$s['routines'][$i]['nextDate']=self::nextOccurrence($s['routines'][$i]);}break;
+                    $i=self::index($s['routines']??[],$id);$s['routines'][$i]['archived']=!$s['routines'][$i]['archived'];if(!$s['routines'][$i]['archived']){$today=(new DateTimeImmutable('now',new DateTimeZone(self::$timezone)))->format('Y-m-d');while($s['routines'][$i]['nextDate']<$today)$s['routines'][$i]['nextDate']=self::nextOccurrence($s['routines'][$i]);}break;
                 case 'routine.generate':
-                    $today=(new DateTimeImmutable('now',new DateTimeZone('Africa/Lagos')))->format('Y-m-d');$generated=0;
+                    $today=(new DateTimeImmutable('now',new DateTimeZone(self::$timezone)))->format('Y-m-d');$generated=0;
                     foreach($s['routines']??[] as $ri=>$rule){if($rule['archived'])continue;$li=self::listIndex($s,$rule['listId'],true);if($s['lists'][$li]['archived'])continue;
                         while($rule['nextDate']<=$today&&$generated<100){$date=$rule['nextDate'];$key=$rule['id'].':'.$date;$exists=false;foreach($s['tasks'] as $t)if(($t['recurrenceKey']??'')===$key)$exists=true;
                             if(!$exists){if(count($s['tasks'])>=5000)throw new LifeError('Task limit reached. Archive old routines before adding more.');$s['tasks'][]=['id'=>self::id(),'title'=>$rule['title'],'listId'=>$rule['listId'],'position'=>count($s['tasks']),'notes'=>'','priority'=>'normal','labels'=>['Routine'],'dueDate'=>$date,'blocker'=>'','checklist'=>[],'archived'=>false,'recurrenceKey'=>$key,'createdAt'=>self::now(),'updatedAt'=>self::now()];}$generated++;
@@ -261,17 +268,19 @@ final class LifeStore {
                 default: throw new LifeError('Unknown board action.',400);
             }
             $s['activity']??=[];$s['activity'][]=['id'=>self::id(),'action'=>$action,'recordId'=>$id,'actor'=>$actor,'at'=>self::now()];$s['activity']=array_slice($s['activity'],-2000);
-            $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=1 AND version=?');
-            $q->execute([json_encode($s,JSON_THROW_ON_ERROR),self::now(),$version]);
+            $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=? AND version=?');
+            $q->execute([json_encode($s,JSON_THROW_ON_ERROR),self::now(),$this->tenantId,$version]);
             if ($q->rowCount()!==1) throw new LifeError('The board changed while saving. Reload the latest board.',409);
-            $ownsTransaction&&$this->db->commit(); return $this->read();
+            $ownsTransaction&&$this->db->commit();
+            if($ownsTransaction)LifeGoogleSync::enqueue($this);
+            return $this->read();
         } catch (Throwable $e) { if ($ownsTransaction&&$this->db->inTransaction()) $this->db->rollBack(); throw $e; }
     }
     private static function nextOccurrence(array $rule): string {$d=new DateTimeImmutable($rule['nextDate']);if($rule['frequency']!=='monthly')return $d->modify($rule['frequency']==='daily'?'+1 day':'+7 days')->format('Y-m-d');$next=$d->modify('first day of next month');$day=min((int)substr($rule['startDate'],8,2),(int)$next->format('t'));return $next->setDate((int)$next->format('Y'),(int)$next->format('m'),$day)->format('Y-m-d');}
     private static function validDate(mixed $date): string {if(!is_string($date)||!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)||!checkdate((int)substr($date,5,2),(int)substr($date,8,2),(int)substr($date,0,4)))throw new LifeError('Choose a valid date.');return $date;}
     private static function validWeek(mixed $week): string {
         if (!is_string($week) || !preg_match('/^\d{4}-\d{2}-\d{2}$/',$week)) throw new LifeError('Choose a valid sprint week.');
-        $d=DateTimeImmutable::createFromFormat('!Y-m-d',$week,new DateTimeZone('Africa/Lagos'));
+        $d=DateTimeImmutable::createFromFormat('!Y-m-d',$week,new DateTimeZone(self::$timezone));
         if (!$d || $d->format('Y-m-d')!==$week || $d->format('N')!=='1') throw new LifeError('Sprints start on Monday.');
         return $week;
     }

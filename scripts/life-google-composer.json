@@ -1,0 +1,10 @@
+{
+  "require": {
+    "google/apiclient": "2.19.4"
+  },
+  "config": {
+    "allow-plugins": false,
+    "preferred-install": "dist",
+    "sort-packages": true
+  }
+}

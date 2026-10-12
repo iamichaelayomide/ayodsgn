@@ -1,3 +1,4 @@
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=2';
 import {installUploadPolish} from './upload-polish.js?v=1';
 import {installDateControls,chooseDate} from './date-controls.js?v=1';
 import {createAnalytics} from './analytics.js?v=2';
@@ -55,9 +56,12 @@ async function loadBoard() {
   data=await request('board'); selectedWeek ||= data.week; conflict=false;selectedBoard=(data.state.boards||[data.state.board]).some(b=>b.id===selectedBoard)?selectedBoard:data.state.board.id; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
   $('auth').hidden=true; $('workspace').hidden=false; if(role==='owner'&&data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); if(role==='owner'&&(data.state.routines||[]).some(r=>!r.archived&&r.nextDate<=today()))await mutate('routine.generate',{});render();document.dispatchEvent(new Event('life:reminders-ready')); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
+const accountSettings=createAccountSettings({request});
 async function start() {
   try {
-    const session=await request('session'); csrf=session.csrf; setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
+    let session=await request('session'); csrf=session.csrf;
+    if(session.authenticated&&session.account&&(session.pendingInvite||(inviteToken&&partnerId))){await request('partner.join',inviteToken&&partnerId?{id:partnerId,token:inviteToken}:{});history.replaceState(null,'',location.pathname);inviteToken=null;session=await request('session');csrf=session.csrf;}
+    accountSettings.refresh(session);setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
     $('setup-label').hidden=!setup; $('auth-submit').disabled=false; $('auth-submit').textContent=setup?'Create my private planner':'Sign in';
     $('auth-copy').textContent=setup?'Enter your one-time setup key and choose a passphrase of at least 14 characters.':'Sign in to your life planner.';
     $('auth-form').elements.password.autocomplete=setup?'new-password':'current-password';
@@ -81,9 +85,9 @@ function matches(task) {
   return (!search || `${task.title} ${task.notes} ${task.labels.join(' ')} ${task.blocker}`.toLowerCase().includes(search)) && (!priority || task.priority===priority) && (!label || task.labels.includes(label));
 }
 function dayLabel(value) {
-  return new Date(`${value}T12:00:00+01:00`).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'Africa/Lagos'});
+  return new Date(`${value}T12:00:00+01:00`).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:plannerTimezone()});
 }
-function today() { return new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Lagos',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
+function today() { return new Intl.DateTimeFormat('en-CA',{timeZone:plannerTimezone(),year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
 function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
   return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${(task.dependencies||[]).length?`<span class="blocked-note">${task.dependencies.filter(id=>{const t=data.state.tasks.find(t=>t.id===id);return t&&!data.state.lists.find(l=>l.id===t.listId)?.isDone;}).length} unfinished dependencies</span>`:''}${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${role==='partner'?'disabled':''} ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
@@ -148,7 +152,7 @@ function render() {
     // Keep a goal draft intact when unrelated tasks are saved.
     if(document.activeElement!==$('sprint-goal') && !$('sprint-goal').dataset.dirty) $('sprint-goal').value=sprint().goal;
     const end=new Date(`${selectedWeek}T12:00:00+01:00`); end.setUTCDate(end.getUTCDate()+6);
-    $('week-range').textContent=`${dayLabel(selectedWeek)} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Africa/Lagos'})}`;
+    $('week-range').textContent=`${dayLabel(selectedWeek)} – ${end.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:plannerTimezone()})}`;
     const selected=data.state.tasks.filter(t=>inWeek.has(t.id)); const done=selected.filter(t=>data.state.lists.find(l=>l.id===t.listId)?.isDone).length;
     if(document.activeElement!==$('week-capacity'))$('week-capacity').value=(sprint().capacityMinutes||0)/60;const effort=selected.reduce((sum,t)=>sum+(t.effortMinutes||0),0),capacity=sprint().capacityMinutes||0;$('capacity-summary').textContent=`${(effort/60).toFixed(1)} hours estimated / ${(capacity/60).toFixed(1)} hours available${capacity&&effort>capacity?' · Over capacity':''}${selected.filter(t=>!t.effortMinutes).length?' · '+selected.filter(t=>!t.effortMinutes).length+' tasks need estimates':''}`;
     $('sprint-progress').textContent=selected.length?`${Math.round(done/selected.length*100)}% · ${done} of ${selected.length} tasks done`:'Choose a few tasks for your week.';

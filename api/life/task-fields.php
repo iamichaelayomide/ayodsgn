@@ -12,6 +12,6 @@ function life_task_delta(mixed $delta,string $notes): ?array {
 }
 function life_task_reminder(array $task): ?int {
  if(($task['reminderMinutes']??null)===null||empty($task['dueDate'])||empty($task['dueTime']))return null;
- $date=DateTimeImmutable::createFromFormat('!Y-m-d H:i',$task['dueDate'].' '.$task['dueTime'],new DateTimeZone('Africa/Lagos'));
+ $date=DateTimeImmutable::createFromFormat('!Y-m-d H:i',$task['dueDate'].' '.$task['dueTime'],new DateTimeZone(LifeStore::$timezone));
  return $date?$date->getTimestamp()-(int)$task['reminderMinutes']*60:null;
 }

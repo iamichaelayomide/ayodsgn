@@ -11,14 +11,14 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=31"><script type="module" src="./app.js?v=32"></script>
+  <link rel="stylesheet" href="./life.css?v=32"><script type="module" src="./app.js?v=33"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
   <section id="auth" class="auth-screen">
     <a class="wordmark" href="/">ayo.<span>dsgn</span></a>
     <div class="auth-card"><p class="eyebrow">YOUR PRIVATE SPACE</p><h1>A little clarity.<br>A little <em>momentum.</em></h1>
-    <p id="auth-copy">Sign in to your life planner.</p>
+    <p id="auth-copy">Sign in or create a private Life planner with your Google account.</p>
     <form id="auth-form">
       <label id="setup-label" hidden>One-time setup key<input name="token" type="password" autocomplete="off"></label>
       <details id="partner-login"><summary>Sign in as an accountability partner</summary><label>Partner ID<input name="partnerId" maxlength="32" autocomplete="username"></label></details><label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
