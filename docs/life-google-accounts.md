@@ -52,3 +52,5 @@ Verification: 22 email-account checks, 22 existing isolation checks and 16 stage
 ## Split onboarding design — 12 October 2026
 
 The public signup and login screen now has a cobalt blue illustration panel and a white form panel. A generated 3D planning illustration is committed at life/images/auth-planning-3d.png. The auth wordmark, Life planner eyebrow and password-storage note are removed. On phones the illustration becomes a compact header; the existing email, Google, consent and mode-switch behavior remains intact.
+
+Mobile onboarding refinement: hide the decorative blue panel at widths up to 800px and present the signup/login form alone. Desktop split layout remains.
