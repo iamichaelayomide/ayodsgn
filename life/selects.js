@@ -39,17 +39,25 @@ export function installSelects() {
     // A dialog's children remain in its top layer, above its backdrop.
     (select.closest('dialog') || document.body).append(menu);
     const rect = button.getBoundingClientRect();
-    const width = Math.min(rect.width,innerWidth-24);
-    menu.style.width = `${width}px`; menu.style.left = `${Math.max(12,Math.min(rect.left,innerWidth-width-12))}px`;
-    const below = innerHeight-rect.bottom-12, above = rect.top-12;
-    const upward = below < Math.min(260,menu.scrollHeight) && above > below;
-    menu.style.maxHeight = `${Math.max(80,Math.min(280,upward?above:below))}px`;
-    menu.style.top = `${upward?Math.max(12,rect.top-menu.getBoundingClientRect().height-6):rect.bottom+6}px`;
+    const dialog = select.closest('dialog'), bounds = dialog?.getBoundingClientRect();
+    const left = Math.max(12,bounds?bounds.left+12:12), right = Math.min(innerWidth-12,bounds?bounds.right-12:innerWidth-12);
+    const heading = dialog?.querySelector('.dialog-heading')?.getBoundingClientRect(), actions = dialog?.querySelector('.dialog-actions')?.getBoundingClientRect();
+    const top = Math.max(12,heading?heading.bottom+8:bounds?bounds.top+12:12), bottom = Math.min(innerHeight-12,actions?actions.top-8:bounds?bounds.bottom-12:innerHeight-12);
+    const width = Math.min(rect.width,right-left);
+    menu.style.width = `${width}px`; menu.style.left = `${Math.max(left,Math.min(rect.left,right-width))}px`;
+    const below = Math.max(0,bottom-rect.bottom-6), above = Math.max(0,rect.top-top-6);
+    const desired = Math.min(280,menu.scrollHeight);
+    const upward = below < desired && above > below;
+    const available = Math.min(280,upward?above:below), rowHeight = items[0]?.getBoundingClientRect().height || 44;
+    const wholeRows = Math.floor((available-14)/rowHeight);
+    menu.style.maxHeight = `${wholeRows>0?Math.min(available,wholeRows*rowHeight+14):available}px`;
+    menu.style.top = `${upward?Math.max(top,rect.top-menu.getBoundingClientRect().height-6):rect.bottom+6}px`;
     button.setAttribute('aria-expanded','true');
     let index = select.selectedIndex;
     if (index < 0 || options[index]?.disabled) index = options.findIndex(o=>!o.disabled);
     if (direction === -1 && select.selectedIndex < 0) index = items.length-1;
-    items[index]?.focus();
+    items[index]?.focus({preventScroll:true});
+    if(items[index])menu.scrollTop=Math.max(0,items[index].offsetTop-menu.clientHeight+items[index].offsetHeight+6);
     let typed = '', lastType = 0;
     menu.addEventListener('keydown', event => {
       const current = items.indexOf(document.activeElement);

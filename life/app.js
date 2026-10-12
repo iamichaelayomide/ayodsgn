@@ -16,7 +16,7 @@ import {createGoals} from './goals.js?v=4';
 import {installNavigation} from './navigation.js?v=2';
 installNavigation();
 import {createCalendar} from './calendar.js?v=43';
-import {installSelects} from './selects.js?v=3';
+import {installSelects} from './selects.js?v=4';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
