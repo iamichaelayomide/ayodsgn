@@ -3,7 +3,7 @@ declare(strict_types=1);
 final class LifeVoice {
     public function __construct(private LifeStore $store,private LifeAI $ai,private array $config,private mixed $transport=null){}
     public function start(array $args):array {
-        $r=$this->ai->read();$s=$r['state'];if(!$r['configured']||!$s['consent'])throw new LifeError('Connect Gemini and accept the data notice in Ramble first.',403);
+        $r=$this->ai->read();$s=$r['state'];if(!$r['configured'])throw new LifeError('Ramble is temporarily unavailable.',503);
         if(($args['version']??null)!==$r['version'])throw new LifeError('Your conversation changed. Reload Ramble and try again.',409);
         $cid=LifeStore::text($args['conversationId']??'',32);$temporary=($args['temporary']??false)===true;$c=null;
         foreach($s['conversations'] as $item)if($item['id']===$cid&&!$item['archived'])$c=$item;

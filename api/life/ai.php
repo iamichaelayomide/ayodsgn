@@ -39,7 +39,7 @@ final class LifeAI {
         try{return $this->sendLocked($version,$args);}finally{flock($lock,LOCK_UN);fclose($lock);}
     }
     private function sendLocked(int $version,array $args):array {
-        $current=$this->read();if($current['version']!==$version)throw new LifeError('Reload this conversation before sending. Your draft is preserved.',409);$s=$current['state'];if(!$s['consent'])throw new LifeError('Review and accept the AI data notice before sending.',403);if(!$current['configured']&&!$this->transport)throw new LifeError('Connect a free-only Gemini project before sending.',503);
+        $current=$this->read();if($current['version']!==$version)throw new LifeError('Reload this conversation before sending. Your draft is preserved.',409);$s=$current['state'];if(!$current['configured']&&!$this->transport)throw new LifeError('Connect a free-only Gemini project before sending.',503);
         $message=LifeStore::text($args['text']??'',6000,true);$temporary=($args['temporary']??false)===true;$ci=$temporary?null:self::find($s['conversations'],LifeStore::text($args['conversationId']??'',32,true));if($ci!==null&&$s['conversations'][$ci]['archived'])throw new LifeError('Start a new conversation.');if($ci!==null&&count($s['conversations'][$ci]['messages'])>=2000)throw new LifeError('This conversation is full. Start a new conversation; your history remains saved.');$requestId=LifeStore::text($args['requestId']??'',64,true);
         if($ci!==null)foreach($s['conversations'][$ci]['messages'] as $m)if(($m['requestId']??'')===$requestId)return $current;
         if($this->store->tenantId!==1){require_once __DIR__.'/public-quota.php';(new LifePublicQuota($this->store->db))->reserve($this->store->tenantId);}

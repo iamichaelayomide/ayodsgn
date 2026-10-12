@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 function life_audio_transcribe(LifeStore $store):array {
-    require_once __DIR__.'/ai.php';$config=LifeAI::configuration();$ai=new LifeAI($store,$config);$r=$ai->read();if(!$r['configured']||!$r['state']['consent'])throw new LifeError('Enable your Gemini connection and data notice first.',403);
+    require_once __DIR__.'/ai.php';$config=LifeAI::configuration();$ai=new LifeAI($store,$config);$r=$ai->read();if(!$r['configured'])throw new LifeError('Ramble is temporarily unavailable.',503);
     $f=$_FILES['audio']??null;if(!$f||($f['error']??1)!==UPLOAD_ERR_OK||!is_uploaded_file($f['tmp_name']))throw new LifeError('Choose an audio file to transcribe.',422);if($f['size']>5*1024*1024)throw new LifeError('Use an audio file smaller than 5 MB.',413);
     $mime=(new finfo(FILEINFO_MIME_TYPE))->file($f['tmp_name']);$allowed=['audio/mpeg','audio/mp3','audio/wav','audio/x-wav','audio/ogg','audio/flac','audio/x-flac','audio/mp4','audio/x-m4a','audio/webm','video/webm'];if(!in_array($mime,$allowed,true))throw new LifeError('Use MP3, WAV, OGG, FLAC, M4A or WebM audio.',422);
     if(($r['state']['usage'][$r['day']]??0)>=30)throw new LifeError('Today’s 30-request limit is reached.',429);$s=$r['state'];$s['usage'][$r['day']]=($s['usage'][$r['day']]??0)+1;$ai->write($r['version'],$s);
