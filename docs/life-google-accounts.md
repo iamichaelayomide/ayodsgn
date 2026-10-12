@@ -18,15 +18,16 @@ Place the downloaded OAuth client JSON at `private/life-google/config.json`, the
 
 Implemented locally: account allocation and legacy linking; tenant-aware board/AI/Undo/partner/storage/push; per-account generation mutex; atomic public AI quota; OAuth code flow with state, nonce, PKCE and Google identity verification; encrypted refresh-token storage; separate Calendar and Tasks consent; synchronization worker with polling, mappings and conflict preservation. Local account-isolation and simulated sync suites pass; no live Google API acceptance check has run.
 
-Not released. Before Google sign-in goes public: install the private PHP dependency, configure the downloaded OAuth client without exposing its secret, publish the basic sign-in consent screen, and verify staging isolation. Before Calendar/Tasks sync: enable both APIs, complete Google scope review, exercise real sync/retry/conflict/delete/reconnect behavior in staging, and add the minute-based `scripts/life-google-sync.php` worker to hosting cron. Push also requires the reminder worker and browser-device delivery checks. All-day event import is currently rejected with an explicit warning rather than silently misrepresented. `syncEnabled` must remain false until those checks and scope review are complete.
+Public sign-in also requires public Privacy Policy and Terms pages at `/life/privacy.php` and `/life/terms.php`, policy links on the sign-in screen, and an account-scoped acceptance record. Acceptance is checked by the server on Google, legacy owner and invited-partner sign-in. Calendar and Tasks remain separate optional permissions; `syncEnabled` must remain false until Google scope review, real synchronization checks, and the scheduled worker are complete.
 
 ## Release notes — 12 October 2026
 
 - Added Google account creation/sign-in and explicit owner-account linking while preserving the existing password login and planner records.
 - Added account-scoped data access, public-account AI quotas, separate optional Calendar/Tasks connections, encrypted credentials, conflict handling, and per-account push delivery.
 - Added account settings for workspace, timezone, Google connections, and device notifications.
+- Added public privacy and terms pages, required sign-in acceptance, and versioned account-scoped acceptance records. Google passwords are never sent to or stored by Life; the existing legacy sign-in uses a separate passphrase hash.
 - Verified PHP parsing, JavaScript syntax, account-isolation checks, partner checks, existing planner/AI/voice/reminder suites, and simulated Google synchronization including separate consent and reconnect after disconnect.
-- Google sign-in and synchronization remain feature-gated; no live account or Google connection was enabled. Real OAuth, two-account staging, Google API sync, and device push delivery remain release checks.
+- Google sign-in may be enabled independently of Calendar/Tasks. Calendar/Tasks sync remains feature-gated; no live Google sync connection was enabled. Real OAuth, two-account staging, Google API sync, and device push delivery remain release checks.
 
 ## Release constraints
 

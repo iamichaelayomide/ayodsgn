@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__.'/../api/life/bootstrap.php';
+require_once __DIR__.'/../api/life/accounts.php';
 life_headers();
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' wss://generativelanguage.googleapis.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
 ?>
@@ -11,7 +12,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=32"><script type="module" src="./app.js?v=33"></script>
+  <link rel="stylesheet" href="./life.css?v=33"><script type="module" src="./app.js?v=34"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
@@ -19,11 +20,13 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
     <a class="wordmark" href="/">ayo.<span>dsgn</span></a>
     <div class="auth-card"><p class="eyebrow">YOUR PRIVATE SPACE</p><h1>A little clarity.<br>A little <em>momentum.</em></h1>
     <p id="auth-copy">Sign in or create a private Life planner with your Google account.</p>
+    <label class="policy-accept"><input id="policy-accept" type="checkbox"><span>I agree to Life’s <a href="/life/privacy.php" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/life/terms.php" target="_blank" rel="noopener">Terms of Service</a>.</span></label>
+    <input id="policy-privacy-version" type="hidden" value="<?=htmlspecialchars(LifeAccounts::PRIVACY_VERSION,ENT_QUOTES)?>"><input id="policy-terms-version" type="hidden" value="<?=htmlspecialchars(LifeAccounts::TERMS_VERSION,ENT_QUOTES)?>">
     <form id="auth-form">
       <label id="setup-label" hidden>One-time setup key<input name="token" type="password" autocomplete="off"></label>
       <details id="partner-login"><summary>Sign in as an accountability partner</summary><label>Partner ID<input name="partnerId" maxlength="32" autocomplete="username"></label></details><label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
       <p id="auth-error" class="error" role="alert"></p><button class="primary" id="auth-submit" type="submit" disabled>Loading…</button>
-    </form><p class="fine-print">Your ideas, your pace. A space just for you.</p></div>
+    </form><p id="policy-note" class="fine-print">Google manages your Google password. Life never receives or stores it.</p><p class="fine-print">Your ideas, your pace. A space just for you.</p></div>
   </section>
   <div id="workspace" class="workspace" hidden>
     <button id="nav-backdrop" class="nav-backdrop" aria-label="Close navigation" hidden tabindex="-1"></button>

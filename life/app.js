@@ -72,7 +72,7 @@ async function start() {
 }
 $('auth-form').addEventListener('submit',async(e)=>{
   e.preventDefault(); const form=e.currentTarget; $('auth-error').textContent=''; $('auth-submit').disabled=true;
-  try { const result=await request(inviteToken?'partner.accept':setup?'setup':'login',{password:form.elements.password.value,token:inviteToken||form.elements.token.value,id:partnerId,partnerId:form.elements.partnerId.value}); csrf=result.csrf;role=result.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');if(inviteToken){history.replaceState(null,'',location.pathname+'?partner='+partnerId);inviteToken=null;}setup=false; form.reset(); await loadBoard(); }
+  try { if(!$('policy-accept').checked)throw Error('Please agree to the Privacy Policy and Terms to continue.');const result=await request(inviteToken?'partner.accept':setup?'setup':'login',{password:form.elements.password.value,token:inviteToken||form.elements.token.value,id:partnerId,partnerId:form.elements.partnerId.value,policyAccepted:true,privacyVersion:$('policy-privacy-version').value,termsVersion:$('policy-terms-version').value}); csrf=result.csrf;role=result.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');if(inviteToken){history.replaceState(null,'',location.pathname+'?partner='+partnerId);inviteToken=null;}setup=false; form.reset(); await loadBoard(); }
   catch(e) { $('auth-error').textContent=e.message; }
   finally { $('auth-submit').disabled=false; }
 });
