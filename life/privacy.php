@@ -6,7 +6,7 @@ header("Content-Security-Policy: default-src 'self'; style-src 'self' https://fo
 ?>
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="How ayo.dsgn Life handles account information, planner content, optional Google connections and reminders."><title>Privacy Policy · Life</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap"><link rel="stylesheet" href="/life/policy.css?v=1"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="How ayo.dsgn Life handles account information, planner content, optional Google connections and reminders."><title>Privacy Policy · Life</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap"><link rel="stylesheet" href="/life/policy.css?v=2"></head>
 <body><header class="policy-header"><a class="policy-brand" href="/">ayo.<span>dsgn</span></a><a href="/life/">Back to Life sign in</a></header>
 <main class="policy-main"><p class="policy-eyebrow">Your information, in your hands</p><h1>Privacy Policy</h1><p class="policy-updated">Effective 12 October 2026</p>
 <p>This policy explains how ayo.dsgn Life (“Life”, “we”, “us”) handles information when you use the Life planner at life.ayodsgn.com. It covers email and Google sign-in, planner features, optional Google connections, AI assistance, accountability sharing and reminders.</p>

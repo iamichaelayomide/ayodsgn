@@ -60,3 +60,5 @@ Navigation and onboarding polish: desktop sidebar follows document flow; mobile 
 Ramble is available automatically when Gemini is configured. No activation dialog or consent flag gate; legacy consent records are preserved without inventing acceptance. Reading or opening the planner does not initiate model requests. User message/voice initiation is still required; quota, authentication, stale-record checks and planner command authorization remain.
 
 Desktop blue onboarding panel: subtle oversized looping ribbons behind the 3D scene, with ayo.life signature near the lower-right corner and italic life. Decorative SVG is hidden from assistive technology; mobile remains form-only.
+
+Privacy and Terms pages receive a soft blush background with repeating decorative loops, retaining white reading cards and unchanged policy text.
