@@ -1,4 +1,4 @@
-import {createAccountSettings,plannerTimezone} from './accounts.js?v=2';
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=3';
 import {installUploadPolish} from './upload-polish.js?v=1';
 import {installDateControls,chooseDate} from './date-controls.js?v=1';
 import {createAnalytics} from './analytics.js?v=2';
@@ -60,13 +60,11 @@ const accountSettings=createAccountSettings({request});
 async function start() {
   try {
     let session=await request('session'); csrf=session.csrf;
-    if(session.authenticated&&session.account&&(session.pendingInvite||(inviteToken&&partnerId))){await request('partner.join',inviteToken&&partnerId?{id:partnerId,token:inviteToken}:{});history.replaceState(null,'',location.pathname);inviteToken=null;session=await request('session');csrf=session.csrf;}
     accountSettings.refresh(session);setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
     $('setup-label').hidden=!setup; $('auth-submit').disabled=false; $('auth-submit').textContent=setup?'Create my private planner':'Sign in';
-    $('auth-copy').textContent=setup?'Enter your one-time setup key and choose a passphrase of at least 14 characters.':'Sign in to your life planner.';
+    $('auth-copy').textContent=setup?'Enter your one-time setup key and choose a passphrase of at least 14 characters.':'Your tasks, goals and plans, in one place.';
     $('auth-form').elements.password.autocomplete=setup?'new-password':'current-password';
-    if(inviteToken){$('auth-copy').textContent='Accept your private partner invitation. Choose a passphrase of at least 14 characters. You will see the whole planner and approve goals and reviewed tasks.';$('auth-submit').textContent='Accept invitation';$('partner-login').hidden=true;}
-    else if(partnerId){$('auth-form').elements.partnerId.value=partnerId;$('partner-login').open=true;}
+    if(inviteToken||partnerId){$('auth-error').textContent='Accountability invitations are paused. Sign in with Google to use your own planner.';}
     if (session.authenticated) await loadBoard();
   } catch(e) { $('auth-error').textContent=e.message; $('auth-submit').textContent='Unavailable'; }
 }

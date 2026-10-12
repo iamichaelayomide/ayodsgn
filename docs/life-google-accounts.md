@@ -32,3 +32,9 @@ Public sign-in also requires public Privacy Policy and Terms pages at `/life/pri
 ## Release constraints
 
 The local working tree includes previous deployed changes that are not reflected in its old baseline. Create a release based on verified current remote master and include only this feature diff. Back up the DB and private files first. Retain original owner ID 1 and all existing record IDs/versions. Do not deploy an incomplete public authentication path.
+
+## Sign-in cleanup — 12 October 2026
+
+The public entry screen uses “Plan your life.” with separate “Create an account with Google” and “Log in with Google” buttons. Both use Google's identity flow; existing identities open their planner and new identities receive a private planner. The public owner/partner login and decorative footer copy are removed. Existing owner passphrase access remains available through `?owner-access=1` for linking/recovery.
+
+New accountability invitations, joining and partner passphrase sign-in are paused server-side. Existing records, partner sessions and approval rules are preserved. The Accountability navigation entry is hidden while onboarding is paused.
