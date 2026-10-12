@@ -12,15 +12,22 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=34"><script type="module" src="./app.js?v=35"></script>
+  <link rel="stylesheet" href="./life.css?v=36"><script type="module" src="./app.js?v=37"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
   <section id="auth" class="auth-screen">
     <a class="wordmark" href="/">ayo.<span>dsgn</span></a>
-    <div class="auth-card"><p class="eyebrow">LIFE PLANNER</p><h1>Plan your <em>life.</em></h1>
+    <div class="auth-card"><p class="eyebrow">LIFE PLANNER</p><h1 id="auth-title">Plan your <em>life.</em></h1>
     <p id="auth-copy">Your tasks, goals and plans, in one place.</p>
-    <div id="google-auth-actions" class="google-auth-actions" hidden><button id="google-signup" class="primary" type="button">Create an account with Google</button><button id="google-login" class="google-login" type="button">Log in with Google</button></div>
+    <form id="email-auth-form" class="email-auth-form">
+      <label>Email<input id="email-auth-email" name="email" type="email" autocomplete="username" required maxlength="254" placeholder="you@example.com"></label>
+      <label>Password<span class="password-input"><input id="email-auth-password" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="72" aria-describedby="email-password-hint"><button id="email-password-toggle" type="button" aria-controls="email-auth-password" aria-pressed="false">Show</button></span></label>
+      <p id="email-password-hint" class="field-hint">Use at least 12 characters.</p>
+      <button id="email-auth-submit" class="primary" type="submit" disabled>Create account</button>
+    </form>
+    <div id="auth-divider" class="auth-divider" hidden><span>or</span></div>
+    <div id="google-auth-actions" class="google-auth-actions" hidden><button id="google-signup" class="google-login" type="button">Sign up with Google</button><button id="google-login" class="google-login" type="button" hidden>Log in with Google</button></div>
     <p id="auth-error" class="error" role="alert"></p>
     <label class="policy-accept"><input id="policy-accept" type="checkbox"><span>I agree to Life’s <a href="/life/privacy.php" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/life/terms.php" target="_blank" rel="noopener">Terms of Service</a>.</span></label>
     <input id="policy-privacy-version" type="hidden" value="<?=htmlspecialchars(LifeAccounts::PRIVACY_VERSION,ENT_QUOTES)?>"><input id="policy-terms-version" type="hidden" value="<?=htmlspecialchars(LifeAccounts::TERMS_VERSION,ENT_QUOTES)?>">
@@ -28,7 +35,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
       <label id="setup-label" hidden>One-time setup key<input name="token" type="password" autocomplete="off"></label>
       <details id="partner-login"><summary>Sign in as an accountability partner</summary><label>Partner ID<input name="partnerId" maxlength="32" autocomplete="username"></label></details><label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
       <button class="primary" id="auth-submit" type="submit" disabled>Loading…</button>
-    </form><p id="policy-note" class="fine-print">Google manages your Google password. Life never receives or stores it.</p></div>
+    </form><p id="auth-mode-switch" class="auth-mode-switch"><span>Already have an account?</span> <button type="button">Log in</button></p><p id="policy-note" class="fine-print">Email passwords are stored as secure hashes. Google passwords stay with Google.</p></div>
   </section>
   <div id="workspace" class="workspace" hidden>
     <button id="nav-backdrop" class="nav-backdrop" aria-label="Close navigation" hidden tabindex="-1"></button>

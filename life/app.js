@@ -1,4 +1,5 @@
-import {createAccountSettings,plannerTimezone} from './accounts.js?v=3';
+import {installEmailAuth} from './auth-entry.js?v=1';
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=4';
 import {installUploadPolish} from './upload-polish.js?v=1';
 import {installDateControls,chooseDate} from './date-controls.js?v=1';
 import {createAnalytics} from './analytics.js?v=2';
@@ -57,12 +58,13 @@ async function loadBoard() {
   $('auth').hidden=true; $('workspace').hidden=false; if(role==='owner'&&data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); if(role==='owner'&&(data.state.routines||[]).some(r=>!r.archived&&r.nextDate<=today()))await mutate('routine.generate',{});render();document.dispatchEvent(new Event('life:reminders-ready')); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
 const accountSettings=createAccountSettings({request});
+const emailAuth=installEmailAuth({request,onAuthenticated:()=>start()});
 async function start() {
   try {
     let session=await request('session'); csrf=session.csrf;
-    accountSettings.refresh(session);setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
+    accountSettings.refresh(session);emailAuth.refresh(session);setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
     $('setup-label').hidden=!setup; $('auth-submit').disabled=false; $('auth-submit').textContent=setup?'Create my private planner':'Sign in';
-    $('auth-copy').textContent=setup?'Enter your one-time setup key and choose a passphrase of at least 14 characters.':'Your tasks, goals and plans, in one place.';
+    if(setup&&new URLSearchParams(location.search).get('owner-access')==='1')$('auth-copy').textContent='Enter your one-time setup key and choose a passphrase of at least 14 characters.';
     $('auth-form').elements.password.autocomplete=setup?'new-password':'current-password';
     if(inviteToken||partnerId){$('auth-error').textContent='Accountability invitations are paused. Sign in with Google to use your own planner.';}
     if (session.authenticated) await loadBoard();
@@ -75,7 +77,7 @@ $('auth-form').addEventListener('submit',async(e)=>{
   finally { $('auth-submit').disabled=false; }
 });
 $('logout').addEventListener('click',async()=>{
-  try { await request('logout',{}); data=null; $('workspace').hidden=true; $('auth').hidden=false; document.querySelectorAll('dialog[open]').forEach(d=>d.close()); $('task-form').reset(); $('sprint-goal').value=''; await start(); }
+  try { await request('logout',{}); data=null; $('workspace').hidden=true; $('auth').hidden=false; document.querySelectorAll('dialog[open]').forEach(d=>d.close()); $('email-auth-form').reset(); $('task-form').reset(); $('sprint-goal').value=''; await start(); }
   catch(e) { pageError(e.message); }
 });
 function matches(task) {

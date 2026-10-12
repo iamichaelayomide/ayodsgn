@@ -1,6 +1,6 @@
 # Google accounts and integration — implementation checkpoint
 
-Approved requirements: Google-only public accounts; preserve legacy owner login/data; separate planner, AI, files, partners and push devices per account. Explicitly link owner Google identity while signed in. Dedicated Life Google Calendar and Life Tasks list; work blocks map to events and to-dos map to Google Tasks. Public AI: 50 text/Economy turns per user, 500 total daily, Lagos reset, native voice owner-only, no billing/fallback.
+Approved requirements: public email/password or Google accounts; preserve legacy owner login/data; separate planner, AI, files, partners and push devices per account. Explicitly link owner Google identity while signed in. Dedicated Life Google Calendar and Life Tasks list; work blocks map to events and to-dos map to Google Tasks. Public AI: 50 text/Economy turns per user, 500 total daily, Lagos reset, native voice owner-only, no billing/fallback.
 
 ## Private configuration
 
@@ -38,3 +38,13 @@ The local working tree includes previous deployed changes that are not reflected
 The public entry screen uses “Plan your life.” with separate “Create an account with Google” and “Log in with Google” buttons. Both use Google's identity flow; existing identities open their planner and new identities receive a private planner. The public owner/partner login and decorative footer copy are removed. Existing owner passphrase access remains available through `?owner-access=1` for linking/recovery.
 
 New accountability invitations, joining and partner passphrase sign-in are paused server-side. Existing records, partner sessions and approval rules are preserved. The Accountability navigation entry is hidden while onboarding is paused.
+
+## Email/password release — 12 October 2026
+
+Public signup and login now offer email/password and Google. Email credentials are kept in a separate account-scoped table as salted hashes; password managers, paste and password visibility are supported. Signup creates a private planner atomically. Login rotates sessions and binds them to the password hash. Email/IP rate limits are separate from the existing Google/legacy sign-in limiter. Public AI quotas apply equally to email accounts.
+
+Matching emails are never sufficient to link accounts: an email/password user must authenticate before linking their verified matching Google identity. Google-only accounts cannot be claimed by signing up with a password. Public identity responses do not contain credential hashes. Current release does not verify mailbox ownership or provide automatic email password reset; support contact is available in the policy pages. No live Google login test is included in this release, at the user's request.
+
+Privacy and Terms versions advance to 2026-10-12-v2 to cover email credentials. Existing owner data, recovery login, and the pause on partner onboarding are preserved.
+
+Verification: 22 email-account checks, 22 existing isolation checks and 16 staged HTTP checks passed. These cover signup, returning login, password hashing, failed login, logout, credential-bound sessions, policy acceptance and cross-account record protection. No real Google login was tested.
