@@ -1,12 +1,13 @@
+import {installCardDrag} from './card-drag.js?v=1';
 import {installEmailAuth} from './auth-entry.js?v=2';
-import {createAccountSettings,plannerTimezone} from './accounts.js?v=5';
-import {installUploadPolish} from './upload-polish.js?v=1';
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=43';
+import {installUploadPolish} from './upload-polish.js?v=43';
 import {installDateControls,chooseDate} from './date-controls.js?v=1';
 import {createAnalytics} from './analytics.js?v=2';
 import {installReminders} from './reminders.js?v=1';
 import {installTaskEditor} from './task-editor.js?v=1';
-import {installPolish} from './polish.js?v=10';
-import {createCompanion} from './companion.js?v=13';
+import {installPolish} from './polish.js?v=43';
+import {createCompanion} from './companion.js?v=43';
 import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
@@ -14,7 +15,7 @@ import {emptyState} from './empty-states.js?v=2';
 import {createGoals} from './goals.js?v=4';
 import {installNavigation} from './navigation.js?v=2';
 installNavigation();
-import {createCalendar} from './calendar.js?v=5';
+import {createCalendar} from './calendar.js?v=43';
 import {installSelects} from './selects.js?v=3';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
@@ -54,7 +55,7 @@ async function mutate(action,args) {
   finally { saving=false; document.body.classList.remove('saving'); }
 }
 async function loadBoard() {
-  data=await request('board'); selectedWeek ||= data.week; conflict=false;selectedBoard=(data.state.boards||[data.state.board]).some(b=>b.id===selectedBoard)?selectedBoard:data.state.board.id; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
+  data=await request('board'); selectedWeek ||= data.week; conflict=false;selectedBoard=(data.state.boards||[data.state.board]).some(b=>b.id===selectedBoard&&!b.archived)?selectedBoard:(data.state.boards||[data.state.board]).find(b=>!b.archived)?.id; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=true);
   $('auth').hidden=true; $('workspace').hidden=false; if(role==='owner'&&data.state.lists.some(l=>!l.archived&&l.name==='Inbox'))await mutate('board.refine',{}); if(role==='owner'&&(data.state.routines||[]).some(r=>!r.archived&&r.nextDate<=today()))await mutate('routine.generate',{});render();document.dispatchEvent(new Event('life:reminders-ready')); if(suspendedDialog){$(suspendedDialog).showModal();suspendedDialog='';}
 }
 const accountSettings=createAccountSettings({request});
@@ -90,7 +91,7 @@ function dayLabel(value) {
 function today() { return new Intl.DateTimeFormat('en-CA',{timeZone:plannerTimezone(),year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()); }
 function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
-  return `<div class="task-shell"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="true" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${(task.dependencies||[]).length?`<span class="blocked-note">${task.dependencies.filter(id=>{const t=data.state.tasks.find(t=>t.id===id);return t&&!data.state.lists.find(l=>l.id===t.listId)?.isDone;}).length} unfinished dependencies</span>`:''}${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${role==='partner'?'disabled':''} ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
+  return `<div class="task-shell" data-color="${escape(task.color||'pink')}"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="false" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${(task.dependencies||[]).length?`<span class="blocked-note">${task.dependencies.filter(id=>{const t=data.state.tasks.find(t=>t.id===id);return t&&!data.state.lists.find(l=>l.id===t.listId)?.isDone;}).length} unfinished dependencies</span>`:''}${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${role==='partner'?'disabled':''} ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
 }
 const planning = createCalendar({getData:()=>data,today,mutate,openTask,refreshSelects,escape});
 const routines=createRoutines({getData:()=>data,mutate,escape,refreshSelects,today});
@@ -101,6 +102,7 @@ installPolish();installDateControls({refreshSelects});installTaskEditor({request
 const analytics=createAnalytics({getData:()=>data,escape,week:()=>data.week,openGoal:id=>goals.open(id)});
 const companion=createCompanion({request,escape,uploadAudio:async file=>{const body=new FormData();body.append("audio",file);const response=await fetch(API+"?action=ai.audio",{method:"POST",credentials:"same-origin",headers:{"X-CSRF-Token":csrf},body});const result=await response.json();if(!response.ok)throw new Error(result.error||"Audio could not be transcribed.");return result;},sendStream:async(args,onPartial)=>{const response=await fetch(API+'?action=ai.send.stream',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(args)});if(!response.ok){const err=await response.json();throw Error(err.error||'Ramble could not respond.');}const reader=response.body.getReader(),decoder=new TextDecoder();let pending='',result;while(true){const chunk=await reader.read();pending+=decoder.decode(chunk.value||new Uint8Array(),{stream:!chunk.done});let pos;while((pos=pending.indexOf('\n'))>=0){const line=pending.slice(0,pos);pending=pending.slice(pos+1);if(!line.trim())continue;const event=JSON.parse(line);if(event.error)throw Error(event.error);if(event.partial)onPartial(event.partial);if(event.result)result=event.result;}if(chunk.done)break;}if(!result)throw Error('Connection interrupted. Your draft is preserved.');return result;},getBoard:()=>data,getScreen:()=>({view,boardId:selectedBoard,taskId:$('task-dialog').open?$('task-form').elements.id.value:'',goalId:$('goal-dialog').open?$('goal-form').elements.id.value:'',mapGroup:$('map-group')?.value||''}),refreshSelects,role:()=>role,reloadBoard:async()=>{const scroll=window.scrollY,boardScroll=$('board').scrollLeft,previous=data;const drafts=[...document.querySelectorAll('dialog[open]')].map(d=>({dialog:d,id:d.querySelector('[name=id]')?.value}));await loadBoard();for(const draft of drafts){if(!draft.id)continue;const find=s=>['tasks','goals','notes','mapNodes'].flatMap(k=>s[k]||[]).find(r=>r.id===draft.id);if(JSON.stringify(find(previous.state))!==JSON.stringify(find(data.state))){draft.dialog.dataset.aiChanged=draft.id;let note=draft.dialog.querySelector('.ai-draft-warning');if(!note){note=document.createElement('p');note.className='error ai-draft-warning';note.setAttribute('role','alert');draft.dialog.prepend(note);}note.textContent='Ramble updated this record. Your open draft is preserved. Close and reopen to see the saved changes.';draft.dialog.addEventListener('close',()=>{delete draft.dialog.dataset.aiChanged;note.remove();},{once:true});}}$('board').scrollLeft=boardScroll;window.scrollTo(0,scroll);},openSource:(type,id)=>{if(type==='tasks'){openTask(id);return;}view=type==='goals'?'goals':type==='mapNodes'?'mindmap':'notes';render();if(type==='goals')goals.open(id);else thinking.open(type,id);}});
 function render() {
+ if(data&&!data.state.boards.some(b=>b.id===selectedBoard&&!b.archived))selectedBoard=data.state.boards.find(b=>!b.archived)?.id;
  document.querySelector('.week-picker-line').hidden=view!=='week';
  $('analytics').hidden=view!=='analytics';
  $('workspace').dataset.view=view;const newTask=$('new-task');newTask.hidden=['today','goals','analytics','companion','calendar','routines','week'].includes(view);(view==='board'?document.querySelector('.board-picker'):document.querySelector('.page-heading')).append(newTask);
@@ -112,7 +114,7 @@ function render() {
  $('thinking').hidden=!['notes','mindmap','templates','history'].includes(view);
  if(!$('thinking').hidden){for(const id of ['board','archive','routines','accountability','goals','planning','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent={notes:'Thoughts',mindmap:'Mind map',templates:'Templates',history:'Activity'}[view];$('page-title').textContent={notes:'Room to think.',mindmap:'Connect your thinking.',templates:'Your rhythm, repeated.',history:'Every step counts.'}[view];$('page-description').textContent='Your ideas, plans and progress, all in one place.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});thinking.render(view);return;}
 
-  $('board-select').innerHTML=(data.state.boards||[data.state.board]).map(b=>`<option value="${b.id}">${escape(b.name)}</option>`).join('');$('board-select').value=selectedBoard;document.querySelector('.board-picker').hidden=!['board','week','archive'].includes(view);$('routines').hidden=view!=='routines';
+  $('board-select').innerHTML=(data.state.boards||[data.state.board]).filter(b=>!b.archived).map(b=>`<option value="${b.id}">${escape(b.name)}</option>`).join('');$('board-select').value=selectedBoard;document.querySelector('.board-picker').hidden=!['board','week','archive'].includes(view);$('routines').hidden=view!=='routines';
   if(view==='routines'){$('goals').hidden=true;$('accountability').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Routines';$('page-title').innerHTML='Build your <em>rhythm.</em>';$('page-description').textContent='Make the important things a little easier to repeat.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});routines.render();return;}
   $('accountability').hidden=view!=='accountability';
   if(view==='accountability'){$('goals').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Accountability';$('page-title').innerHTML='Better, <em>together.</em>';$('page-description').textContent='A trusted perspective. A little encouragement. Shared progress.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});accountability.render();return;}
@@ -138,7 +140,7 @@ function render() {
   $('task-count').textContent=`${tasks.length} task${tasks.length===1?'':'s'}`;
   $('clear-filters').hidden=!($('search').value || $('priority-filter').value || $('label-filter').value);
   $('board').hidden=view==='archive'; $('archive').hidden=view!=='archive'; $('sprint-panel').hidden=view!=='week'; $('new-list').hidden=view!=='board'; $('board-footnote').hidden=view==='archive';
-  $('page-title').innerHTML=view==='board'?'Your life, <em>in motion.</em>':view==='week'?'A week with <em>intention.</em>':'Your <em>archive.</em>';
+  $('page-title').textContent=['board','week'].includes(view)?data.state.boards.find(b=>b.id===selectedBoard)?.name||'My board':'Your archive';
   $('breadcrumb').textContent=view==='board'?'My board':view==='week'?'This week':'Archive';
   $('page-description').textContent=view==='board'?'Capture the thought. Take the next step. Keep the bigger picture close.':view==='week'?'A clear goal, a considered shortlist, and space to make progress.':'Lists, tasks and thoughts. Restore whenever you’re ready.';
   document.querySelectorAll('[data-view]').forEach(b=>{ if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current'); });
@@ -161,9 +163,9 @@ function render() {
 function renderArchive() {
  const lists=data.state.lists.filter(l=>l.archived),tasks=data.state.tasks.filter(t=>t.archived&&(t.title+' '+t.notes).toLowerCase().includes($('search').value.toLowerCase())),notes=(data.state.notes||[]).filter(n=>n.archived&&n.title.toLowerCase().includes($('search').value.toLowerCase())),archivedGoals=(data.state.goals||[]).filter(g=>g.archived&&g.title.toLowerCase().includes($('search').value.toLowerCase()));
  const available=order(data.state.lists.filter(l=>!l.archived));
- $('task-count').textContent=`${lists.length+tasks.length+notes.length+archivedGoals.length} archived items`;
+ $('task-count').textContent=`${data.state.boards.filter(b=>b.archived).length+lists.length+tasks.length+notes.length+archivedGoals.length} archived items`;
  const section=(title,items)=>items.length?`<section class="archive-section"><h2>${title}<span>${items.length}</span></h2>${items.join('')}</section>`:'';
- $('archive').innerHTML=section('Lists',lists.map(l=>`<div class="archive-row"><span class="archive-kind"><img class="action-icon" src="./icons/archive.svg" alt=""></span><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore</button></div>`))+section('Tasks',tasks.map(t=>`<div class="archive-row"><span class="archive-kind">Task</span><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${available.map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}" ${available.length?'':'disabled'}>Restore</button></div>`))+section('Thoughts',notes.map(n=>`<div class="archive-row"><span class="archive-kind">${n.kind==='idea'?'Idea':'Note'}</span><strong>${escape(n.title)}</strong><button data-note-restore="${n.id}">Restore</button></div>`))+section('Goals',archivedGoals.map(g=>`<div class="archive-row"><span class="archive-kind">Goal</span><strong>${escape(g.title)}</strong><button data-goal-restore="${g.id}">Restore</button></div>`))||emptyState('archive','Nothing archived yet. Your saved work will be here when you need it.');
+ $('archive').innerHTML=section('Boards',data.state.boards.filter(b=>b.archived).map(b=>`<div class="archive-row"><strong>${escape(b.name)}</strong><button data-board-restore="${b.id}">Restore board</button></div>`))+section('Lists',lists.map(l=>`<div class="archive-row"><span class="archive-kind"><img class="action-icon" src="./icons/archive.svg" alt=""></span><strong>${escape(l.name)}</strong><button data-list-restore="${l.id}">Restore</button></div>`))+section('Tasks',tasks.map(t=>`<div class="archive-row"><span class="archive-kind">Task</span><strong>${escape(t.title)}</strong><select aria-label="Restore list for ${escape(t.title)}" data-restore-list="${t.id}">${available.map(l=>`<option value="${l.id}" ${l.id===t.listId?'selected':''}>${escape(l.name)}</option>`).join('')}</select><button data-task-restore="${t.id}" ${available.length?'':'disabled'}>Restore</button></div>`))+section('Thoughts',notes.map(n=>`<div class="archive-row"><span class="archive-kind">${n.kind==='idea'?'Idea':'Note'}</span><strong>${escape(n.title)}</strong><button data-note-restore="${n.id}">Restore</button></div>`))+section('Goals',archivedGoals.map(g=>`<div class="archive-row"><span class="archive-kind">Goal</span><strong>${escape(g.title)}</strong><button data-goal-restore="${g.id}">Restore</button></div>`))||emptyState('archive','Nothing archived yet. Your saved work will be here when you need it.');
 }
 
 function checklistRow(item={text:'',done:false,id:''}) {
@@ -207,7 +209,7 @@ document.addEventListener('life:complete-open-task',async()=>{const f=$('task-fo
 $('task-form').addEventListener('submit',async(e)=>{
   e.preventDefault();const f=e.currentTarget,submit=f.querySelector('[type=submit]');$('task-error').textContent='';submit.disabled=true;
   const args={};for(const key of ['id','title','notes','blocker','priority','dueDate','listId','goalId'])args[key]=f.elements[key].value;
-  args.notesDelta=JSON.parse(f.dataset.notesDelta||'null');args.dueTime=f.elements.dueTime.value;args.reminderMinutes=f.elements.reminderMinutes.value===''?null:Number(f.elements.reminderMinutes.value);
+  args.color=f.elements.color.value;args.notesDelta=JSON.parse(f.dataset.notesDelta||'null');args.dueTime=f.elements.dueTime.value;args.reminderMinutes=f.elements.reminderMinutes.value===''?null:Number(f.elements.reminderMinutes.value);
   args.labels=f.elements.labels.value.split(',').map(l=>l.trim()).filter(Boolean);
   args.checklist=[...$('checklist').children].map(row=>({id:row.dataset.id,text:row.querySelector('[type=text]').value,done:row.querySelector('[type=checkbox]').checked}));
   args.sprintWeek=selectedWeek;args.inSprint=f.elements.inSprint.checked;
@@ -220,7 +222,8 @@ let cardOpenTimer;
 document.addEventListener('click',async(e)=>{
   const b=e.target.closest('button');if(!b||!data)return;
   try{
-    if(b.dataset.task){if(e.detail>1)return;clearTimeout(cardOpenTimer);cardOpenTimer=setTimeout(()=>openTask(b.dataset.task),280);}
+    if(b.dataset.boardRestore){await mutate('board.restore',{id:b.dataset.boardRestore});}
+    else if(b.dataset.task){if(e.detail>1)return;clearTimeout(cardOpenTimer);cardOpenTimer=setTimeout(()=>openTask(b.dataset.task),280);}
     else if(b.dataset.addTask)openTask('',b.dataset.addTask);
     else if(b.dataset.listEdit)openList(b.dataset.listEdit);
     else if(b.dataset.listMove)await mutate('list.move',{id:b.dataset.listMove,position:Number(b.dataset.position)});
@@ -229,15 +232,6 @@ document.addEventListener('click',async(e)=>{
     else if(b.dataset.listRestore)await mutate('list.restore',{id:b.dataset.listRestore});
     else if(b.dataset.taskRestore){const id=b.dataset.taskRestore;await mutate('task.restore',{id,listId:document.querySelector(`[data-restore-list="${id}"]`).value});}
   }catch(e){pageError(e.message);}
-});
-$('board').addEventListener('dragstart',e=>{const card=e.target.closest('[data-task]');if(!card||saving)return;dragging=card.dataset.task;e.dataTransfer.setData('text/plain',dragging);e.dataTransfer.effectAllowed='move';});
-$('board').addEventListener('dragover',e=>{const col=e.target.closest('[data-list]');if(col&&dragging){e.preventDefault();document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));col.classList.add('drop-target');}});
-$('board').addEventListener('dragend',()=>{dragging=null;document.querySelectorAll('.drop-target').forEach(x=>x.classList.remove('drop-target'));});
-$('board').addEventListener('drop',async(e)=>{
-  const col=e.target.closest('[data-list]');if(!col||!dragging)return;e.preventDefault();const id=dragging;dragging=null;
-  const cards=order(data.state.tasks.filter(t=>!t.archived&&t.listId===col.dataset.list&&t.id!==id)),target=e.target.closest('[data-task]');
-  const position=target?cards.findIndex(t=>t.id===target.dataset.task):cards.length;
-  try{await mutate('task.move',{id,listId:col.dataset.list,position:position<0?cards.length:position});}catch(e){pageError(e.message);}
 });
 function changeWeek(offset) {const d=new Date(`${selectedWeek}T12:00:00+01:00`);d.setUTCDate(d.getUTCDate()+offset);selectedWeek=d.toISOString().slice(0,10);delete $('sprint-goal').dataset.dirty;render();}
 $('previous-week').addEventListener('click',()=>changeWeek(-7));$('next-week').addEventListener('click',()=>changeWeek(7));
@@ -254,37 +248,15 @@ document.querySelectorAll('#reload,[data-reload]').forEach(button=>button.addEve
 window.addEventListener('beforeunload',(e)=>{if(saving||$('sprint-goal').dataset.dirty||document.querySelector('dialog[open] form')){e.preventDefault();e.returnValue='';}});
 $('board-select').addEventListener('change',()=>{selectedBoard=$('board-select').value;try{localStorage.setItem('life.board',selectedBoard);}catch{}render();});
 function openBoard(id=''){const f=$('board-form');f.reset();f.elements.id.value=id;f.elements.name.value=(data.state.boards||[]).find(b=>b.id===id)?.name||'';$('board-dialog').showModal();f.elements.name.focus();}
+$('page-title').addEventListener('dblclick',()=>{if(['board','week'].includes(view))openBoard(selectedBoard);});$('page-title').tabIndex=0;$('page-title').addEventListener('keydown',e=>{if(['board','week'].includes(view)&&e.key==='Enter')openBoard(selectedBoard);});
+$('archive-board').onclick=async()=>{try{await confirmArchive('board.archive',selectedBoard);}catch(e){pageError(e.message);}};
 $('new-board').addEventListener('click',()=>openBoard());$('rename-board').addEventListener('click',()=>openBoard(selectedBoard));$('board-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;try{await mutate('board.save',Object.fromEntries(new FormData(f)));if(!f.elements.id.value){selectedBoard=data.state.boards.at(-1).id;try{localStorage.setItem('life.board',selectedBoard);}catch{}render();}$('board-dialog').close();}catch(err){f.querySelector('.error').textContent=err.message;}});
 $('save-capacity').addEventListener('click',async()=>{try{await mutate('sprint.save',{week:selectedWeek,goal:sprint().goal,taskIds:sprint().taskIds,capacityMinutes:Math.round(Number($('week-capacity').value)*60)});}catch(err){pageError(err.message);}});
 
 start();
 
-// Touch dragging uses a dedicated handle, leaving the rest of the board free to swipe.
-let touchMove=null, dragFrame=0;
 const boardElement=$('board');
-function finishTouch(cancel=false){
-  if(!touchMove)return;const current=touchMove;touchMove=null;cancelAnimationFrame(dragFrame);
-  current.handle.classList.remove('is-dragging');document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));
-  if(!cancel&&current.target&&current.moved){
-    const cards=order(data.state.tasks.filter(t=>!t.archived&&t.listId===current.target.dataset.list&&t.id!==current.id));
-    const position=current.card?cards.findIndex(t=>t.id===current.card.dataset.task):cards.length;
-    mutate('task.move',{id:current.id,listId:current.target.dataset.list,position:position<0?cards.length:position}).catch(e=>pageError(e.message));
-  }
-}
-boardElement.addEventListener('pointerdown',event=>{
-  const handle=event.target.closest('[data-drag-task]');if(!handle||saving||event.button!==0)return;
-  event.preventDefault();handle.setPointerCapture(event.pointerId);handle.classList.add('is-dragging');
-  touchMove={id:handle.dataset.dragTask,handle,pointer:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false,target:null,card:null};
-  function tick(){if(!touchMove)return;const r=boardElement.getBoundingClientRect();
-    if(touchMove.moved){if(touchMove.x<r.left+48)boardElement.scrollLeft-=9;else if(touchMove.x>r.right-48)boardElement.scrollLeft+=9;
-      const hit=document.elementFromPoint(touchMove.x,touchMove.y);touchMove.target=hit?.closest('[data-list]');touchMove.card=hit?.closest('[data-task]');
-      document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));touchMove.target?.classList.add('drop-target');}
-    dragFrame=requestAnimationFrame(tick);
-  }dragFrame=requestAnimationFrame(tick);
-});
-boardElement.addEventListener('pointermove',event=>{if(touchMove&&touchMove.pointer===event.pointerId){touchMove.x=event.clientX;touchMove.y=event.clientY;touchMove.moved ||=Math.hypot(event.clientX-touchMove.startX,event.clientY-touchMove.startY)>8;}});
-boardElement.addEventListener('pointerup',()=>finishTouch());boardElement.addEventListener('pointercancel',()=>finishTouch(true));
-
+installCardDrag({board:boardElement,getData:()=>data,canMove:()=>!saving&&role==='owner',move:args=>mutate('task.move',args),onError:e=>{render();pageError(e.message);}});
 let boardScrollFrame=0;
 boardElement.addEventListener('scroll',()=>{cancelAnimationFrame(boardScrollFrame);boardScrollFrame=requestAnimationFrame(()=>{
   if(innerWidth>480||!data)return;const left=boardElement.getBoundingClientRect().left+20;

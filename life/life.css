@@ -150,3 +150,25 @@
 .auth-illustration{position:relative;z-index:1}
 .auth-signature{position:absolute;right:28px;bottom:24px;color:#fff;font:36px/1 var(--serif);letter-spacing:-1px;z-index:2}
 .auth-signature em{font-weight:400}
+
+/* Focused board and task controls. */
+.workspace[data-view=board] .page-heading .eyebrow,.workspace[data-view=week] .page-heading .eyebrow,.workspace[data-view=board] #page-description,.workspace[data-view=week] #page-description{display:none}
+.workspace[data-view=board] .page-heading,.workspace[data-view=week] .page-heading{padding-top:24px;padding-bottom:16px}
+.workspace[data-view=board] #page-title,.workspace[data-view=week] #page-title{font:600 28px/1.25 var(--sans);letter-spacing:-.6px;cursor:text;margin:0}
+#archive-board{margin-left:auto}.board-picker{align-items:center}.board-picker>label{max-width:280px}.board-picker>label{font-size:0}.board-picker select{font-size:14px}
+.sidebar{background-color:#fff;background-image:linear-gradient(#ffffffcc,#ffffffcc),url('./images/policy-ribbons.svg');background-size:650px 700px}
+.sidebar nav button,.sidebar-bottom button,.sidebar-tools summary,.nav-group summary,.sidebar nav button .nav-label,.sidebar-bottom .nav-label{font-size:14px!important}
+.sidebar .nav-icon,.sidebar-bottom .nav-icon,.sidebar-tools .action-icon{width:22px;height:22px;flex:0 0 22px}
+.sidebar nav button[aria-current=page]{background:#eaf0ff}
+.task-shell[data-color=pink] .task-card{background:#fcf0f9;border-color:#efdaea}.task-shell[data-color=blue] .task-card{background:#edf3ff;border-color:#d3e1f7}.task-shell[data-color=mint] .task-card{background:#edf7f1;border-color:#d2e9dc}.task-shell[data-color=peach] .task-card{background:#fff2e9;border-color:#f1ddce}.task-shell[data-color=lavender] .task-card{background:#f3effc;border-color:#ded5f1}.task-shell[data-color=neutral] .task-card{background:#f6f5f3;border-color:#e2dfda}
+#task-form textarea[name=title]{padding:16px 18px!important;border:1px solid var(--line);border-radius:14px;background:#f7f6f5;box-sizing:border-box;font-size:24px;line-height:1.3;min-height:72px}
+.description-toggle{display:inline-flex;align-items:center;gap:8px;margin:12px 0}.task-detail-actions{gap:8px;margin:16px 0}.task-detail-actions button{display:flex;align-items:center;gap:8px;padding:10px 12px;width:auto}
+#task-form .task-detail-panels{margin-bottom:16px}.task-detail-panels>section{padding:16px;border:1px solid var(--line);border-radius:14px;background:#fafafa}
+#task-form .dialog-actions{position:static;background:white;margin-top:20px}.unscheduled-actions,.account-google-actions{display:flex;gap:12px;flex-wrap:wrap}.account-settings [data-link]{margin-bottom:12px}.account-settings section{padding-top:20px;margin-top:20px}.notification-switch{display:flex;align-items:center;justify-content:space-between;gap:20px}.notification-switch input{appearance:none;width:44px;height:26px;min-height:26px;border:0;border-radius:20px;background:#d8d5da;position:relative;cursor:pointer;flex:none;padding:0}.notification-switch input:before{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform .15s}.notification-switch input:checked{background:var(--blue)}.notification-switch input:checked:before{transform:translateX(18px)}.notification-switch input:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.card-drag-ghost{position:fixed;pointer-events:none;z-index:1000;transform:rotate(2deg);opacity:.95;box-shadow:0 16px 36px #17173530;border-radius:16px}.card-drop-slot{border:2px dashed #99aceb;border-radius:16px;background:#e9efff;min-height:80px;margin:0 0 10px}.card-drag-source{display:none!important}.card-dragging .board{scroll-snap-type:none}.card-dragging,.card-dragging *{cursor:grabbing!important}.task-shell{transition:transform .12s ease}.unscheduled-row>button:first-child{flex:1;text-align:left}
+@media(max-width:480px){.board-picker{flex-wrap:wrap}#archive-board{font-size:12px}.task-detail-actions button{font-size:12px;padding:9px}.task-detail-actions{gap:6px}#task-form textarea[name=title]{font-size:22px}.page-heading #page-title{font-size:24px!important}}
+@media(prefers-reduced-motion:reduce){.task-shell,.notification-switch input:before{transition:none}}
+
+.board-picker{justify-content:flex-start;gap:12px}#archive-board{margin-left:0}.board-options{margin-left:auto}.sidebar .account-settings-trigger{font-size:14px!important}
+
+.description-content .ql-editor{font-size:14px}.description-content.ql-container{font:14px/1.6 var(--sans)}

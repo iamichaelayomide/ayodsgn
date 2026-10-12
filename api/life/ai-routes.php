@@ -2,7 +2,6 @@
 declare(strict_types=1);
 function life_ai_route(LifeStore $store,string $method,string $action,array $input):never {
     require_once __DIR__.'/ai.php';$config=LifeAI::configuration();$ai=new LifeAI($store,$config);
-    if(str_starts_with($action,'ai.voice.')&&$store->tenantId!==1)throw new LifeError('Native voice is available to the original owner account only.',403);
     if($method==='GET'&&$action==='ai')life_ai_json($ai->read());
     if($method!=='POST')throw new LifeError('Method not allowed.',405);
     if($action==='ai.configure'){

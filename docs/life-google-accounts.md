@@ -62,3 +62,7 @@ Ramble is available automatically when Gemini is configured. No activation dialo
 Desktop blue onboarding panel: subtle oversized looping ribbons behind the 3D scene, with ayo.life signature near the lower-right corner and italic life. Decorative SVG is hidden from assistive technology; mobile remains form-only.
 
 Privacy and Terms pages receive a soft blush background with repeating decorative loops, retaining white reading cards and unchanged policy text.
+
+Board/workspace release: compact board/week headings with keyboard/double-click rename; reversible board archive with preserved prior archives; six validated card colors (pink default); pointer dragging with floating preview, insertion slot and edge scrolling; labeled task controls and inline description below title; archive action on unscheduled tasks; device notification switch and spaced connection actions; matching sidebar icon/text scale with faint ribbons. Native voice opens directly for every personal account, greets without issuing planner actions, and retains per-account duration limits and authentication. Browser microphone permission remains required.
+
+Verification: disposable browser preview confirmed compact heading, labeled task actions, readable rich description, card movement between lists and notification switch semantics. Physical microphone playback still requires a real-device check.
