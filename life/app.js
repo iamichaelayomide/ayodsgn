@@ -1,4 +1,4 @@
-import {createTaskHistory} from './task-history.js?v=2';
+import {createTaskHistory} from './task-history.js?v=3';
 import {installCardDrag} from './card-drag.js?v=1';
 import {installEmailAuth} from './auth-entry.js?v=2';
 import {createAccountSettings,plannerTimezone} from './accounts.js?v=44';
@@ -105,7 +105,7 @@ const companion=createCompanion({request,escape,uploadAudio:async file=>{const b
 const taskHistory=createTaskHistory({root:$('task-history'),request,escape,getData:()=>data,mutate});
 function render() {
  $('task-history').hidden=view!=='task-history';
- if(view==='task-history'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','companion','analytics','sprint-panel','board-footnote','new-task'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;document.querySelector('.week-picker-line').hidden=true;$('workspace').dataset.view=view;$('workspace').classList.remove('ramble-view');$('breadcrumb').textContent='History';$('page-title').textContent='Your history';$('page-description').textContent='Search past tasks and goals, or bring them back into your plans.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});taskHistory.render();return;}
+ if(view==='task-history'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','companion','analytics','sprint-panel','board-footnote','new-task'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;document.querySelector('.week-picker-line').hidden=true;$('workspace').dataset.view=view;$('workspace').classList.remove('ramble-view');$('breadcrumb').textContent='History';$('page-title').textContent='History';$('page-description').textContent='Your completed, blocked and archived tasks and goals.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});taskHistory.render();return;}
  if(data&&!data.state.boards.some(b=>b.id===selectedBoard&&!b.archived))selectedBoard=data.state.boards.find(b=>!b.archived)?.id;
  document.querySelector('.week-picker-line').hidden=view!=='week';
  $('analytics').hidden=view!=='analytics';
