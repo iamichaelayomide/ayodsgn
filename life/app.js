@@ -1,7 +1,8 @@
+import {installPWA,removeLifeSubscriptions} from './pwa.js?v=1';
 import {createTaskHistory} from './task-history.js?v=3';
 import {installCardDrag} from './card-drag.js?v=1';
 import {installEmailAuth} from './auth-entry.js?v=2';
-import {createAccountSettings,plannerTimezone} from './accounts.js?v=44';
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=45';
 import {installUploadPolish} from './upload-polish.js?v=43';
 import {installDateControls,chooseDate} from './date-controls.js?v=1';
 import {createAnalytics} from './analytics.js?v=2';
@@ -21,6 +22,7 @@ import {installSelects} from './selects.js?v=4';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = 'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
+installPWA({isBusy:()=>saving});
 let suspendedDialog = '', role='owner', selectedBoard='';
 try{selectedBoard=localStorage.getItem('life.board')||'';}catch{}
 const inviteParams=new URLSearchParams(location.search);let inviteToken=inviteParams.get('invite');const partnerId=inviteParams.get('partner');
@@ -79,7 +81,7 @@ $('auth-form').addEventListener('submit',async(e)=>{
   finally { $('auth-submit').disabled=false; }
 });
 $('logout').addEventListener('click',async()=>{
-  try { await request('logout',{}); data=null; $('workspace').hidden=true; $('auth').hidden=false; document.querySelectorAll('dialog[open]').forEach(d=>d.close()); $('email-auth-form').reset(); $('task-form').reset(); $('sprint-goal').value=''; await start(); }
+  try { let remindersRemoved=true;try{remindersRemoved=await removeLifeSubscriptions(request);}catch{remindersRemoved=false;}await request('logout',{}); data=null; $('workspace').hidden=true; $('auth').hidden=false; document.querySelectorAll('dialog[open]').forEach(d=>d.close()); $('email-auth-form').reset(); $('task-form').reset(); $('sprint-goal').value=''; await start();if(!remindersRemoved)announce('Signed out. Check browser notification settings to turn off remaining device reminders.'); }
   catch(e) { pageError(e.message); }
 });
 function matches(task) {

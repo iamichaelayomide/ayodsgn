@@ -1,1 +1,32 @@
-{"name":"My Life · ayo.dsgn","short_name":"Life","start_url":"./","scope":"./","display":"standalone","background_color":"#ffffff","theme_color":"#1f46d2","icons":[{"src":"./push-icon.png","sizes":"192x192","type":"image/png"},{"src":"./push-icon-512.png","sizes":"512x512","type":"image/png"}]}
+{
+  "id": "/",
+  "name": "Life",
+  "short_name": "Life",
+  "description": "Your tasks, goals and plans, in one place.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbf5f9",
+  "theme_color": "#1f46d2",
+  "icons": [
+    {
+      "src": "/life/pwa-icons/life-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/life/pwa-icons/life-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/life/pwa-icons/life-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

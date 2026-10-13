@@ -8,11 +8,11 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
 <!doctype html>
 <html lang="en">
 <head>
-  <base href="/life/"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="/life/"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title><link rel="icon" href="/life/favicon.svg?v=1" type="image/svg+xml">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="manifest" href="./manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=56"><script type="module" src="./app.js?v=54"></script>
+  <meta name="theme-color" content="#1f46d2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Life"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="apple-touch-icon" href="/life/pwa-icons/apple-touch-icon.png"><link rel="manifest" href="/life/manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
+  <link rel="stylesheet" href="./life.css?v=57"><script type="module" src="./app.js?v=55"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
