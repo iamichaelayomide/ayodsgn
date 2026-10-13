@@ -1,8 +1,8 @@
 // Collect utterances locally; discard idle silence and cap a single command at 45 seconds.
-export function createSpeechCapture(){
+export function createSpeechCapture(threshold=350){
  let chunks=[],prefix=[],active=false,quiet=0,total=0,tooLong=false;
  return {
-  add(buffer){const bytes=new Uint8Array(buffer),samples=new Int16Array(buffer);let sum=0;for(const value of samples)sum+=value*value;const voiced=Math.sqrt(sum/Math.max(1,samples.length))>=350;
+  add(buffer){const bytes=new Uint8Array(buffer),samples=new Int16Array(buffer);let sum=0;for(const value of samples)sum+=value*value;const voiced=Math.sqrt(sum/Math.max(1,samples.length))>=threshold;
    if(!active){prefix.push(bytes.slice());if(prefix.length>5)prefix.shift();if(!voiced)return;active=true;chunks=prefix;prefix=[];total=chunks.reduce((n,c)=>n+c.length,0);}
    else {chunks.push(bytes.slice());total+=bytes.length;}
    quiet=voiced?0:quiet+samples.length;if(total>1440000){tooLong=true;chunks=[];}if(quiet>=12800)active=false;

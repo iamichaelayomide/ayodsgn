@@ -40,7 +40,7 @@ try {
     if($action==='ai.audio'){if(!$signed||$role!=='owner'||$store->tenantId!==1)throw new LifeError('Only the owner can transcribe audio.',403);if(!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??''))throw new LifeError('Your session changed.',403);require __DIR__.'/audio.php';life_json(life_audio_transcribe($store));}
     if($action==='upload') {if(!$signed||$role!=='owner')throw new LifeError('Only the owner can upload files.',403);if(!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??''))throw new LifeError('Your session changed.',403);require __DIR__.'/attachments.php';life_json(life_upload($store,$config,$_POST));}
     if (stripos($_SERVER['CONTENT_TYPE']??'','application/json')!==0) throw new LifeError('Send JSON data.',415);
-    if ((int)($_SERVER['CONTENT_LENGTH']??0)>($action==='ai.voice.transcribe'?2050000:150000)) throw new LifeError('Request is too large.',413);
+    if ((int)($_SERVER['CONTENT_LENGTH']??0)>150000) throw new LifeError('Request is too large.',413);
     $input=json_decode(file_get_contents('php://input'),true,64,JSON_THROW_ON_ERROR);
     if (!is_array($input)) throw new LifeError('Invalid request.',400);
     if (!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??'')) throw new LifeError('Your session changed. Reload and try again.',403);
