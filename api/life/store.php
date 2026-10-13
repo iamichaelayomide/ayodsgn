@@ -85,6 +85,27 @@ final class LifeStore {
             }
 
             switch ($action) {
+                case 'history.delete':
+                    $this->history->seed($s);$this->history->delete(self::text($id,32,true),($args['confirmed']??false)===true);break;
+                case 'history.restore':
+                    $entry=$this->history->get(self::text($id,32,true));$kind=$entry['kind'];$collection=$kind==='goal'?'goals':'tasks';$record=$entry['task'];$existing=null;
+                    foreach($s[$collection]??[] as $i=>$row)if($row['id']===$record['id']){$existing=$i;$record=$row;break;}
+                    if($kind==='task'){
+                        $listId=self::text($args['listId']??'',32,true);$li=self::listIndex($s,$listId);if($s['lists'][$li]['isDone']??false)throw new LifeError('Choose an unfinished list to reopen this task.');
+                        if($existing===null&&count($s['tasks'])>=5000)throw new LifeError('The board has reached its task limit.');
+                        $record['listId']=$listId;$record['blocker']='';$record['completedAt']=null;$record['reminderMinutes']=null;unset($record['approval'],$record['boardArchive']);
+                    }else{
+                        $type=$args['type']??'adhoc';$period=self::text($args['period']??'',10);
+                        if(!in_array($type,['adhoc','quarter','month','week'],true))throw new LifeError('Choose a goal period.');
+                        if($type==='quarter'&&!preg_match('/^\d{4}-Q[1-4]$/',$period))throw new LifeError('Choose a quarter, for example 2026-Q4.');
+                        if($type==='month'&&!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/',$period))throw new LifeError('Choose a month, for example 2026-10.');
+                        if($type==='week')$period=self::validWeek($period);if($type==='adhoc')$period='';
+                        foreach($s['goals']??[] as $child)if(!$child['archived']&&$child['parentId']===$record['id']&&($type!==$record['type']||$period!==$record['period']))throw new LifeError('Keep this goal’s period while it has linked goals.');
+                        if($existing===null&&count($s['goals']??[])>=1000)throw new LifeError('Goal limit reached.');
+                        $record['type']=$type;$record['period']=$period;$record['parentId']='';$record['completed']=false;unset($record['approval']);
+                    }
+                    $record['archived']=false;$record['updatedAt']=self::now();$s[$collection]??=[];if($existing===null)$s[$collection][]=$record;else $s[$collection][$existing]=$record;
+                    $id=$record['id'];break;
                 case 'attachment.add':
                     self::index($s['tasks'],self::text($args['taskId']??'',32,true));$s['attachments']??=[];if(count($s['attachments'])>=500)throw new LifeError('Attachment limit reached.');$s['attachments'][]=['id'=>self::text($id,32,true),'taskId'=>$args['taskId'],'name'=>self::text($args['name']??'',200,true),'mime'=>self::text($args['mime']??'',100,true),'size'=>(int)($args['size']??0),'archived'=>false,'createdAt'=>self::now()];break;
                 case 'attachment.archive':
