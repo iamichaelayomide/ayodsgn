@@ -8,7 +8,7 @@ import {createAnalytics} from './analytics.js?v=2';
 import {installReminders} from './reminders.js?v=1';
 import {installTaskEditor} from './task-editor.js?v=2';
 import {installPolish} from './polish.js?v=43';
-import {createCompanion} from './companion.js?v=48';
+import {createCompanion} from './companion.js?v=49';
 import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
@@ -274,3 +274,5 @@ $('board').addEventListener('change',async event=>{const input=event.target.clos
 $('board').addEventListener('dblclick',event=>{const title=event.target.closest('[data-rename-task]');if(!title)return;clearTimeout(cardOpenTimer);event.preventDefault();const task=data.state.tasks.find(t=>t.id===title.dataset.renameTask),form=document.createElement('form');form.className='inline-rename';form.innerHTML=`<input aria-label="Rename card" maxlength="200" required value="${escape(task.title)}"><button type="submit">Save</button><button type="button">Cancel</button>`;title.closest('.task-shell').append(form);form.querySelector('input').focus();form.querySelector('input').select();form.querySelector('[type=button]').addEventListener('click',()=>form.remove());form.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();form.remove();}});form.addEventListener('submit',async e=>{e.preventDefault();try{await mutate('task.rename',{id:task.id,title:form.querySelector('input').value});}catch(error){pageError(error.message);}});});
 
 $('upload-attachment').addEventListener('click',async()=>{const file=$('attachment-file').files[0],id=$('task-form').elements.id.value;if(!file||!id){$('task-error').textContent='Save the task and choose a file first.';return;}const body=new FormData();body.append('file',file);body.append('taskId',id);body.append('version',data.version);try{const response=await fetch(API+'?action=upload',{method:'POST',credentials:'same-origin',headers:{'X-CSRF-Token':csrf},body});const result=await response.json();if(!response.ok){if(response.status===409){conflict=true;document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=false);}if(response.status===401)await request('board');throw new Error(result.error);}data=result;render();$('attachment-list').insertAdjacentHTML('beforeend',`<p><a href="${API}?action=attachment&id=${result.state.attachments.at(-1).id}">${escape(file.name)}</a></p>`);$('attachment-file').value='';}catch(e){$('task-error').textContent=e.message;}});
+
+document.addEventListener('life:voice-navigate',event=>{const next=event.detail;if(next.boardId)selectedBoard=next.boardId;view=next.view;render();});

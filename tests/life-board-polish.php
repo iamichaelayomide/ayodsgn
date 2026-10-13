@@ -4,7 +4,7 @@ $db=new PDO('sqlite::memory:');$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_
 function ok($v){global $n;if(!$v)throw new Exception('Board polish check '.$n.' failed');$n++;}
 function bad($fn,$status=422){try{$fn();}catch(LifeError $e){ok($e->status===$status);return;}throw new Exception('Expected rejection');}
 $d=$store->read();$first=$d['state']['boards'][0]['id'];bad(fn()=>$store->mutate($d['version'],'board.archive',['id'=>$first]));
-$d=$store->mutate($d['version'],'board.save',['name'=>'Projects']);$second=$d['state']['boards'][1]['id'];$list=array_values(array_filter($d['state']['lists'],fn($l)=>$l['boardId']===$second))[0]['id'];
+$d=$store->mutate($d['version'],'board.save',['name'=>'Projects']);$second=$d['state']['boards'][1]['id'];$list=array_values(array_filter($d['state']['lists'],fn($l)=>($l['boardId']??$store->read()['state']['board']['id'])===$second))[0]['id'];
 $d=$store->mutate($d['version'],'task.save',['title'=>'Blue card','listId'=>$list,'color'=>'blue']);$task=$d['state']['tasks'][0];ok($task['color']==='blue');
 $d=$store->mutate($d['version'],'task.save',array_merge($task,['notes'=>'Updated']));ok($d['state']['tasks'][0]['color']==='blue');bad(fn()=>$store->mutate($d['version'],'task.save',array_merge($task,['color'=>'javascript:bad'])));
 $d=$store->mutate($d['version'],'task.save',['title'=>'Already archived','listId'=>$list]);$old=$d['state']['tasks'][1]['id'];$d=$store->mutate($d['version'],'task.archive',['id'=>$old]);
