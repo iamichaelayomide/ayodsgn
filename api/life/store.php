@@ -10,11 +10,13 @@ require_once __DIR__.'/task-fields.php';
 
 final class LifeStore {
     public static string $timezone='Africa/Lagos';
+    public readonly LifeTaskHistory $history;
     public function __construct(public PDO $db, public readonly int $tenantId=1) {
         if($tenantId<1)throw new LifeError('Invalid account.',403);
         self::$timezone='Africa/Lagos';
         try{$q=$db->prepare('SELECT timezone FROM life_account WHERE id=?');$q->execute([$tenantId]);$zone=$q->fetchColumn();if(is_string($zone)&&in_array($zone,DateTimeZone::listIdentifiers(),true))self::$timezone=$zone;}catch(PDOException $e){}
         require_once __DIR__.'/google-sync.php';new LifeGoogleSync($this);
+        require_once __DIR__.'/task-history.php';$this->history=new LifeTaskHistory($this);
     }
     public static function id(): string { return bin2hex(random_bytes(16)); }
     public static function now(): string { return gmdate('Y-m-d\TH:i:s\Z'); }
@@ -281,6 +283,7 @@ final class LifeStore {
             $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=? AND version=?');
             $q->execute([json_encode($s,JSON_THROW_ON_ERROR),self::now(),$this->tenantId,$version]);
             if ($q->rowCount()!==1) throw new LifeError('The board changed while saving. Reload the latest board.',409);
+            $this->history->capture($current['state'],$s,$action,$version+1);
             $ownsTransaction&&$this->db->commit();
             if($ownsTransaction)LifeGoogleSync::enqueue($this);
             return $this->read();
