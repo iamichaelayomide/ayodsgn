@@ -11,7 +11,7 @@ export function createNativeTurns(){
  function match(value){const words=normalized(value);if(!words)return null;const candidates=all.filter(t=>t.source!=='greeting'&&normalized(t.request||t.user).includes(words));return candidates.length===1?candidates[0]:null;}
  return {
   begin,
-  current(){return input||begin('greeting');},response(){return response||(response=this.current());},setResponse(turn){response=turn;},releaseResponse(turn){if(response===turn)response=null;},
+  current(){return input||begin('greeting');},response(){if(response?.complete&&!response.repairing&&response!==input)response=input;return response||(response=this.current());},setResponse(turn){response=turn;},releaseResponse(turn){if(response===turn)response=null;},
   activity(){const old=response;if(old&&!old.complete)old.cancelled=true;response=null;const turn=begin();turn.hasSpeech=true;return {old,turn};},
   speech(){if(input?.source==='audio'&&!input.complete)input.hasSpeech=true;},
   request(turn,text){turn.request=text;for(let i=unassigned.length-1;i>=0;i--){const chunk=unassigned[i],target=match(chunk.value);if(target){attach(target,chunk.value,chunk.interim,chunk.finished);unassigned.splice(i,1);}}},

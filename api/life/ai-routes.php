@@ -22,14 +22,16 @@ function life_ai_route(LifeStore $store,string $method,string $action,array $inp
     if($action==='ai.command.undo')life_ai_json(LifeCommands::undo($store,$ai,$input['version'],LifeStore::text($input['id']??'',32,true)));
     if($action==='ai.voice.command'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->command($input));}
     if($action==='ai.preview')life_ai_json(['context'=>LifeAI::context($store->read()['state'],LifeStore::text($input['text']??'',6000),$ai->read()['state']['memories'])]);
-    if($action==='ai.send.stream'){define('LIFE_AI_STREAM',true);header('Content-Type: application/x-ndjson; charset=utf-8');header('X-Accel-Buffering: no');while(ob_get_level()>0)ob_end_flush();try{$value=$ai->send($input['version'],$input);unset($value['state']['providerUsage']);foreach($value['state']['commands']??[] as $i=>$c)unset($value['state']['commands'][$i]['before'],$value['state']['commands'][$i]['beforeMemories'],$value['state']['commands'][$i]['afterMemories']);echo json_encode(['result'=>$value],JSON_THROW_ON_ERROR)."\n";}catch(Throwable $e){echo json_encode(['error'=>$e instanceof LifeError?$e->getMessage():'Ramble could not respond. Your draft is preserved.'])."\n";}flush();exit;}
+    if($action==='ai.send.stream'){define('LIFE_AI_STREAM',true);header('Content-Type: application/x-ndjson; charset=utf-8');header('X-Accel-Buffering: no');while(ob_get_level()>0)ob_end_flush();try{$value=$ai->send($input['version'],$input);unset($value['state']['providerUsage']);foreach($value['state']['commands']??[] as $i=>$c)unset($value['state']['commands'][$i]['before'],$value['state']['commands'][$i]['beforeMemories'],$value['state']['commands'][$i]['afterMemories']);echo json_encode(['result'=>life_ai_public($value)],JSON_THROW_ON_ERROR)."\n";}catch(Throwable $e){echo json_encode(['error'=>$e instanceof LifeError?$e->getMessage():'Ramble could not respond. Your draft is preserved.'])."\n";}flush();exit;}
     if($action==='ai.send')life_ai_json($ai->send($input['version'],$input));
     if($action==='ai.apply'||$action==='ai.undo')life_ai_json($ai->apply($input['version'],$input,$action==='ai.undo'));
     if($action==='ai.mutate')life_ai_json($ai->mutate($input['version'],LifeStore::text($input['action']??'',60,true),$input['args']??[]));
     throw new LifeError('Unknown AI request.',404);
 }
 
-function life_ai_json(array $value):never {
-    $sanitize=static function(array &$state):void {unset($state['providerUsage']);foreach($state['commands']??[] as $i=>$c)unset($state['commands'][$i]['before'],$state['commands'][$i]['beforeMemories'],$state['commands'][$i]['afterMemories']);};
-    if(isset($value['state']))$sanitize($value['state']);if(isset($value['data']['state']))$sanitize($value['data']['state']);life_json($value);
+function life_ai_public(array $value):array {
+    $sanitize=static function(array &$state):void {unset($state['providerUsage'],$state['voiceSessions']);foreach($state['conversations']??[] as $index=>$conversation)$state['conversations'][$index]['messages']=array_values(array_filter($conversation['messages']??[],fn($message)=>!($message['voice']??false)));foreach($state['commands']??[] as $i=>$c)unset($state['commands'][$i]['before'],$state['commands'][$i]['beforeMemories'],$state['commands'][$i]['afterMemories']);};
+    if(isset($value['state']))$sanitize($value['state']);if(isset($value['data']['state']))$sanitize($value['data']['state']);return $value;
 }
+
+function life_ai_json(array $value):never {life_json(life_ai_public($value));}

@@ -17,7 +17,7 @@ trait LifeNativeVoice {
         }unset($session);$this->ai->write($r['version'],$s);return ['accepted'=>true,'kind'=>$entry['kind'],'request'=>$entry['request']];
     }
     public function cancel(array $args):array {
-        $v=$this->session($args);$turn=LifeStore::text($args['turnId']??'',64,true);$r=$this->ai->read();$s=$r['state'];foreach($s['voiceSessions'] as &$session)if($session['id']===$v['id']&&isset($session['nativeTurns'][$turn]))$session['nativeTurns'][$turn]['cancelled']=true;unset($session);$this->ai->write($r['version'],$s);return $this->commandStatus($args+['requestId'=>'']);
+        $v=$this->session($args);$turn=LifeStore::text($args['turnId']??'',64,true);$r=$this->ai->read();$s=$r['state'];foreach($s['voiceSessions'] as &$session)if($session['id']===$v['id']){$session['nativeTurns'][$turn]??=['id'=>$turn,'kind'=>'command','request'=>'','source'=>'audio','at'=>time()];$session['nativeTurns'][$turn]['cancelled']=true;}unset($session);$this->ai->write($r['version'],$s);return $this->commandStatus($args+['requestId'=>'']);
     }
     public function commandStatus(array $args):array {
         $v=$this->session($args);$key=LifeStore::text($args['requestId']??'',100);$turn=LifeStore::text($args['turnId']??'',64);$entries=$v['nativeCommands']??[];if($key!==''&&!str_starts_with($key,'nv2-'))$key='nv2-'.substr(hash('sha256',$v['id'].'/'.$key),0,48);$saved=[];
@@ -29,6 +29,7 @@ trait LifeNativeVoice {
         $turnId=LifeStore::text($args['turnId']??'',64,true);$toolId=LifeStore::text($args['toolCallId']??'',100,true);$requestId=LifeStore::text($args['requestId']??'',64,true);
         $stable='nv2-'.substr(hash('sha256',$v['id'].'/'.$requestId),0,48);$turn=$v['nativeTurns'][$turnId]??null;
         if(isset($v['nativeCommands'][$stable])){$saved=$v['nativeCommands'][$stable];if($saved['turnId']!==$turnId)throw new LifeError('Command belongs to another spoken turn.',409);return $this->ai->read()+['receipt'=>$saved['receipt'],'board'=>$this->store->read(),'planner'=>LifeCommands::context($this->store->read()['state'])];}
+        if(!$turn){$this->turn(['sessionId'=>$v['id'],'turnId'=>$turnId,'kind'=>'command','request'=>$args['plan']['request']??'','source'=>$args['source']??'greeting','hasSpeech'=>$args['hasSpeech']??false,'screen'=>$args['screen']??[]]);$v=$this->session($args);$turn=$v['nativeTurns'][$turnId]??null;}
         if(!$turn||$turn['kind']!=='command'||$turn['cancelled']||time()-$turn['at']>120)throw new LifeError('That spoken instruction is no longer active. No changes were made.',409);
         $plan=$args['plan']??[];if(!is_array($plan)||($plan['intent']??'')!=='instruction'||($plan['targetConfidence']??'')!=='clear')throw new LifeError('Please clarify the task or destination first.');
         $actions=$plan['actions']??[];if(!is_array($actions)||count($actions)<1||count($actions)>20)throw new LifeError('Ask for one to twenty changes.');
@@ -46,6 +47,7 @@ trait LifeNativeVoice {
             $required=match($action['operation']??''){'task.move'=>['id','listId'],'task.complete','checklist.toggle'=>['id','done'],'task.schedule'=>['id','date'],'task.dependencies'=>['id','ids'],default=>[]};if(($action['operation']??'')==='checklist.toggle')$required[]='itemId';foreach($required as $key)if(!array_key_exists($key,$arguments))throw new LifeError('Missing action field: '.$key);
             if(($action['operation']??'')==='task.complete'&&array_diff(array_keys($arguments),['id','done']))throw new LifeError('Completion uses id and done only.');
         }
+        foreach($actions as &$action)if($action['operation']==='task.book')$action['arguments']=LifeCalendarBooking::normalize($action['arguments'],$turn['request'],$this->store->read()['state'],$turn['screen']??[]);unset($action);$plan['actions']=$actions;$plan['_screen']=$turn['screen']??[];
         $fingerprint=hash('sha256',json_encode(LifeVoiceProtocol::ordered($actions),JSON_THROW_ON_ERROR));
         foreach($v['nativeCommands']??[] as $row)if($row['turnId']===$turnId&&($row['fingerprint']??'')===$fingerprint){$r=$this->ai->read();$s=$r['state'];foreach($s['voiceSessions'] as &$session)if($session['id']===$v['id'])$session['nativeCommands'][$stable]=$row;unset($session);$updated=$this->ai->write($r['version'],$s);return $updated+['receipt'=>$row['receipt'],'board'=>$this->store->read(),'planner'=>LifeCommands::context($this->store->read()['state'])];}
         $plan['_fingerprint']=$fingerprint;
@@ -59,7 +61,7 @@ trait LifeNativeVoice {
         $bid=LifeStore::text($args['boardId']??'',32);if($bid!==''&&!array_filter($this->store->read()['state']['boards'],fn($b)=>$b['id']===$bid&&!$b['archived']))throw new LifeError('That board is unavailable.');return ['navigation'=>['view'=>$view,'boardId'=>$bid],'confirmation'=>'Opened '.($view==='board'?'your board':str_replace('-',' ',$view)).'.'];
     }
     public function undoNative(array $args):array {
-        $v=$this->session($args);$turn=$v['nativeTurns'][$args['turnId']??'']??null;if(!$turn||$turn['kind']!=='command'||$turn['cancelled']||!preg_match('/\bundo\b/iu',$turn['request'])||$v['temporary'])throw new LifeError('Ask explicitly to undo the last change.');
+        $v=$this->session($args);if(!isset($v['nativeTurns'][$args['turnId']??''])){$this->turn(['sessionId'=>$v['id'],'turnId'=>$args['turnId']??'','kind'=>'command','request'=>$args['plan']['request']??'','source'=>$args['source']??'greeting','hasSpeech'=>$args['hasSpeech']??false,'screen'=>$args['screen']??[]]);$v=$this->session($args);}$turn=$v['nativeTurns'][$args['turnId']??'']??null;if(!$turn||$turn['kind']!=='command'||$turn['cancelled']||!preg_match('/\bundo\b/iu',$turn['request'])||$v['temporary'])throw new LifeError('Ask explicitly to undo the last change.');
         $key=LifeStore::text($args['requestId']??'',64,true);$stable='nv2-'.substr(hash('sha256',$v['id'].'/'.$key),0,48);
         if(isset($v['nativeCommands'][$stable]))return $this->ai->read()+['receipt'=>$v['nativeCommands'][$stable]['receipt'],'board'=>$this->store->read()];
         $r=$this->ai->read();$commands=array_values(array_filter($r['state']['commands']??[],fn($c)=>!$c['undone']));$last=end($commands);if(!$last)throw new LifeError('There is no saved change to undo.');
