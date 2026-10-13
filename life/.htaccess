@@ -2,13 +2,23 @@ Options -Indexes
 DirectoryIndex index.php
 <IfModule mod_headers.c>
   <Files "reminder-sw.js">
+    Header unset Cache-Control
+    Header always unset Cache-Control
     Header always set Service-Worker-Allowed "/"
     Header always set Cache-Control "no-cache, max-age=0, must-revalidate"
   </Files>
   <Files "manifest.webmanifest">
+    Header unset Cache-Control
+    Header always unset Cache-Control
     Header always set Cache-Control "no-cache, max-age=0, must-revalidate"
   </Files>
 </IfModule>
 <IfModule mod_mime.c>
   AddType application/manifest+json .webmanifest
+</IfModule>
+
+<IfModule mod_expires.c>
+  <FilesMatch "^(reminder-sw\.js|manifest\.webmanifest)$">
+    ExpiresActive Off
+  </FilesMatch>
 </IfModule>
