@@ -13,6 +13,8 @@ function life_ai_route(LifeStore $store,string $method,string $action,array $inp
     if($action==='ai.voice.start'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->start($input));}
     if($action==='ai.voice.context'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->context($input));}
     if($action==='ai.voice.command'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->command($input));}
+    if($action==='ai.voice.transcribe'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->transcribe($input));}
+    if($action==='ai.voice.resolve'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->resolve($input));}
     if($action==='ai.voice.save'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->save($input));}
     if($action==='ai.voice.finish'){require_once __DIR__.'/voice.php';life_ai_json((new LifeVoice($store,$ai,$config))->finish($input));}
     if($action==='ai.records')life_ai_json(['boardVersion'=>$store->read()['version'],'records'=>LifeCommands::relevant($store->read()['state'],LifeStore::text($input['text']??'',6000),$input['screen']??[])]);
