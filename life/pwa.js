@@ -1,5 +1,5 @@
 /** Installation is optional. Only public offline assets are stored by the worker. */
-const workerURL='/life/reminder-sw.js?v=pwa1';
+const workerURL='/life/pwa-worker.php?v=1';
 let registrationPromise;
 export function ensureLifeRegistration(){
  if(!('serviceWorker' in navigator)||!window.isSecureContext)return Promise.resolve(null);
@@ -8,7 +8,7 @@ export function ensureLifeRegistration(){
 export async function lifePushSubscriptions(){
  if(!('serviceWorker' in navigator))return [];
  const registrations=await navigator.serviceWorker.getRegistrations(),out=[];
- for(const registration of registrations){const script=(registration.active||registration.waiting||registration.installing)?.scriptURL;if(!script)continue;const source=new URL(script);if(source.origin!==location.origin||source.pathname!=='/life/reminder-sw.js')continue;const subscription=await registration.pushManager?.getSubscription();if(subscription)out.push({registration,subscription});}
+ for(const registration of registrations){const script=(registration.active||registration.waiting||registration.installing)?.scriptURL;if(!script)continue;const source=new URL(script);if(source.origin!==location.origin||!['/life/reminder-sw.js','/life/pwa-worker.php'].includes(source.pathname))continue;const subscription=await registration.pushManager?.getSubscription();if(subscription)out.push({registration,subscription});}
  return out.sort((a,b)=>a.registration.scope===location.origin+'/'?-1:b.registration.scope===location.origin+'/'?1:0);
 }
 export async function removeLifeSubscriptions(request){

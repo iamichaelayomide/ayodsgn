@@ -38,4 +38,4 @@ iPhone: open the same address in Safari; Share → Add to Home Screen; keep Open
 
 Internet is needed for planner edits, calendar sync and Ramble. Notifications retain their separate explicit settings toggle.
 
-Worker registration uses a release query (`?v=pwa1`) to avoid the previous unversioned worker cached by hosting. Subscription matching compares same-origin worker pathname so both legacy unversioned subscriptions and the new root registration are discovered. Worker and manifest bypass origin expiry rules.
+Hostinger overrides expiry headers for static JavaScript. Root registration therefore uses `/life/pwa-worker.php?v=1`, a public, session-free wrapper which emits the existing worker source with explicit no-store/no-cache and root-scope headers. The original reminder-sw.js remains for legacy subscriptions. Subscription matching accepts both same-origin worker paths, with queries ignored. App version 57, accounts 47 and PWA client 3 avoid older cached imports.
