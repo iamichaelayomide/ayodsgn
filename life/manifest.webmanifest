@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Life",
-  "short_name": "Life",
+  "name": "Ramble",
+  "short_name": "Ramble",
   "description": "Your tasks, goals and plans, in one place.",
   "lang": "en",
   "start_url": "/",

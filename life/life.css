@@ -259,3 +259,8 @@
 /* Keep navigation reachable while any planner view scrolls. */
 .workspace>main>.topbar{position:sticky;top:0;z-index:30;background:var(--paper)}
 @media(display-mode:standalone){.workspace>main>.topbar{top:env(safe-area-inset-top)}}
+
+/* Agreement is part of the form, before every sign-in action. */
+.email-auth-form .policy-accept{margin:0;font-weight:400;font-size:13px;line-height:1.6}.auth-card button:disabled{cursor:not-allowed;background:#eff0f4;color:#868a98;border-color:#e3e5ec;opacity:1}.auth-signature{white-space:nowrap}
+.goal-linked-tasks summary{display:flex;align-items:center;gap:10px;list-style:none}.goal-linked-tasks summary::-webkit-details-marker{display:none}.goal-linked-tasks summary::marker{content:''}.goal-linked-tasks summary .action-icon{width:22px;height:22px;flex:0 0 22px;margin:0}.goal-linked-tasks summary span{flex:1;min-width:0}.goal-tasks-chevron{width:16px;height:16px;flex:none;opacity:.65;transition:transform .15s}.goal-linked-tasks[open] .goal-tasks-chevron{transform:rotate(180deg)}
+.auth-mobile-signature{display:none}@media(max-width:800px){.auth-mobile-signature{display:block;font:30px/1 var(--serif);letter-spacing:-.7px;color:var(--blue);margin-bottom:24px}}

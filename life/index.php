@@ -9,10 +9,10 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
 <html lang="en">
 <head>
   <base href="/life/"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title><link rel="icon" href="/life/favicon.svg?v=1" type="image/svg+xml">
+  <meta name="robots" content="noindex,nofollow"><title>Ramble · ayo.dsgn</title><link rel="icon" href="/life/favicon.svg?v=1" type="image/svg+xml">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
-  <meta name="theme-color" content="#1f46d2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Life"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="apple-touch-icon" href="/life/pwa-icons/apple-touch-icon.png"><link rel="manifest" href="/life/manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./life.css?v=60"><script type="module" src="./app.js?v=59"></script>
+  <meta name="theme-color" content="#1f46d2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Ramble"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="apple-touch-icon" href="/life/pwa-icons/apple-touch-icon.png"><link rel="manifest" href="/life/manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
+  <link rel="stylesheet" href="./life.css?v=61"><script type="module" src="./app.js?v=60"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
@@ -20,20 +20,20 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
     <aside class="auth-visual" aria-label="Plan your life">
       <svg class="auth-playful-lines" viewBox="0 0 640 960" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><path d="M-130 95C80 275 555 15 464-86C368-192 18 57 126 280C230 500 704 383 702 212C700 47 418 148 427 453C436 758 846 693 796 555M-172 604C-20 468 265 352 286 478C311 626-45 836-64 696C-89 528 301 653 335 834C369 1004-11 1113-92 953M239 1091C170 805 518 619 594 769C670 919 427 1055 419 910"/></svg>
       <img class="auth-illustration" src="./images/auth-life-3d-v2.png" width="1280" height="1280" alt="" decoding="async" fetchpriority="high">
-      <span class="auth-signature">ayo.<em>life</em></span>
+      <span class="auth-signature">ayo.<em>ramble</em></span>
     </aside>
-    <div class="auth-form-pane"><div class="auth-card"><h1 id="auth-title">Create an <em>account.</em></h1>
+    <div class="auth-form-pane"><div class="auth-card"><span class="auth-mobile-signature">ayo.<em>ramble</em></span><h1 id="auth-title">Create an <em>account.</em></h1>
     <p id="auth-copy">Your tasks, goals and plans, in one place.</p>
     <form id="email-auth-form" class="email-auth-form">
       <label>Email<input id="email-auth-email" name="email" type="email" autocomplete="username" required maxlength="254" placeholder="you@example.com"></label>
       <label>Password<span class="password-input"><input id="email-auth-password" name="password" type="password" autocomplete="new-password" required minlength="12" maxlength="72" aria-describedby="email-password-hint"><button id="email-password-toggle" type="button" aria-controls="email-auth-password" aria-pressed="false">Show</button></span></label>
       <p id="email-password-hint" class="field-hint">Use at least 12 characters.</p>
+      <label class="policy-accept"><input id="policy-accept" type="checkbox"><span>I agree to Ramble’s <a href="/life/privacy.php" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/life/terms.php" target="_blank" rel="noopener">Terms of Service</a>.</span></label>
       <button id="email-auth-submit" class="primary" type="submit" disabled>Create account</button>
     </form>
     <div id="auth-divider" class="auth-divider" hidden><span>or</span></div>
-    <div id="google-auth-actions" class="google-auth-actions" hidden><button id="google-signup" class="google-login" type="button">Sign up with Google</button><button id="google-login" class="google-login" type="button" hidden>Log in with Google</button></div>
+    <div id="google-auth-actions" class="google-auth-actions" hidden><button id="google-signup" class="google-login" type="button" disabled>Sign up with Google</button><button id="google-login" class="google-login" type="button" disabled hidden>Log in with Google</button></div>
     <p id="auth-error" class="error" role="alert"></p>
-    <label class="policy-accept"><input id="policy-accept" type="checkbox"><span>I agree to Life’s <a href="/life/privacy.php" target="_blank" rel="noopener">Privacy Policy</a> and <a href="/life/terms.php" target="_blank" rel="noopener">Terms of Service</a>.</span></label>
     <input id="policy-privacy-version" type="hidden" value="<?=htmlspecialchars(LifeAccounts::PRIVACY_VERSION,ENT_QUOTES)?>"><input id="policy-terms-version" type="hidden" value="<?=htmlspecialchars(LifeAccounts::TERMS_VERSION,ENT_QUOTES)?>">
     <form id="auth-form" hidden>
       <label id="setup-label" hidden>One-time setup key<input name="token" type="password" autocomplete="off"></label>
