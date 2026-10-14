@@ -1,4 +1,4 @@
-import {ensureLifeRegistration,lifePushSubscriptions,removeLifeSubscriptions} from './pwa.js?v=1';
+import {ensureLifeRegistration,lifePushSubscriptions,removeLifeSubscriptions} from './pwa.js?v=2';
 export const plannerTimezone=()=>document.documentElement.dataset.timezone||'Africa/Lagos';
 export function createAccountSettings({request}) {
  let session;

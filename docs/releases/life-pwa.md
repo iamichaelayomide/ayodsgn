@@ -37,3 +37,5 @@ Android: open https://life.ayodsgn.com/ in Chrome; tap Install Life or Chrome's 
 iPhone: open the same address in Safari; Share → Add to Home Screen; keep Open as Web App enabled if offered; Add.
 
 Internet is needed for planner edits, calendar sync and Ramble. Notifications retain their separate explicit settings toggle.
+
+Worker registration uses a release query (`?v=pwa1`) to avoid the previous unversioned worker cached by hosting. Subscription matching compares same-origin worker pathname so both legacy unversioned subscriptions and the new root registration are discovered. Worker and manifest bypass origin expiry rules.
