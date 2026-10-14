@@ -12,7 +12,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="robots" content="noindex,nofollow"><title>My Life · ayo.dsgn</title><link rel="icon" href="/life/favicon.svg?v=1" type="image/svg+xml">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Sans:wght@500;600;700&family=Instrument+Serif:ital@0;1&display=swap">
   <meta name="theme-color" content="#1f46d2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Life"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="apple-touch-icon" href="/life/pwa-icons/apple-touch-icon.png"><link rel="manifest" href="/life/manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
-  <link rel="stylesheet" href="./applications.css?v=2"><link rel="stylesheet" href="./chat-mobile.css?v=1"><link rel="stylesheet" href="./life.css?v=62"><script type="module" src="./app.js?v=64"></script>
+  <link rel="stylesheet" href="./applications.css?v=2"><link rel="stylesheet" href="./chat-mobile.css?v=1"><link rel="stylesheet" href="./life.css?v=62"><script type="module" src="./app.js?v=65"></script>
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
