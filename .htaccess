@@ -1,4 +1,9 @@
 RewriteEngine On
+Options -Indexes
+# Development fixtures, maintenance commands and deployment metadata are never public routes.
+RewriteRule ^(?:tests|scripts|docs)(?:/|$) - [F,L,NC]
+RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
+RewriteRule \.(?:sql|sqlite|sqlite3|bak|log|pem|key)$ - [F,L,NC]
 RewriteRule ^\.git(?:/|$) - [F,L]
 # One canonical planner origin. Keep old bookmarks and invitations working.
 RewriteCond %{HTTP_HOST} ^(?:www\.)?ayodsgn\.com$ [NC]

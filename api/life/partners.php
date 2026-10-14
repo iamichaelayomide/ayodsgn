@@ -14,7 +14,7 @@ final class LifePartners {
         return ['id'=>$id,'token'=>$token,'expiresAt'=>$expires];
     }
     public function accept(string $id,string $token,string $password): array {
-        if(strlen($password)<14||strlen($password)>200)throw new LifeError('Use a passphrase between 14 and 200 characters.');
+        if(strlen($password)<14||strlen($password)>72||str_contains($password,"\0"))throw new LifeError('Use a passphrase between 14 and 72 bytes.');
         $p=$this->find($id);if(!$p||$p['revoked']||$p['password_hash']||$p['expires_at']<time()||!hash_equals($p['token_hash']??'',hash('sha256',$token)))throw new LifeError('This invitation is invalid, expired, or already used.',403);
         $this->store->db->beginTransaction();try {
             $q=$this->store->db->prepare('UPDATE life_partner SET password_hash=?,token_hash=NULL WHERE id=? AND owner_id=? AND token_hash=? AND revoked=0');$q->execute([password_hash($password,PASSWORD_DEFAULT),$id,$this->store->tenantId,$p['token_hash']]);if($q->rowCount()!==1)throw new LifeError('Invitation already used.',409);

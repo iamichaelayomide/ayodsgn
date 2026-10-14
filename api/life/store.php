@@ -34,7 +34,7 @@ final class LifeStore {
     }
     public function initialize(string $password): void {
         if($this->tenantId!==1)throw new LifeError('Owner setup is unavailable for this account.',403);
-        if (strlen($password) < 14 || strlen($password) > 200) throw new LifeError('Use a password or passphrase between 14 and 200 characters.');
+        if (strlen($password) < 14 || strlen($password) > 72 || str_contains($password,"\0")) throw new LifeError('Use a password or passphrase between 14 and 72 bytes.');
         $this->db->beginTransaction();
         try {
             if ($this->owner()) throw new LifeError('Owner setup is already complete.', 409);

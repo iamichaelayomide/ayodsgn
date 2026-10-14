@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-10-14T04:59:02.037352+00:00",
+  "method": "npm bulk advisory endpoint (CLI unavailable)",
+  "packageNames": 52,
+  "packageVersions": 52,
+  "advisories": {
+    "sharp": [
+      {
+        "id": 1193725,
+        "url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+        "title": "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545",
+        "severity": "high",
+        "vulnerable_versions": "<0.35.4",
+        "cwe": [
+          "CWE-122"
+        ],
+        "cvss": {
+          "score": 0,
+          "vectorString": null
+        }
+      },
+      {
+        "id": 1241331,
+        "url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+        "title": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+        "severity": "high",
+        "vulnerable_versions": "<0.35.5",
+        "cwe": [
+          "CWE-416",
+          "CWE-1395"
+        ],
+        "cvss": {
+          "score": 0,
+          "vectorString": null
+        }
+      }
+    ]
+  }
+}

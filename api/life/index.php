@@ -13,6 +13,7 @@ try {
         if (!$owner || !hash_equals(hash('sha256',$owner['password_hash']),$_SESSION['credential']??'')) { $_SESSION=[];session_regenerate_id(true);$_SESSION['csrf']=bin2hex(random_bytes(32)); }
     }
     if(isset($_SESSION['partner'])) { $p=(new LifePartners($store))->find($_SESSION['partner']); if(!$p||$p['revoked']||!hash_equals(hash('sha256',$p['password_hash']??''),$_SESSION['credential']??'')){$_SESSION=[];session_regenerate_id(true);$_SESSION['csrf']=bin2hex(random_bytes(32));}}
+    if(!$device->validSession($_SESSION,time())){$_SESSION=[];session_regenerate_id(true);$_SESSION['csrf']=bin2hex(random_bytes(32));life_device_cookie('',time()-3600);$store=life_store($config);$googleMembership=null;}
     life_keep_device($store->db);
     $signed=isset($_SESSION['owner'])||isset($_SESSION['partner'])||isset($_SESSION['userId']);$role=isset($_SESSION['partner'])||$googleMembership?'partner':'owner';
     $method=$_SERVER['REQUEST_METHOD']??'GET'; $action=$_GET['action']??'session';
@@ -42,7 +43,8 @@ try {
     if($action==='upload') {if(!$signed||$role!=='owner')throw new LifeError('Only the owner can upload files.',403);if(!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??''))throw new LifeError('Your session changed.',403);require __DIR__.'/attachments.php';life_json(life_upload($store,$config,$_POST));}
     if (stripos($_SERVER['CONTENT_TYPE']??'','application/json')!==0) throw new LifeError('Send JSON data.',415);
     if ((int)($_SERVER['CONTENT_LENGTH']??0)>150000) throw new LifeError('Request is too large.',413);
-    $input=json_decode(file_get_contents('php://input'),true,64,JSON_THROW_ON_ERROR);
+    $raw=file_get_contents('php://input',false,null,0,150001);if($raw===false||strlen($raw)>150000)throw new LifeError('Request is too large.',413);
+    $input=json_decode($raw,true,64,JSON_THROW_ON_ERROR);
     if (!is_array($input)) throw new LifeError('Invalid request.',400);
     if (!hash_equals($_SESSION['csrf'],$_SERVER['HTTP_X_CSRF_TOKEN']??'')) throw new LifeError('Your session changed. Reload and try again.',403);
     // Pause new accountability access while keeping existing records and sessions intact.

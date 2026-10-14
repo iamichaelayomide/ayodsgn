@@ -32,6 +32,16 @@ final class LifeRemember {
         if((int)$row['expires_at']<=$now||$credential===null||!hash_equals($row['credential_hash'],$credential)){$this->delete($row['id']);return null;}
         return $row+['identity'=>$identity];
     }
+    /** A resumed PHP session must not outlive the device login that authorized it. */
+    public function validSession(array $session,int $now): bool {
+        if(!isset($session['rememberId']))return true; // Older sessions acquire a device token below.
+        $id=$session['rememberId'];$identity=self::identity($session);
+        if(!is_string($id)||!preg_match('/^[a-f0-9]{32}$/D',$id)||$identity===null)return false;
+        $q=$this->db->prepare('SELECT identity_json,credential_hash,expires_at FROM life_device_login WHERE id=?');$q->execute([$id]);$row=$q->fetch(PDO::FETCH_ASSOC);
+        if(!$row||(int)$row['expires_at']<=$now)return false;
+        $stored=json_decode($row['identity_json'],true,8,JSON_THROW_ON_ERROR);$credential=$this->credential($identity);
+        return $stored===$identity&&$credential!==null&&hash_equals($row['credential_hash'],$credential);
+    }
     public function issue(array $identity,int $now): string {
         $credential=$this->credential($identity);if($credential===null)throw new LifeError('Sign in again to keep this device signed in.',401);
         $id=bin2hex(random_bytes(16));$secret=bin2hex(random_bytes(32));
