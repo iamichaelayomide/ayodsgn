@@ -222,3 +222,24 @@
 @media(max-width:800px){.sidebar{top:calc(12px + env(safe-area-inset-top));height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));padding-bottom:max(20px,env(safe-area-inset-bottom))}#life-update{left:12px;max-width:calc(100vw - 24px);gap:12px;padding:14px}#life-install-dialog{max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}}
 @media(display-mode:standalone){.voice-fab{right:calc(20px + env(safe-area-inset-right))}#life-update{left:calc(20px + env(safe-area-inset-left))}}
 @media(display-mode:standalone) and (max-width:600px){#task-dialog{inset:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);width:auto;height:auto}#task-dialog form{min-height:calc(100dvh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}}
+
+/* Give mobile board controls room instead of squeezing four actions into one row. */
+@media(max-width:800px){
+ .workspace[data-view=board] .page-heading{padding:24px 20px 16px}
+ .board-picker{display:grid;grid-template-columns:minmax(146px,1fr) minmax(0,1fr) 44px;gap:10px;padding:0 20px 16px;align-items:stretch}
+ .board-picker>label{grid-column:1/3;grid-row:1;max-width:none;width:100%;min-width:0;margin:0}
+ .board-picker .select-control{margin:0;width:100%}
+ .board-picker .select-trigger{position:relative;display:block;min-height:44px;margin:0;padding:10px 36px 10px 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .board-picker .select-trigger::after{position:absolute;right:16px;top:calc(50% - 5px);margin:0}
+ .board-picker .board-options{grid-column:3;grid-row:1;margin:0;width:44px}
+ .board-picker .board-options>summary{height:44px;padding:10px}
+ .board-picker #archive-board{grid-column:1;grid-row:2;min-width:0;min-height:44px;margin:0;padding:10px 8px;font-size:12px;gap:8px}
+ .board-picker #new-task{grid-column:2/4;grid-row:2;min-height:44px;margin:0;padding:10px 14px;font-size:14px}
+ .toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:0 20px 16px}
+ .toolbar .search{grid-column:1;grid-row:1;width:100%;min-width:0;height:44px;min-height:44px}
+ .toolbar .search input{font-size:16px;line-height:24px;height:42px;min-height:0;padding:8px 0!important}
+ .toolbar .board-filter-options{grid-column:2;grid-row:1}
+ .toolbar .board-filter-options>summary{min-height:44px}
+ .toolbar #task-count{grid-column:1;grid-row:2;margin:0;font-size:12px;line-height:1.5}
+ .toolbar #clear-filters{grid-column:2;grid-row:2;justify-self:end;margin:0}
+}
