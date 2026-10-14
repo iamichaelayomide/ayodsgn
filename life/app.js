@@ -33,13 +33,14 @@ const sprint = () => data.state.sprints[selectedWeek] || {goal:'',taskIds:[]};
 const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function announce(message) { $('announcement').textContent=message; setTimeout(()=>{$('announcement').textContent='';},4000); }
 function pageError(message) { $('page-error').textContent=message; $('page-error').hidden=!message; }
-async function request(action, body) {
+async function request(action, body, retrySession=true) {
   let response;
   try { response = await fetch(`${API}?action=${action}`,{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json','X-CSRF-Token':csrf}:{},body:body?JSON.stringify(body):undefined}); }
   catch { throw new Error('Connection interrupted. Your draft is still here. Please retry.'); }
   let result;
   try { result=await response.json(); } catch { throw new Error('The server could not respond. Your draft is preserved.'); }
   if (!response.ok) {
+    if(response.status===403&&result.error==='Your session changed. Reload and try again.'&&body&&retrySession){const session=await request('session',undefined,false);csrf=session.csrf;if(session.authenticated)return request(action,body,false);}
     const error=new Error(result.error || 'The request could not be completed.'); error.status=response.status;
     if (response.status===409 && action==='mutate') { conflict=true; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=false); }
     if (response.status===401 && action!=='login') { const openDialog=document.querySelector('dialog[open]'); if(openDialog){suspendedDialog=openDialog.id;openDialog.close();} const session=await request('session');csrf=session.csrf; $('workspace').hidden=true; $('auth').hidden=false; $('auth-copy').textContent='Your session ended. Sign in again to continue; your open draft is preserved.'; }

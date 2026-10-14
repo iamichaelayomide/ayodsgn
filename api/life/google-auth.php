@@ -38,7 +38,7 @@ final class LifeGoogleAuth {
             $account=$accounts->find($flow['accountId']);if(!$account||!hash_equals($account['google_sub']??'',$identity['sub']??''))throw new LifeError('Connect the same Google account you use to sign in.',403);
             require_once __DIR__.'/google-sync.php';$service=substr($flow['purpose'],8);(new LifeGoogleSync(new LifeStore($db,(int)$account['id'])))->connect($token,$service);
         }else {$account=$flow['purpose']==='link'?$accounts->linkGoogle((int)$flow['accountId'],$identity):$accounts->signIn($identity,$flow['timezone']);if($flow['purpose']==='login')$accounts->acceptPolicies((int)$account['id'],'google:'.hash('sha256',(string)$identity['sub']),$flow['privacyVersion']??'',$flow['termsVersion']??'');}
-        $pending=$flow['purpose']==='login'&&is_array($flow['invite']??null)?$flow['invite']:null;session_regenerate_id(true);$_SESSION=['userId'=>(int)$account['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time()];if($pending)$_SESSION['pendingPartnerInvite']=$pending;return $account;
+        $pending=$flow['purpose']==='login'&&is_array($flow['invite']??null)?$flow['invite']:null;session_regenerate_id(true);$_SESSION=['userId'=>(int)$account['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time()];if($pending)$_SESSION['pendingPartnerInvite']=$pending;require_once __DIR__.'/remember.php';life_keep_device($db);return $account;
     }
     public static function encrypt(array $token,int $accountId): string {
         $key=base64_decode(self::config()['encryptionKey']??'',true);if($key===false||strlen($key)!==32)throw new LifeError('Private Google token storage is not configured.',503);

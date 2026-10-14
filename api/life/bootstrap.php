@@ -28,7 +28,6 @@ function life_session(): void {
     // while keeping the cookie out of cross-site subrequests.
     session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>($_SERVER['HTTPS']??'')==='on','httponly'=>true,'samesite'=>'Lax']);
     session_start();
-    if ((isset($_SESSION['owner'])||isset($_SESSION['partner'])||isset($_SESSION['userId'])) && time()-($_SESSION['last_activity']??0)>3600) { $_SESSION=[]; session_regenerate_id(true); }
     $_SESSION['csrf']??=bin2hex(random_bytes(32));
     if ((isset($_SESSION['owner'])||isset($_SESSION['partner'])||isset($_SESSION['userId']))) $_SESSION['last_activity']=time();
 }
