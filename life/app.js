@@ -1,4 +1,4 @@
-import {createApplications} from './applications.js?v=1';
+import {createApplications} from './applications.js?v=2';
 import {installPWA,removeLifeSubscriptions} from './pwa.js?v=5';
 import {createTaskHistory} from './task-history.js?v=3';
 import {installCardDrag} from './card-drag.js?v=1';

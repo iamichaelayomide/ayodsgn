@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {uploadSelection,bindUploadCard} from '../life/application-upload.js';
+let checks=0;const check=(value)=>{assert.ok(value);checks++;};
+const file={name:'Sales CV.DOCX',size:2048};
+check(uploadSelection([file]).size==='2 KB');
+check(!!uploadSelection([]).error);
+check(!!uploadSelection([file,file]).error);
+check(!!uploadSelection([{name:'script.html',size:2048}]).error);
+check(!!uploadSelection([{name:'CV.pdf',size:5*1024*1024+1}]).error);
+check(!!uploadSelection([{name:'CV.pdf',size:0}]).error);
+check(uploadSelection([{name:'CV.pdf',size:5*1024*1024}]).size==='5.0 MB');
+function element(){const listeners={};return {hidden:false,disabled:false,textContent:'',files:[],listeners,classList:{toggle(){},add(){},remove(){}},addEventListener:(name,fn)=>listeners[name]=fn,contains:()=>false,focus(){this.focused=true;}};}
+const input=element(),card=element(),name=element(),help=element(),remove=element(),error=element(),submit=element();let busy=false;
+Object.defineProperty(input,'value',{set(value){if(value==='')this.files=[];}});
+const parts={'[name=file]':input,'.application-upload-card':card,'[data-upload-name]':name,'[data-upload-help]':help,'[data-upload-remove]':remove,'[data-upload-error]':error,'[type=submit]':submit,'form':{getAttribute:()=>String(busy)}};
+bindUploadCard({querySelector:selector=>parts[selector]});
+check(submit.disabled&&remove.hidden&&name.textContent==='Click to upload');
+input.files=[file];input.listeners.change();
+check(!submit.disabled&&!remove.hidden&&name.textContent==='Sales CV.DOCX');
+check(help.textContent==='2 KB · Click to replace');
+remove.listeners.click();check(input.files.length===0&&submit.disabled&&input.focused);
+card.listeners.drop({preventDefault(){},dataTransfer:{files:[file]}});check(input.files[0]===file&&!submit.disabled);
+card.listeners.drop({preventDefault(){},dataTransfer:{files:[file,file]}});check(input.files[0]===file&&!!error.textContent);
+busy=true;card.listeners.drop({preventDefault(){},dataTransfer:{files:[{name:'replacement.pdf',size:3000}]}});check(input.files[0]===file);
+busy=false;input.files=[{name:'invalid.exe',size:3000}];input.listeners.change();check(submit.disabled&&input.files.length===0&&!!error.textContent);
+console.log(`${checks} upload selection, drag/drop, replacement and saving-state checks passed`);
