@@ -8,16 +8,16 @@ import {installDateControls,chooseDate} from './date-controls.js?v=1';
 import {createAnalytics} from './analytics.js?v=2';
 import {installReminders} from './reminders.js?v=1';
 import {installTaskEditor} from './task-editor.js?v=2';
-import {installPolish} from './polish.js?v=43';
+import {installPolish} from './polish.js?v=44';
 import {createCompanion} from './companion.js?v=50';
 import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
-import {createGoals} from './goals.js?v=4';
+import {createGoals} from './goals.js?v=5';
 import {installNavigation} from './navigation.js?v=2';
 installNavigation();
-import {createCalendar} from './calendar.js?v=43';
+import {createCalendar} from './calendar.js?v=44';
 import {installSelects} from './selects.js?v=4';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
@@ -96,10 +96,10 @@ function taskCard(task) {
   const complete=task.checklist.filter(c=>c.done).length;
   return `<div class="task-shell" data-color="${escape(task.color||'pink')}"><button type="button" class="drag-handle" data-drag-task="${task.id}" aria-label="Drag task: ${escape(task.title)}" title="Drag to move"><img src="./icons/grip-vertical.svg" alt=""></button><button class="task-card" data-task="${task.id}" draggable="false" aria-label="Open task: ${escape(task.title)}"><span class="card-labels">${task.labels.map(l=>`<span class="tag">${escape(l)}</span>`).join('')}</span><strong data-rename-task="${task.id}" title="Double-click to rename">${escape(task.title)}</strong>${(task.dependencies||[]).length?`<span class="blocked-note">${task.dependencies.filter(id=>{const t=data.state.tasks.find(t=>t.id===id);return t&&!data.state.lists.find(l=>l.id===t.listId)?.isDone;}).length} unfinished dependencies</span>`:''}${task.blocker?`<span class="blocked-note">Blocked: ${escape(task.blocker)}</span>`:''}<span class="card-meta"><span class="priority ${task.priority}">${escape(task.priority)} priority</span>${task.dueDate?`<span class="due ${task.dueDate<today()?'overdue':''}">${task.dueDate<today()?'Overdue · ':''}${dayLabel(task.dueDate)}</span>`:''}${task.checklist.length?`<span class="check-progress">${complete}/${task.checklist.length} done</span>`:''}</span></button>${task.checklist.length?`<div class="card-checklist">${task.checklist.map(c=>`<label class="card-check"><input type="checkbox" data-check-task="${task.id}" data-check-item="${c.id}" ${role==='partner'?'disabled':''} ${c.done?'checked':''}><span>${escape(c.text)}</span></label>`).join('')}</div>`:''}</div>`;
 }
-const planning = createCalendar({getData:()=>data,today,mutate,openTask,refreshSelects,escape});
+const planning = createCalendar({getData:()=>data,today,mutate,openTask,createTask:date=>openTask('','',{dueDate:date}),refreshSelects,escape});
 const routines=createRoutines({getData:()=>data,mutate,escape,refreshSelects,today});
 const accountability=createAccountability({getData:()=>data,request,mutate,escape,role:()=>role});
-const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,week:()=>selectedWeek});
+const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,openTask,week:()=>selectedWeek});
 const thinking=createThinking({getData:()=>data,mutate,escape,refreshSelects,role:()=>role,openTask,week:()=>selectedWeek});
 installPolish();installDateControls({refreshSelects});installTaskEditor({request,refreshSelects});installUploadPolish();installReminders({request,openTask,isOwner:()=>role==='owner'&&!!data});
 const analytics=createAnalytics({getData:()=>data,escape,week:()=>data.week,openGoal:id=>goals.open(id)});
@@ -112,7 +112,7 @@ function render() {
  document.querySelector('.week-picker-line').hidden=view!=='week';
  $('analytics').hidden=view!=='analytics';
  $('workspace').dataset.view=view;const newTask=$('new-task');newTask.hidden=['today','goals','analytics','companion','calendar','routines','week'].includes(view);(view==='board'?document.querySelector('.board-picker'):document.querySelector('.page-heading')).append(newTask);
- document.dispatchEvent(new Event('life:board-toolbar'));
+ $('archive-board').hidden=data.state.boards.filter(b=>!b.archived).length<2;$('archive-board').disabled=$('archive-board').hidden;document.dispatchEvent(new Event('life:board-toolbar'));
  $('workspace').classList.toggle('ramble-view',view==='companion');
  $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Ramble';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
 
@@ -179,11 +179,11 @@ function checklistRow(item={text:'',done:false,id:''}) {
   row.innerHTML=`<input type="checkbox" aria-label="Checklist item completed" ${item.done?'checked':''}><input type="text" aria-label="Checklist item text" maxlength="300" value="${escape(item.text)}" required><button type="button" aria-label="Remove checklist item" title="Delete checklist item"><img class="action-icon" src="./icons/trash.svg" alt=""></button>`;
   row.querySelector('button').addEventListener('click',()=>row.remove());$('checklist').append(row);return row;
 }
-function openTask(id='',listId='') {
+function openTask(id='',listId='',defaults={}) {
   const task=data.state.tasks.find(t=>t.id===id), form=$('task-form'); form.reset();$('task-error').textContent='';$('checklist').replaceChildren();
   $('attachment-list').innerHTML=(data.state.attachments||[]).filter(a=>!a.archived&&a.taskId===id).map(a=>`<p><a href="${API}?action=attachment&id=${a.id}">${escape(a.name)}</a></p>`).join('')||'<p>No attachments yet.</p>';$('upload-attachment').disabled=!id||role==='partner';
   form.elements.listId.innerHTML=order(data.state.lists.filter(l=>!l.archived)).map(l=>`<option value="${l.id}">${escape((data.state.boards.find(b=>b.id===(l.boardId||data.state.board.id))?.name||'')+' · '+l.name)}</option>`).join('');
-  for(const key of ['id','title','notes','blocker','priority','dueDate'])form.elements[key].value=task?.[key]??(key==='priority'?'normal':'');
+  for(const key of ['id','title','notes','blocker','priority','dueDate'])form.elements[key].value=task?.[key]??defaults[key]??(key==='priority'?'normal':'');
   form.elements.listId.value=task?.listId||listId||mobileList||activeLists()[0].id;
   const peers=order(data.state.tasks.filter(t=>!t.archived&&t.listId===form.elements.listId.value));form.elements.position.value=task?peers.findIndex(t=>t.id===task.id)+1:peers.length+1;
   form.elements.dependencies.innerHTML=data.state.tasks.filter(t=>!t.archived&&t.id!==id).map(t=>`<option value="${t.id}" ${(task?.dependencies||[]).includes(t.id)?'selected':''}>${escape(t.title)}</option>`).join('');

@@ -25,7 +25,7 @@ export function installPolish(){
  form.addEventListener('invalid',e=>{const area=e.target.closest('.task-detail-panels>section');if(area){area.hidden=false;actions.querySelector(`[aria-controls="${area.id}"]`)?.setAttribute('aria-expanded','true');}},true);
  const picker=document.querySelector('.board-picker'),toolbar=document.querySelector('.toolbar');
  const options=document.createElement('details');options.className='board-options';options.innerHTML='<summary aria-label="Board options"><img class="action-icon" src="./icons/more.svg" alt=""></summary><div class="board-options-items"></div>';
- ['new-board','new-list'].forEach(id=>options.querySelector('div').append(document.getElementById(id)));picker.append(document.getElementById('new-task'),options);
+ ['new-board','new-list','archive-board'].forEach(id=>options.querySelector('div').append(document.getElementById(id)));picker.append(document.getElementById('new-task'),options);
  const filters=document.createElement('details');filters.className='board-filter-options';filters.innerHTML='<summary><img class="action-icon" src="./icons/filter.svg" alt=""><span>Filters</span><span id="active-filter-count" hidden></span></summary><div></div>';
  ['priority-filter','label-filter'].forEach(id=>filters.querySelector('div').append(document.getElementById(id).closest('label')));toolbar.querySelector('.search').after(filters);
  const search=document.querySelector('.search-icon');const img=document.createElement('img');img.src='./icons/search-normal.svg';img.alt='';img.className='search-icon';search.replaceWith(img);
