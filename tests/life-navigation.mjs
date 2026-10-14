@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';import {createNavigationHistory} from '../life/navigation-history.js';
+const history=createNavigationHistory(3);
+const filtered={tab:'opportunities',tracker:'jobs',filter:'applied',query:'sales',selected:''};
+history.remember(filtered);filtered.query='changed';
+assert.equal(history.canBack,true);
+assert.equal(history.back().query,'sales');
+assert.equal(history.canBack,false);assert.equal(history.back(),null);
+history.remember({view:'board'});history.remember({view:'goals'});history.remember({view:'applications',applications:{tab:'trackers'}});
+const saved=history.snapshot();history.clear();assert.equal(history.canBack,false);history.restore(saved);saved[2].view='other';
+assert.equal(history.back().view,'applications');assert.equal(history.back().view,'goals');assert.equal(history.back().view,'board');
+history.remember({tab:'trackers'});history.remember({tab:'trackers'});history.remember({tab:'opportunities',tracker:'jobs'});history.remember({selected:'opportunity'});
+assert.equal(history.back().selected,'opportunity');assert.equal(history.back().tracker,'jobs');assert.equal(history.back().tab,'trackers');assert.equal(history.back(),null);
+for(let i=0;i<5;i++)history.remember({view:String(i)});assert.deepEqual(history.snapshot().map(e=>e.view),['2','3','4']);
+console.log('13 back-navigation, origin-filter, snapshot and bounded-history checks passed');

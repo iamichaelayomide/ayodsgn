@@ -266,3 +266,15 @@
 .auth-mobile-signature{display:none}@media(max-width:800px){.auth-mobile-signature{display:block;font:30px/1 var(--serif);letter-spacing:-.7px;color:var(--blue);margin-bottom:24px}}
 /* Quiet login-first onboarding with compact alternate sign-in spacing. */
 .auth-card .auth-divider{margin:10px 0}.auth-card .email-auth-form .policy-accept{margin-top:0!important}.auth-card .email-auth-form{gap:16px!important}
+/* Back and breadcrumb controls share the app's sticky top bar. */
+.topbar{gap:12px}
+.topbar .app-back-button{display:grid;place-items:center;flex:none;width:40px;height:44px;min-height:44px;padding:8px;border:0;background:transparent}
+.app-back-button svg{width:22px;height:22px}
+.topbar .app-breadcrumbs{display:flex;align-items:center;gap:8px;min-width:0;flex:1;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.app-breadcrumbs::-webkit-scrollbar{display:none}
+.app-breadcrumbs button{font-size:12px;border:0;background:transparent;padding:8px 4px;min-height:44px;white-space:nowrap;flex:none}
+.app-breadcrumbs button:hover{color:var(--blue)}
+#breadcrumb{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px}
+.breadcrumb-separator{color:var(--muted);flex:none}
+#breadcrumb [aria-current=page]{overflow:hidden;text-overflow:ellipsis;max-width:240px;white-space:nowrap}
+@media(max-width:800px){.topbar{gap:6px}.topbar .app-back-button{width:32px;padding:6px}.app-breadcrumbs button,#breadcrumb{font-size:11px}.topbar .app-breadcrumbs,#breadcrumb{gap:6px}#breadcrumb [aria-current=page]{max-width:150px}.topbar #save-status{font-size:10px;max-width:80px;white-space:normal;text-align:right;flex:none}}
