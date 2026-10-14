@@ -8,7 +8,7 @@ function harness({scope='/',active=false,offline=false,bad=false}={}){
  const cache={put:async(k,v)=>stored.set(k,v),match:async k=>stored.get(k)};
  const self={location:new URL('https://life.test/life/reminder-sw.js'),registration:{scope:'https://life.test'+scope,active,showNotification:async(...args)=>notice=args},addEventListener:(k,f)=>listeners[k]=f,skipWaiting:async()=>skips++,clients:{claim:async()=>claimed++,matchAll:async()=>[],openWindow:async u=>opened=u}};
  const fetch=async (request,options)=>{calls.push({request,options});if(offline)throw Error('offline');const path=typeof request==='string'?request:new URL(request.url).pathname;return {ok:true,redirected:false,url:'https://life.test'+path,headers:new Headers({'content-type':path.endsWith('.html')?'text/html':path.endsWith('.css')?'text/css':'image/png','cache-control':bad?'private,no-store':'public'}),publicPath:path};};
- vm.runInNewContext(source,{self,URL,Headers,Response,fetch,caches:{open:async()=>cache,keys:async()=>['life-public-pwa-old','unrelated-cache','life-public-pwa-v2'],delete:async k=>removed.push(k)}});
+ vm.runInNewContext(source,{self,URL,Headers,Response,fetch,caches:{open:async()=>cache,keys:async()=>['life-public-pwa-old','unrelated-cache','life-public-pwa-v3'],delete:async k=>removed.push(k)}});
  const event=async(type,extra={})=>{let promise,handled=false;listeners[type]({...extra,waitUntil:p=>promise=p,respondWith:p=>{promise=p;handled=true;}});return {value:await promise,handled};};
  return {event,stored,calls,removed,get skips(){return skips;},get claimed(){return claimed;},get opened(){return opened;},get notice(){return notice;}};
 }
