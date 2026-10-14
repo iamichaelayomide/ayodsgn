@@ -39,3 +39,7 @@ iPhone: open the same address in Safari; Share → Add to Home Screen; keep Open
 Internet is needed for planner edits, calendar sync and Ramble. Notifications retain their separate explicit settings toggle.
 
 Hostinger overrides expiry headers for static JavaScript. Root registration therefore uses `/life/pwa-worker.php?v=1`, a public, session-free wrapper which emits the existing worker source with explicit no-store/no-cache and root-scope headers. The original reminder-sw.js remains for legacy subscriptions. Subscription matching accepts both same-origin worker paths, with queries ignored. App version 57, accounts 47 and PWA client 3 avoid older cached imports.
+
+## Live verification — 14 October 2026
+
+Published code release: 11ca6116b8e15fbb553ad8ebc88404c6d21d7b96. Live HTML serves app version 57. The worker endpoint returns 200, application/javascript, Service-Worker-Allowed: /, Cache-Control: no-cache, no-store, max-age=0, must-revalidate and CDN-Cache-Control: no-store. The manifest and all four PNG icons return 200 with the expected content types. Chrome successfully installed the waiting root worker, displayed Update ready and activated it after an explicit Update Life click; the banner then disappeared after reload. No new worker registration error occurred. Hostinger cache was cleared during verification; no SSH access or deployment keys were created. Actual-device checks remain outstanding.
