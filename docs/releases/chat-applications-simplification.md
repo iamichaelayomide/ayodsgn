@@ -1,0 +1,13 @@
+# Chat and Applications simplification — 14 October 2026
+
+Mobile chat now uses a bounded viewport with an independently scrolling transcript/list. Visual viewport height and offset track keyboard changes; safe areas are retained. The composer grows for multiline drafts and remains above the bottom edge. At short viewport heights, starter suggestions are hidden. Chat search has an inset icon and an accessible hidden label; the back control uses a consistent chevron and 44px touch target. Feature CSS loads after legacy CSS to avoid competing layout rules.
+
+Applications has three distinct views: Opportunities (default), Trackers (overview and counts), and Documents. The manage action is an accessible icon at the far right. Search is one row; tracker selection and collapsed filters replace the long row of tracker tabs. Opportunity and document cards use matching surfaces. Document archive/restore sits at the right of each card header. Documents can be searched by name and kind.
+
+Opportunity creation/editing initially shows exactly four fields: name, application status, optional deadline and optional link. Add more details reveals tracker/category, organisation and opening status. Optional dates, descriptions and preparation each have their own small disclosure, with no group exceeding four fields. All existing fields remain in the form, so editing the short form preserves stored optional details. Dates now keep their original control type when enhanced, avoiding the incorrect Choose time label on date fields.
+
+No schema, account, provider or notification configuration changes. Entry app.js v66; Applications module/CSS v3; companion.js v52; chat-mobile.css v2; date-controls.js v2. Rollback checkpoint: d6571a9ec48c1d723252a02869011818bfee9683.
+
+Verification: application, account, ownership/security, command, voice and Google backend suites pass in isolated PHP-WASM. Application filtering (12), starter suggestions (8), upload handling (15), PWA privacy (42) and 15 real local HTTP/multipart checks pass. Chrome browser checks verify short-form creation with deadline/link, compact editing preserving organisation/description/checklist, search, tracker management and document card rendering. Phone previews at 375/390px and a 440px-high keyboard-space simulation keep the composer within the viewport with no horizontal overflow. These previews do not substitute for physical iPhone keyboard verification. Browser console reported no errors.
+
+The portfolio-wide build script cannot complete in this sparse workspace because its pre-existing projects/index.html file is absent. Changed module syntax and whitespace checks pass; all relevant PHP files parse. Live deployment and verification are recorded in the accompanying local evidence.
