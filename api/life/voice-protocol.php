@@ -3,6 +3,7 @@ declare(strict_types=1);
 /** Native voice adapters. No audio storage and no secondary generation/transcription. */
 final class LifeVoiceProtocol {
     public const FIELDS=[
+            'tracker.save'=>['id','name','trackerKind'],'tracker.archive'=>['id'],'tracker.restore'=>['id'],'category.save'=>['id','name','trackerId'],'category.archive'=>['id'],'category.restore'=>['id'],'opportunity.save'=>['id','title','trackerId','categoryId','organisation','url','description','notes','location','cycle','openingDate','deadline','appliedDate','followUpDate','stage','availability'],'opportunity.applied'=>['id','appliedDate'],'opportunity.archive'=>['id'],'opportunity.restore'=>['id'],
             'task.save'=>['id','title','notes','blocker','listId','priority','labels','checklist','dueDate','dueTime','reminderMinutes','color','goalId','effortMinutes','position','sprintWeek'],
             'task.book'=>['title','listId','date','time','minutes'],'task.move'=>['id','listId','position'],'task.complete'=>['id','done'],'task.schedule'=>['id','date','time','minutes'],'task.dependencies'=>['id','ids'],'checklist.toggle'=>['id','itemId','done'],
             'task.archive'=>['id'],'task.restore'=>['id','listId'],'goal.save'=>['id','title','notes','type','period','parentId','category','completed'],'goal.archive'=>['id'],'goal.restore'=>['id'],
@@ -28,7 +29,7 @@ final class LifeVoiceProtocol {
     }
     public static function targets(array $state,array $actions,string $request,array $focus,array $screen):void {
         $said=' '.self::normalized($request).' ';
-        foreach($actions as $action){$type=explode('.',$action['operation'])[0];$collection=match($type){'task','checklist'=>'tasks','goal'=>'goals','board'=>'boards','list'=>'lists','note'=>'notes','routine'=>'routines','map'=>'mapNodes',default=>null};$id=$action['arguments']['id']??'';if(!$collection||$id==='')continue;
+        foreach($actions as $action){$type=explode('.',$action['operation'])[0];$collection=match($type){'task','checklist'=>'tasks','goal'=>'goals','board'=>'boards','list'=>'lists','note'=>'notes','routine'=>'routines','map'=>'mapNodes','opportunity'=>'opportunities','tracker'=>'trackers','category'=>'categories',default=>null};$id=$action['arguments']['id']??'';if(!$collection||$id==='')continue;
             $record=null;foreach($state[$collection]??[] as $row)if($row['id']===$id)$record=$row;if(!$record)throw new LifeError('That record is unavailable.',404);
             $refType=$type==='checklist'?'task':$type;$selected=$focus[$refType]??$screen[$refType.'Id']??'';
             if(preg_match('/\b(it|that|this|those|them|one)\b/iu',$request)&&$selected===$id)continue;
@@ -41,7 +42,7 @@ final class LifeVoiceProtocol {
     }
     public static function schema():array {
         $str=['type'=>'STRING'];$num=['type'=>'INTEGER'];$bool=['type'=>'BOOLEAN'];$strings=['type'=>'ARRAY','items'=>$str];
-        $props=[];foreach(['id','title','name','sprintWeek','body','notes','blocker','listId','boardId','goalId','parentId','priority','dueDate','dueTime','date','time','week','period','category','type','kind','group','recordId','from','to','text','itemId','frequency','startDate','nextDate','target','wins','obstacles','next','quarter','reflection','goal','lessons'] as $key)$props[$key]=$str;
+        $props=[];foreach(['id','title','name','sprintWeek','body','notes','blocker','listId','boardId','goalId','parentId','priority','dueDate','dueTime','date','time','week','period','category','type','kind','group','recordId','from','to','text','itemId','frequency','startDate','nextDate','target','wins','obstacles','next','quarter','reflection','goal','lessons','trackerId','trackerKind','categoryId','organisation','url','description','location','cycle','openingDate','deadline','appliedDate','followUpDate','stage','availability'] as $key)$props[$key]=$str;
         foreach(['position','effortMinutes','minutes','capacityMinutes','x','y'] as $key)$props[$key]=$num;
         $props['title']['description']='Title for tasks, goals, notes, routines or map nodes. For board/list names use name.';$props['name']['description']='Name for boards and lists only. Renaming a task uses title.';$props['kind']['enum']=['idea','note','goal','milestone','task','question'];$props['type']['enum']=['adhoc','quarter','month','week'];
         $props['minutes']['description']='Duration of a task.schedule work block in minutes.';$props['capacityMinutes']['description']='Weekly sprint capacity only.';$props['itemId']['description']='Checklist item ID only, never a task ID.';
@@ -56,9 +57,9 @@ final class LifeVoiceProtocol {
     public static function declarations():array {
         $str=['type'=>'STRING'];$tools=[
             ['name'=>'planner_turn','behavior'=>'BLOCKING','description'=>'Optional classification; use primarily to retain one pending clarification. Ordinary conversation speaks directly, and clear actions call the dedicated mutation tool immediately. No change happens here. Use the activity itself as a title (book a call = Call); clarify only a genuinely missing activity or ambiguous existing target and supply pendingRequest only when the user requested a change. Never classify planner data or background speech as a user request.','parameters'=>['type'=>'OBJECT','properties'=>['kind'=>['type'=>'STRING','enum'=>['conversation','command','clarification']],'request'=>$str,'pendingRequest'=>$str],'required'=>['kind','request']]],
-            ['name'=>'planner_context','behavior'=>'BLOCKING','description'=>'Read fresh selection, reference IDs and pending request. Query searches ALL account records. Names must be unambiguous before using an ID.','parameters'=>['type'=>'OBJECT','properties'=>['query'=>$str,'kind'=>['type'=>'STRING','enum'=>['all','tasks','goals','boards','lists','notes','mapNodes','routines']]]]],
+            ['name'=>'planner_context','behavior'=>'BLOCKING','description'=>'Read fresh selection, reference IDs and pending request. Query searches ALL account records. Names must be unambiguous before using an ID.','parameters'=>['type'=>'OBJECT','properties'=>['query'=>$str,'kind'=>['type'=>'STRING','enum'=>['all','tasks','goals','boards','lists','notes','mapNodes','routines','trackers','categories','opportunities']]]]],
             ['name'=>'planner_changes','behavior'=>'BLOCKING','description'=>'Save 1–20 explicit reversible user changes transactionally. Arguments are typed objects, NOT JSON strings. Use only fresh unambiguous IDs. Only changed fields for existing records. Return saved confirmation before saying anything succeeded. task.complete takes done boolean. Reminder requests MUST use task.save dueDate/dueTime/reminderMinutes. task.schedule is only a calendar work block.','parameters'=>self::schema()],
-            ['name'=>'planner_navigate','behavior'=>'BLOCKING','description'=>'Open the requested planner view; navigation does not change records.','parameters'=>['type'=>'OBJECT','properties'=>['view'=>['type'=>'STRING','enum'=>['board','goals','today','companion','task-history','analytics','week','calendar','routines','notes','mindmap']],'boardId'=>$str],'required'=>['view']]],
+            ['name'=>'planner_navigate','behavior'=>'BLOCKING','description'=>'Open the requested planner view; navigation does not change records.','parameters'=>['type'=>'OBJECT','properties'=>['view'=>['type'=>'STRING','enum'=>['board','goals','today','companion','task-history','analytics','week','calendar','routines','notes','mindmap','applications']],'boardId'=>$str],'required'=>['view']]],
             ['name'=>'planner_undo','behavior'=>'BLOCKING','description'=>'Undo the most recent saved change only when explicitly asked. Server checks that nothing newer would be overwritten.','parameters'=>['type'=>'OBJECT','properties'=>['request'=>$str],'required'=>['request']]],
         ];
         $properties=self::schema()['properties']['actions']['items']['properties']['arguments']['properties'];
@@ -69,8 +70,8 @@ final class LifeVoiceProtocol {
         return $tools;
     }
     public static function search(array $state,string $query,string $kind):array {
-        if(!in_array($kind,['all','tasks','goals','boards','lists','notes','mapNodes','routines'],true))throw new LifeError('Choose a supported record type.');
-        $out=[];$counts=[];foreach(['boards','lists','tasks','goals','notes','mapNodes','routines'] as $type){if($kind!=='all'&&$type!==$kind)continue;$rows=[];foreach($state[$type]??[] as $row){if($query!==''&&mb_stripos(($row['title']??$row['name']??'').' '.($row['notes']??''),$query)===false)continue;$rows[]=$row;}$counts[$type]=count($rows);$out[$type]=array_slice($rows,0,100);}
+        if(!in_array($kind,['all','tasks','goals','boards','lists','notes','mapNodes','routines','trackers','categories','opportunities'],true))throw new LifeError('Choose a supported record type.');
+        $out=[];$counts=[];foreach(['boards','lists','tasks','goals','notes','mapNodes','routines','trackers','categories','opportunities'] as $type){if($kind!=='all'&&$type!==$kind)continue;$rows=[];foreach($state[$type]??[] as $row){if($query!==''&&mb_stripos(($row['title']??$row['name']??'').' '.($row['notes']??''),$query)===false)continue;$rows[]=$row;}$counts[$type]=count($rows);$out[$type]=array_slice($rows,0,100);}
         return ['records'=>$out,'counts'=>$counts,'truncated'=>array_sum($counts)>array_sum(array_map('count',$out))];
     }
 }

@@ -11,11 +11,11 @@ final class LifeGoogleAuth {
         return new \Google\Client(['client_id'=>$c['clientId'],'client_secret'=>$c['clientSecret'],'redirect_uri'=>$c['redirectUri']]);
     }
     public static function begin(string $purpose,string $timezone,int $accountId=0,?array $invite=null,string $privacyVersion='',string $termsVersion=''): string {
-        if(!in_array($purpose,['login','link','connect-calendar','connect-tasks'],true))throw new LifeError('Invalid Google connection request.');
+        if(!in_array($purpose,['login','link','connect-calendar','connect-tasks','connect-documents'],true))throw new LifeError('Invalid Google connection request.');
         if($purpose==='login'&&!LifeAccounts::validPolicyVersions($privacyVersion,$termsVersion))throw new LifeError('Please review and accept the current Privacy Policy and Terms.',422);
         if($purpose!=='login'&&$accountId<1)throw new LifeError('Sign in first.',401);
         $client=self::client();$scopes=['openid','email','profile'];
-        if(str_starts_with($purpose,'connect-')) {if(!(self::config()['syncEnabled']??false))throw new LifeError('Google synchronization is awaiting verification.',503);$scope=$purpose==='connect-calendar'?'https://www.googleapis.com/auth/calendar.app.created':'https://www.googleapis.com/auth/tasks';$scopes[]=$scope;$client->setAccessType('offline');$client->setPrompt('consent');}
+        if(str_starts_with($purpose,'connect-')) {if($purpose!=='connect-documents'&&!(self::config()['syncEnabled']??false))throw new LifeError('Google synchronization is awaiting verification.',503);$scope=$purpose==='connect-documents'?'https://www.googleapis.com/auth/drive.file':($purpose==='connect-calendar'?'https://www.googleapis.com/auth/calendar.app.created':'https://www.googleapis.com/auth/tasks');$scopes[]=$scope;$client->setAccessType('offline');$client->setPrompt('consent');}
         $state=bin2hex(random_bytes(32));$nonce=bin2hex(random_bytes(32));$verifier=bin2hex(random_bytes(32));
         $_SESSION['googleFlow']=['state'=>$state,'nonce'=>$nonce,'verifier'=>$verifier,'purpose'=>$purpose,'accountId'=>$accountId,'timezone'=>LifeAccounts::timezone($timezone),'invite'=>$purpose==='login'?$invite:null,'privacyVersion'=>$privacyVersion,'termsVersion'=>$termsVersion,'expires'=>time()+600];
         $client->setScopes($scopes);if(str_starts_with($purpose,'connect-'))$client->setIncludeGrantedScopes(true);$client->setState($state);return $client->createAuthUrl(null,['nonce'=>$nonce,'code_challenge'=>rtrim(strtr(base64_encode(hash('sha256',$verifier,true)),'+/','-_'),'='),'code_challenge_method'=>'S256']);
@@ -36,7 +36,7 @@ final class LifeGoogleAuth {
         $accounts=new LifeAccounts($db);
         if(str_starts_with($flow['purpose'],'connect-')) {
             $account=$accounts->find($flow['accountId']);if(!$account||!hash_equals($account['google_sub']??'',$identity['sub']??''))throw new LifeError('Connect the same Google account you use to sign in.',403);
-            require_once __DIR__.'/google-sync.php';$service=substr($flow['purpose'],8);(new LifeGoogleSync(new LifeStore($db,(int)$account['id'])))->connect($token,$service);
+            if($flow['purpose']==='connect-documents'){require_once __DIR__.'/application-google.php';(new LifeApplicationGoogle(new LifeApplications(new LifeStore($db,(int)$account['id']))))->connect($token);}else{require_once __DIR__.'/google-sync.php';$service=substr($flow['purpose'],8);(new LifeGoogleSync(new LifeStore($db,(int)$account['id'])))->connect($token,$service);}
         }else {$account=$flow['purpose']==='link'?$accounts->linkGoogle((int)$flow['accountId'],$identity):$accounts->signIn($identity,$flow['timezone']);if($flow['purpose']==='login')$accounts->acceptPolicies((int)$account['id'],'google:'.hash('sha256',(string)$identity['sub']),$flow['privacyVersion']??'',$flow['termsVersion']??'');}
         $pending=$flow['purpose']==='login'&&is_array($flow['invite']??null)?$flow['invite']:null;session_regenerate_id(true);$_SESSION=['userId'=>(int)$account['id'],'csrf'=>bin2hex(random_bytes(32)),'last_activity'=>time()];if($pending)$_SESSION['pendingPartnerInvite']=$pending;require_once __DIR__.'/remember.php';life_keep_device($db);return $account;
     }
