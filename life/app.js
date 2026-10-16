@@ -1,5 +1,5 @@
 import {createNavigationHistory} from './navigation-history.js?v=1';
-import {createApplications} from './applications.js?v=4';
+import {createApplications} from './applications.js?v=5';
 import {installPWA,removeLifeSubscriptions} from './pwa.js?v=5';
 import {createTaskHistory} from './task-history.js?v=3';
 import {installCardDrag} from './card-drag.js?v=1';
