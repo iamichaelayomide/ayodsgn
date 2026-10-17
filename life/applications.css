@@ -170,3 +170,13 @@
 #applications .applications-summary .application-summary-card{display:flex;align-items:flex-start;justify-content:flex-start}
 #applications .application-tracker .application-tracker-open{display:grid;align-items:center;justify-content:stretch}
 @media(max-width:800px){.workspace[data-view=applications] #breadcrumb-home{display:none}.workspace[data-view=applications] #breadcrumb>.breadcrumb-separator:first-child{display:none}}
+
+/* Type and named tracker are separate, visible scopes. */
+.applications-controls{grid-template-columns:minmax(180px,1fr) minmax(140px,180px) minmax(150px,200px) auto;align-items:end}
+.applications-controls>label:not(.application-search){font-size:12px;gap:8px;color:var(--muted)}
+.applications-controls .select-trigger{color:var(--body)}
+#applications button,.applications-dialog button{touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform 120ms cubic-bezier(.23,1,.32,1),opacity 120ms cubic-bezier(.23,1,.32,1)}
+#applications button:active:not(:disabled):not(:focus-visible),.applications-dialog button:active:not(:disabled):not(:focus-visible){transform:scale(.98)}
+@media(max-width:1050px){.applications-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}.applications-controls .application-search{grid-column:1/-1}}
+@media(max-width:600px){.applications-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.applications-controls .application-filters{grid-column:1/-1;justify-self:start}.applications-controls select,.applications-controls .select-trigger{font-size:16px}.applications-controls .select-control{min-width:0}}
+@media(prefers-reduced-motion:reduce){#applications button,.applications-dialog button{transition:opacity 120ms ease}#applications button:active:not(:disabled):not(:focus-visible),.applications-dialog button:active:not(:disabled):not(:focus-visible){transform:none}}

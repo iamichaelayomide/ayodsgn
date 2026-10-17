@@ -1,10 +1,11 @@
 export const stageName=(tracker,key)=>tracker?.stages.find(s=>s.id===key)?.name||key;
-export function opportunities(state,{tracker='',category='',stage='',query='',view='all',today=''}={}){
+export function opportunities(state,{tracker='',kind='',category='',stage='',query='',view='all',today=''}={}){
  const activeTrackers=new Set(state.trackers.filter(t=>!t.archived).map(t=>t.id));
  const activeCategories=new Set(state.categories.filter(c=>!c.archived).map(c=>c.id));
  return state.opportunities.filter(o=>{
   const archived=o.archived||!activeTrackers.has(o.trackerId)||(o.categoryId&&!activeCategories.has(o.categoryId));
   if((view==='archived')!==Boolean(archived))return false;
+  if(kind&&(state.trackers.find(t=>t.id===o.trackerId)?.kind||'jobs')!==kind)return false;
   if(tracker&&o.trackerId!==tracker||category&&o.categoryId!==category||stage&&o.stage!==stage)return false;
   if(view==='not-applied'&&o.appliedDate||view==='applied'&&!o.appliedDate||view==='upcoming'&&o.availability!=='upcoming')return false;
   if(view==='deadlines'&&(!o.deadline||o.deadline<today||o.deadline>new Date(new Date(today+'T12:00:00Z').getTime()+7*86400000).toISOString().slice(0,10)))return false;
@@ -14,3 +15,6 @@ export function opportunities(state,{tracker='',category='',stage='',query='',vi
  }).sort((a,b)=>(a.deadline||'9999').localeCompare(b.deadline||'9999')||b.updatedAt.localeCompare(a.updatedAt));
 }
 export function documentsFor(state,opportunity){return state.documents.filter(d=>!d.archived&&d.trackerId===opportunity.trackerId&&(!d.categoryId||d.categoryId===opportunity.categoryId)&&(!d.opportunityId||d.opportunityId===opportunity.id));}
+
+export function trackersFor(state,{kind='',archived=false}={}){return state.trackers.filter(t=>Boolean(t.archived)===archived&&(!kind||(t.kind||'jobs')===kind));}
+export function filteredDocuments(state,{kind='',tracker='',category='',query='',archived=false}={}){const ids=new Set(state.trackers.filter(t=>!kind||(t.kind||'jobs')===kind).map(t=>t.id));return state.documents.filter(d=>Boolean(d.archived)===archived&&ids.has(d.trackerId)&&(!tracker||d.trackerId===tracker)&&(!category||d.categoryId===category)&&(!query||[d.name,d.kind].join(' ').toLocaleLowerCase().includes(query.toLocaleLowerCase().trim())));}
