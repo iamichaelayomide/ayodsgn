@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import * as goals from '../life/goals.js';
+assert.equal(typeof goals.keyResultProgress,'function','measured result progress is available');
+assert.equal(goals.keyResultProgress({baseline:100,current:60,target:20}),50);
+assert.equal(goals.keyResultProgress({baseline:0,current:20,target:10}),100);
+assert.equal(goals.keyResultProgress({baseline:0,current:null,target:10}),null);
+assert.equal(goals.keyResultProgress({baseline:2,current:2,target:2}),null);
+assert.equal(goals.goalStatus({completed:true}),'done');
+assert.equal(goals.goalStatus({status:'progress'}),'progress');
+const records=[{id:'a',type:'day',period:'2026-10-19',title:'Deliver report'},{id:'b',type:'adhoc',period:'2026-10-19',title:'Sketch'},{id:'c',type:'month',period:'2026-10',title:'Report',archived:true}];
+assert.deepEqual(goals.filterGoalRecords(records,{type:'day',period:'2026-10-19',search:'REPORT'}).map(g=>g.id),['a']);
+assert.deepEqual(goals.filterGoalRecords(records,{type:'all',period:'',search:''}).map(g=>g.id),['a','b']);
+const state={goals:[{id:'q'},{id:'m',parentId:'q'},{id:'d',parentId:'m',completed:true}],lists:[{id:'done',isDone:true}],tasks:[{id:'a',goalId:'m',listId:'done'},{id:'a',goalId:'q',listId:'done'}]};
+assert.equal(goals.goalTaskProgress(state,'q').linked.length,1,'linked tasks count uniquely');
+assert.equal(goals.goalDeliveryProgress(state,'q').percent,100,'tasks and taskless descendant goals contribute');
+assert.equal(goals.goalDeliveryProgress({goals:[],tasks:[],lists:[]},'q').percent,0);
+console.log('Goal views, measured results, and unique delivery checks passed');
+// Exercise view changes and status writes through the public controller and its events.
+const makeElement=()=>({events:{},addEventListener(name,fn){this.events[name]=fn;}});
+const root={...makeElement(),dataset:{},classList:{toggle(){}},innerHTML:'',querySelector(){return null;}};
+const form={...makeElement(),elements:{type:makeElement(),parentId:makeElement(),status:makeElement(),progressMode:{value:'linked'}}};
+globalThis.document={getElementById:id=>id==='goals'?root:id==='goal-form'?form:{},body:{classList:{contains:()=>false}}};
+const actions=[],data={state:{goals:[{id:'g',title:'Ship it',type:'adhoc',status:'todo',progressMode:'linked',keyResults:[]}],tasks:[],lists:[]}};
+const controller=goals.createGoals({getData:()=>data,mutate:async(action,args)=>{actions.push({action,args});Object.assign(data.state.goals[0],args);},escape:String,refreshSelects:()=>{},openTask:()=>{},week:()=> '2026-10-19'});
+controller.setBoardMode(true);
+assert.match(root.innerHTML,/data-goal-lane="todo"/);
+await root.events.click({target:{closest:()=>({dataset:{goalView:'list'},hasAttribute:()=>false})}});
+controller.setBoardMode(false);controller.setBoardMode(true);
+assert.equal(root.dataset.goalView,'list','Returning to goal mode preserves the selected view');
+root.events.change({target:{dataset:{goalStatus:'g'},value:'progress',hasAttribute:()=>false}});
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(actions[0].args.status,'progress');
+assert.equal(actions[0].args.completed,false);
+console.log('Goal view controller and status checks passed');
+root.events.click({target:{closest:()=>({dataset:{goalMove:'done',goalId:'g'},hasAttribute:()=>false})}});
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(actions.at(-1).args.status,'done','The accessible move button completes a goal without dragging');
+assert.equal(actions.at(-1).args.completed,true);
+
+assert.equal(actions[0].args.progressMode,'manual','Moving a linked goal explicitly chooses manual progress');
+
+form.elements.status.events.change?.();
+assert.equal(form.elements.progressMode.value,'manual','Changing dialog status explicitly switches linked progress to manual');

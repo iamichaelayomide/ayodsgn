@@ -7,6 +7,7 @@ final class LifeError extends RuntimeException {
 }
 
 require_once __DIR__.'/task-fields.php';
+require_once __DIR__.'/goal-model.php';
 
 final class LifeStore {
     public static string $timezone='Africa/Lagos';
@@ -51,7 +52,7 @@ final class LifeStore {
     public function read(): array {
         $q=$this->db->prepare('SELECT version,state FROM life_board WHERE id=?');$q->execute([$this->tenantId]);$row=$q->fetch(PDO::FETCH_ASSOC);
         if (!$row) throw new LifeError('The board has not been initialized.', 503);
-        $state=json_decode($row['state'],true,512,JSON_THROW_ON_ERROR);$state['boards']??=[$state['board']+['archived'=>false]];return ['version'=>(int)$row['version'],'state'=>$state,'week'=>self::week()];
+        $state=json_decode($row['state'],true,512,JSON_THROW_ON_ERROR);$state['boards']??=[$state['board']+['archived'=>false]];if(isset($state['goals']))$state['goals']=array_map([LifeGoalModel::class,'normalize'],$state['goals']);return ['version'=>(int)$row['version'],'state'=>$state,'week'=>self::week()];
     }
     private static function index(array $items, string $id): int {
         foreach ($items as $i=>$item) if ($item['id']===$id) return $i;
@@ -80,9 +81,6 @@ final class LifeStore {
             $s=$current['state']; $id=$args['id']??'';
             if($role==='partner'&&!in_array($action,['goal.approve','task.approve','task.complete'],true))throw new LifeError('Partners can review goals and approve reviewed tasks. Editing belongs to the owner.',403);
             if($role==='owner'&&in_array($action,['goal.approve','task.approve'],true))throw new LifeError('A partner must approve this item.',403);
-            if(($s['accountabilityEnabled']??false)&&$role==='owner') {
-                if($action==='goal.save'&&($args['completed']??false))throw new LifeError('Your partner must approve goal completion.',403);
-            }
 
             switch ($action) {
                 case 'history.delete':
@@ -95,14 +93,15 @@ final class LifeStore {
                         if($existing===null&&count($s['tasks'])>=5000)throw new LifeError('The board has reached its task limit.');
                         $record['listId']=$listId;$record['blocker']='';$record['completedAt']=null;$record['reminderMinutes']=null;unset($record['approval'],$record['boardArchive']);
                     }else{
-                        $type=$args['type']??'adhoc';$period=self::text($args['period']??'',10);
-                        if(!in_array($type,['adhoc','quarter','month','week'],true))throw new LifeError('Choose a goal period.');
-                        if($type==='quarter'&&!preg_match('/^\d{4}-Q[1-4]$/',$period))throw new LifeError('Choose a quarter, for example 2026-Q4.');
-                        if($type==='month'&&!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/',$period))throw new LifeError('Choose a month, for example 2026-10.');
-                        if($type==='week')$period=self::validWeek($period);if($type==='adhoc')$period='';
-                        foreach($s['goals']??[] as $child)if(!$child['archived']&&$child['parentId']===$record['id']&&($type!==$record['type']||$period!==$record['period']))throw new LifeError('Keep this goal’s period while it has linked goals.');
                         if($existing===null&&count($s['goals']??[])>=1000)throw new LifeError('Goal limit reached.');
-                        $record['type']=$type;$record['period']=$period;$record['parentId']='';$record['completed']=false;unset($record['approval']);
+                        $original=LifeGoalModel::normalize($record);$record=$original;$record['archived']=false;
+                        $validationGoals=$s['goals']??[];
+                        if($existing===null)$validationGoals[]=$record;else $validationGoals[$existing]=$record;
+                        $record=LifeGoalModel::save($validationGoals,[
+                            'id'=>$record['id'],'type'=>$args['type']??'adhoc','period'=>$args['period']??'',
+                            'parentId'=>'','keyResultId'=>'','status'=>'todo','completed'=>false,
+                        ],(bool)($s['accountabilityEnabled']??false),$role);
+                        LifeGoalModel::activeLimit($s['goals']??[],$record,$existing===null?null:$original);
                     }
                     $record['archived']=false;$record['updatedAt']=self::now();$s[$collection]??=[];if($existing===null)$s[$collection][]=$record;else $s[$collection][$existing]=$record;
                     $id=$record['id'];break;
@@ -166,7 +165,7 @@ final class LifeStore {
                     $quarter=self::text($args['quarter']??'',7,true);if(!preg_match('/^\d{4}-Q[1-4]$/',$quarter))throw new LifeError('Choose a quarter.');$s['quarterReviews'][$quarter]=['quarter'=>$quarter,'wins'=>self::text($args['wins']??'',10000),'lessons'=>self::text($args['lessons']??'',10000),'next'=>self::text($args['next']??'',10000),'updatedAt'=>self::now()];break;
                 case 'goal.approve':
                     $i=self::index($s['goals']??[],$id);if($s['goals'][$i]['archived'])throw new LifeError('This goal is archived.');
-                    $s['goals'][$i]['completed']=true;$s['goals'][$i]['approval']=['by'=>$actor,'at'=>self::now()];break;
+                    $s['goals'][$i]['completed']=true;$s['goals'][$i]['status']='done';$s['goals'][$i]['updatedAt']=self::now();$s['goals'][$i]['approval']=['by'=>$actor,'at'=>self::now()];break;
                 case 'task.approve':
                     $i=self::index($s['tasks'],$id);$li=self::listIndex($s,$s['tasks'][$i]['listId']);
                     if($s['tasks'][$i]['archived']||$s['lists'][$li]['name']!=='Review')throw new LifeError('Only tasks in Review can be approved.');
@@ -179,20 +178,10 @@ final class LifeStore {
                     if($destination===null)throw new LifeError('No destination list is available.');
                     $s['tasks'][$i]['listId']=$destination;$s['tasks'][$i]['completedAt']=$args['done']?self::now():null;if($role==='partner'&&$args['done'])$s['tasks'][$i]['approval']=['by'=>$actor,'at'=>self::now()];else unset($s['tasks'][$i]['approval']);self::reorder($s['tasks'],$id,count($s['tasks']),$destination);break;
                 case 'goal.archive': case 'goal.restore':
-                    $i=self::index($s['goals']??[],$id);if($action==='goal.archive'){foreach($s['goals'] as $child)if(!$child['archived']&&$child['parentId']===$id)throw new LifeError('Archive linked goals first.');}$s['goals'][$i]['archived']=$action==='goal.archive';$s['goals'][$i]['updatedAt']=self::now();break;
+                    $i=self::index($s['goals']??[],$id);if($action==='goal.archive'){foreach($s['goals'] as $child)if(!$child['archived']&&$child['parentId']===$id)throw new LifeError('Archive linked goals first.');}if($action==='goal.restore'){ $restored=$s['goals'][$i];$restored['archived']=false;LifeGoalModel::activeLimit($s['goals'],$restored,$s['goals'][$i]);$validationGoals=$s['goals'];$validationGoals[$i]=$restored;LifeGoalModel::save($validationGoals,['id'=>$id],(bool)($s['accountabilityEnabled']??false),$role);}$s['goals'][$i]['archived']=$action==='goal.archive';$s['goals'][$i]['updatedAt']=self::now();break;
                 case 'goal.save':
-                    $goals=$s['goals']??[];$type=$args['type']??'quarter';
-                    if (!in_array($type,['quarter','month','week','adhoc'],true)) throw new LifeError('Choose a goal period.');
-                    $parent=self::text($args['parentId']??'',32);
-                    if ($parent!=='') {$pi=self::index($goals,$parent);$required=['month'=>'quarter','week'=>'month'];if (!isset($required[$type]) || $goals[$pi]['type']!==$required[$type] || $goals[$pi]['archived']) throw new LifeError('Link a monthly goal to a quarter, or a weekly goal to a month.');}
-                    $period=self::text($args['period']??'',10);
-                    if ($type==='quarter' && !preg_match('/^\d{4}-Q[1-4]$/',$period)) throw new LifeError('Choose a quarter, for example 2026-Q4.');
-                    if ($type==='month' && !preg_match('/^\d{4}-(0[1-9]|1[0-2])$/',$period)) throw new LifeError('Choose a month, for example 2026-10.');
-                    if ($type==='week') $period=self::validWeek($period);
-                    if ($parent!=='') { $pp=$goals[$pi]['period'];if ($type==='month' && (substr($period,0,4)!==substr($pp,0,4) || (int)ceil((int)substr($period,5,2)/3)!==(int)substr($pp,-1))) throw new LifeError('This month must be within the parent quarter.');if($type==='week' && substr($period,0,7)!==$pp)throw new LifeError('Choose the month containing this sprint Monday.');}
-                    $item=['title'=>self::text($args['title']??'',200,true),'notes'=>self::text($args['notes']??'',10000),'type'=>$type,'period'=>$period,'parentId'=>$parent,'category'=>self::text($args['category']??'Personal',60,true),'completed'=>($args['completed']??false)===true,'updatedAt'=>self::now()];
-                    if ($id==='') {if(count($goals)>=1000)throw new LifeError('Goal limit reached.');$item+=['id'=>self::id(),'createdAt'=>self::now(),'archived'=>false];$goals[]=$item;}
-                    else {$i=self::index($goals,$id);if($goals[$i]['archived'])throw new LifeError('This goal is archived.');if($parent===$id)throw new LifeError('A goal cannot be its own parent.');foreach($goals as $child)if(!$child['archived']&&$child['parentId']===$id&&($type!==$goals[$i]['type']||$period!==$goals[$i]['period']))throw new LifeError('Keep the period type while this goal has linked goals.');$goals[$i]=array_merge($goals[$i],$item);}
+                    $goals=$s['goals']??[];$item=LifeGoalModel::save($goals,$args,(bool)($s['accountabilityEnabled']??false),$role);
+                    if($id==='')$goals[]=$item;else $goals[self::index($goals,$id)]=$item;
                     $s['goals']=$goals;break;
                 case 'review.save':
                     $week=self::validWeek($args['week']??'');$s['reviews'][$week]=['week'=>$week,'wins'=>self::text($args['wins']??'',10000),'obstacles'=>self::text($args['obstacles']??'',10000),'next'=>self::text($args['next']??'',10000),'updatedAt'=>self::now()];break;
@@ -240,10 +229,13 @@ final class LifeStore {
                     if (isset($args['goalId'])) {$goalId=self::text($args['goalId'],32);if($goalId!==''){ $gi=self::index($s['goals']??[],$goalId);if($s['goals'][$gi]['archived'])throw new LifeError('Choose an active goal.');}$item['goalId']=$goalId;}
                     if ($id==='') {
                         if (count($s['tasks'])>=5000) throw new LifeError('The board has reached its task limit.');
+                        if($s['lists'][self::listIndex($s,$listId)]['isDone'])$item['completedAt']=self::now();
                         $item+=['id'=>self::id(),'archived'=>false,'position'=>count($s['tasks']),'createdAt'=>self::now()]; $s['tasks'][]=$item; $id=$item['id'];
                     } else {
                         $i=self::index($s['tasks'],$id); if ($s['tasks'][$i]['archived']) throw new LifeError('Restore this task before editing.');
                         $oldList=$s['tasks'][$i]['listId']; $s['tasks'][$i]=array_merge($s['tasks'][$i],$item);
+                        $wasDone=(bool)$s['lists'][self::listIndex($s,$oldList,true)]['isDone'];$isDone=(bool)$s['lists'][self::listIndex($s,$listId)]['isDone'];
+                        if($wasDone!==$isDone){$s['tasks'][$i]['completedAt']=$isDone?self::now():null;unset($s['tasks'][$i]['approval']);}
                         if ($oldList!==$listId) self::reorder($s['tasks'],$id,count($s['tasks']),$listId);
                     }
                     if (isset($args['position'])) self::reorder($s['tasks'],$id,(int)$args['position'],$listId);
@@ -300,6 +292,7 @@ final class LifeStore {
                     $s['sprints'][$week]=['capacityMinutes'=>$capacity,'id'=>$s['sprints'][$week]['id']??self::id(),'week'=>$week,'goal'=>self::text($args['goal']??'',2000),'taskIds'=>array_values(array_unique($ids)),'updatedAt'=>self::now()]; break;
                 default: throw new LifeError('Unknown board action.',400);
             }
+            LifeGoalModel::reconcile($s);
             $s['activity']??=[];$s['activity'][]=['id'=>self::id(),'action'=>$action,'recordId'=>$id,'actor'=>$actor,'at'=>self::now()];$s['activity']=array_slice($s['activity'],-2000);
             $q=$this->db->prepare('UPDATE life_board SET state=?,version=version+1,updated_at=? WHERE id=? AND version=?');
             $q->execute([json_encode($s,JSON_THROW_ON_ERROR),self::now(),$this->tenantId,$version]);

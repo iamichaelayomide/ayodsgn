@@ -1,3 +1,4 @@
+import {swipeIntent} from './planner-interactions.js?v=1';
 export function installNavigation(){
   const workspace=document.getElementById('workspace'), sidebar=document.getElementById('planner-navigation'), main=workspace.querySelector('main'), collapse=document.getElementById('nav-collapse'), open=document.getElementById('nav-open'), backdrop=document.getElementById('nav-backdrop'), mobile=matchMedia('(max-width:800px)');
   let isOpen=false, collapsed=false;
@@ -7,5 +8,12 @@ export function installNavigation(){
   collapse.addEventListener('click',()=>{collapsed=!collapsed;applyCollapse();try{localStorage.setItem('life.sidebar.collapsed',String(collapsed));}catch{}});
   open.addEventListener('click',()=>drawer(true));document.getElementById('nav-close').addEventListener('click',()=>drawer(false));backdrop.addEventListener('click',()=>drawer(false));sidebar.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{if(mobile.matches)drawer(false);}));
   document.addEventListener('keydown',event=>{if(!isOpen)return;if(event.key==='Escape'){event.preventDefault();drawer(false);}if(event.key==='Tab'){const controls=[...sidebar.querySelectorAll('a,button,summary')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+  const edge=document.createElement('div');edge.className='drawer-swipe-edge';edge.setAttribute('aria-hidden','true');workspace.append(edge);let gesture=null;
+  const brand=sidebar.querySelector('.sidebar-brand');
+  for(const surface of [edge,brand,backdrop].filter(Boolean)){
+   surface.addEventListener('pointerdown',event=>{if(!mobile.matches||event.pointerType==='mouse'||event.button!==0||gesture)return;if(surface!==backdrop&&event.target.closest('button,a,input,select,textarea'))return;gesture={pointer:event.pointerId,x:event.clientX,y:event.clientY,at:performance.now(),open:isOpen,surface};});
+   surface.addEventListener('pointermove',event=>{if(!gesture||gesture.pointer!==event.pointerId)return;const dx=event.clientX-gesture.x,dy=event.clientY-gesture.y;if(Math.abs(dy)>Math.abs(dx)&&Math.abs(dy)>12){gesture=null;return;}if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.5){surface.setPointerCapture(event.pointerId);}});
+   surface.addEventListener('pointerup',event=>{if(!gesture||gesture.pointer!==event.pointerId)return;const result=swipeIntent({dx:event.clientX-gesture.x,dy:event.clientY-gesture.y,elapsed:performance.now()-gesture.at,open:gesture.open});gesture=null;if(result){event.preventDefault();drawer(result==='open');}});surface.addEventListener('pointercancel',()=>gesture=null);
+  }
   mobile.addEventListener('change',()=>drawer(false,false));applyCollapse();drawer(false,false);
 }
