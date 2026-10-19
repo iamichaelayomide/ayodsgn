@@ -25,6 +25,6 @@
 - Public research depends on existing Gemini quota. No paid fallback, billing or provider changes; no claim of guaranteed recognition or response latency.
 
 ## Migration and rollback
-Additive state fields only; no SQL migration, account reset or destructive record rewrite. Existing receipts/chats remain intact. New asset versions: app70, companion55, goals7, navigation3, card-drag2, chat-mobile4; new goals/interactions styles and module.
+Additive state fields only; no SQL migration, account reset or destructive record rewrite. Existing receipts/chats remain intact. New asset versions: app70, companion55, goals7, navigation3, card-drag2, chat-mobile4; new goals/interactions styles and module. Final chat polish updates app71, companion56, chat-files2 and chat-mobile5; headings, bold and inline code render after escaping all source HTML. Regression tests confirmed the original raw-markup defect before the fix.
 
 Publish only the explicitly changed Ramble sources/tests/docs atop production master 5c498d556864e4f8aca12cf9bf88261b6020d6ec (tree 47f2087a18e8609716309a63eed267c0beddde84). GitHub → Hostinger deployment. No SSH access changes. Rollback by publishing a new commit restoring changed paths from that checkpoint; retain additive data fields. Confirm the branch lease before any update.

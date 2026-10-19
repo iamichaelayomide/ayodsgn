@@ -1,4 +1,4 @@
-import {createChatFiles,formatChatText,attachmentMarkup,webSourcesMarkup} from './chat-files.js?v=1';
+import {createChatFiles,formatChatText,attachmentMarkup,webSourcesMarkup} from './chat-files.js?v=2';
 import {chatSuggestions} from './chat-suggestions.js?v=1';
 import {createVoice} from './voice.js?v=14';
 import {emptyState} from './empty-states.js?v=2';

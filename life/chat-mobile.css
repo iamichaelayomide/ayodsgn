@@ -121,3 +121,5 @@
 }
 @media(max-width:800px) and (max-height:520px){.ramble-view #companion .ramble-suggestions,.ramble-view #companion .ramble-welcome{display:none}.ramble-view #companion #ai-message{max-height:96px}}
 @media(prefers-reduced-motion:reduce){#companion button{transition:opacity 120ms ease}#companion button:active:not(:disabled):not(:focus-visible){transform:none}}
+
+#companion .chat-message h3{font:600 1.08em/1.4 var(--sans);margin:1.2em 0 .5em}#companion .chat-message h3:first-child{margin-top:0}#companion .chat-message code{font-size:.9em;background:#ecebf3;padding:.1em .3em;border-radius:4px;overflow-wrap:anywhere}

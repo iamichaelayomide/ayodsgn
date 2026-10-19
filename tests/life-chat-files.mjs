@@ -21,3 +21,6 @@ assert.equal(webSourcesMarkup([{url:'javascript:alert(1)',title:'bad'},{url:'htt
 assert.match(webSourcesMarkup([{url:'https://example.com/?q=<x>',title:'<source>'}]),/rel="noopener noreferrer"/);
 assert.match(webSourcesMarkup([{url:'https://example.com',title:'<source>'}]),/&lt;source&gt;/);
 console.log('Chat upload selection, validation, failure, retry, removal, late response and escaped rendering checks passed');
+
+assert.equal(formatChatText('### Next steps\n- **Write** a plan\n\nUse `title` safely <img src=x onerror=alert(1)>'),'<h3>Next steps</h3><ul><li><strong>Write</strong> a plan</li></ul><p>Use <code>title</code> safely &lt;img src=x onerror=alert(1)&gt;</p>');
+assert.equal(formatChatText('**<script>alert(1)</script>**'),'<p><strong>&lt;script&gt;alert(1)&lt;/script&gt;</strong></p>');
