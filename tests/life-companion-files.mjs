@@ -15,7 +15,10 @@ const click=async dataset=>{await listeners.click[0]({target:{closest:()=>({data
 const submit=()=>listeners.submit[0]({preventDefault(){},target:{id:'ai-composer',querySelector:()=>error}});
 await companion.render();assert.match(content,/Add files/);
 assert.match(content, /ramble-send[^>]*disabled/, 'Empty composer must disable Send');
-await click({ai:'add-files'});assert.match(content,/Photos/);assert.match(content,/Files/);
+assert.doesNotMatch(content,/id="ramble-file-picker"/, 'Attachment choices stay out of the default composer');
+await click({ai:'add-files'});assert.match(content,/Add photos/);assert.match(content,/Add files/);assert.match(content,/id="ramble-file-picker"[^>]*popover="auto"/, 'Attachment choices open in a dismissible popover');
+await click({ai:'add-files'});assert.doesNotMatch(content,/id="ramble-file-picker"/, 'Plus toggles the menu closed');
+await click({ai:'add-files'});
 
 listeners.input[0]({target:{id:'ai-message',value:'Use this file',hasAttribute:()=>false}});
 assert.equal(sendButton.disabled,false,'Typing immediately enables Send without losing input focus');

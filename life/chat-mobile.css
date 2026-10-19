@@ -41,10 +41,13 @@
 #companion #ai-error{margin:0;font-size:13px}
 #companion #ai-error:empty{display:none}
 #companion .ramble-add-file span{font-size:28px;font-weight:400;line-height:1}
-#companion .ramble-file-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:8px;border-top:1px solid var(--line)}
-#companion .ramble-file-picker>button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:10px 12px;min-height:52px;background:var(--paper,#fff);border:1px solid var(--line);border-radius:12px;font-size:14px;text-align:left}
-#companion .ramble-file-picker small,#companion .ramble-file-picker p{font-size:12px;line-height:1.5;color:var(--muted)}
-#companion .ramble-file-picker p{grid-column:1/-1;margin:0}
+#companion .ramble-file-picker{position:fixed;inset:auto;margin:0;width:220px;max-width:calc(100vw - 16px);padding:6px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--body);box-shadow:0 8px 28px #2022391f;overflow:auto;max-height:calc(100dvh - 16px)}
+#companion .ramble-file-picker:not(:popover-open){display:none}
+#companion .ramble-file-picker:popover-open{display:grid;gap:2px}
+#companion .ramble-file-picker>button{display:flex;align-items:center;gap:12px;padding:12px;min-height:48px;border:0;background:transparent;border-radius:10px;font-size:15px;text-align:left}
+#companion .ramble-file-picker .action-icon{width:22px;height:22px;flex:none;margin:0}
+#companion .ramble-file-picker>button:active{background:#eef0fc}
+@media(hover:hover) and (pointer:fine){#companion .ramble-file-picker>button:hover{background:#f3f3f7}}
 #companion .ramble-file-row{display:flex;gap:8px;overflow-x:auto;overscroll-behavior:contain;max-width:100%;padding:2px 0 4px}
 #companion .ramble-file-chip{display:flex;align-items:center;gap:8px;flex:0 0 auto;max-width:100%;padding:6px 8px;border:1px solid var(--line);background:var(--paper,#fff);border-radius:14px}
 #companion .ramble-file-chip[data-status=failed]{border-color:var(--danger,#a43150)}
