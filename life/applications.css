@@ -180,3 +180,26 @@
 @media(max-width:1050px){.applications-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}.applications-controls .application-search{grid-column:1/-1}}
 @media(max-width:600px){.applications-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.applications-controls .application-filters{grid-column:1/-1;justify-self:start}.applications-controls select,.applications-controls .select-trigger{font-size:16px}.applications-controls .select-control{min-width:0}}
 @media(prefers-reduced-motion:reduce){#applications button,.applications-dialog button{transition:opacity 120ms ease}#applications button:active:not(:disabled):not(:focus-visible),.applications-dialog button:active:not(:disabled):not(:focus-visible){transform:none}}
+
+/* User-named groups lead to folders, then opportunities. */
+.application-heading-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.applications-view-heading h2{overflow-wrap:anywhere;min-width:0;margin:0}
+#applications .application-manage-button{width:44px;padding:10px;background:white;border:1px solid var(--line);flex:none}
+.applications-controls{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.application-folder-list{display:grid;gap:12px}
+#applications .application-folder-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px;width:100%;padding:20px 24px;text-align:left;background:white;border:1px solid var(--line);border-radius:16px}
+.application-folder-row>span:first-child{font-size:16px;font-weight:500;overflow-wrap:anywhere}
+.application-folder-row>span:nth-child(2){font-size:14px;color:var(--muted)}
+.application-folder-row .action-icon,.application-tracker-arrow .action-icon,.application-summary-arrow .action-icon{transform:rotate(-90deg)}
+#applications .applications-summary{gap:12px;margin-bottom:24px}
+#applications .application-summary-card{padding:16px 44px 16px 16px;gap:6px}
+#applications .application-summary-card strong{font-size:22px}
+#applications .application-summary-card .application-summary-arrow{top:20px;right:16px}
+#applications .application-tracker-open strong{overflow-wrap:anywhere}
+#applications .application-tracker-open{padding:24px;text-align:left}
+.applications-dialog input,.applications-dialog select,.applications-dialog textarea{background:white}
+@media(hover:hover) and (pointer:fine){#applications .application-folder-row:hover{background:#f8faff;border-color:#bac8fa}}
+@media(max-width:800px){.applications-view-heading{gap:16px}.application-heading-actions{width:100%}.application-heading-actions>.primary{flex:1}.applications-controls{grid-template-columns:minmax(0,1fr) auto}.applications-controls .application-search{grid-column:1/-1}.applications-controls>.application-filters{grid-column:auto;justify-self:end}#applications .application-folder-row{padding:18px 20px}.applications-summary{grid-template-columns:1fr 1fr}}
+
+/* Groups are the entry point; counts remain secondary. */
+.applications-view-heading[data-groups-home] h2{display:none}.applications-view-heading[data-groups-home]{justify-content:flex-end}.applications-summary{margin:20px 0 0}.applications-summary .application-summary-card{min-height:76px;padding:14px;gap:6px}.applications-summary .application-summary-card span{font-size:12px;line-height:1.4}.applications-controls>[data-app-action=summary-filter]{min-height:40px;background:transparent;border:0;color:var(--blue);padding:4px 0;text-align:left}.application-tracker-grid{margin-top:16px}

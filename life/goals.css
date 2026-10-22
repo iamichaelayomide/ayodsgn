@@ -1,4 +1,92 @@
-/* Goal views share the planner's existing paper, ink, and action colors. */
-.goal-toolbar{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}.goal-filter-row,.goal-action-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.goal-toolbar label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted,#786d74)}.goal-toolbar input,.goal-toolbar select{min-height:40px;max-width:100%;font:inherit;font-size:14px}.goal-toolbar input[type=search]{width:210px}.goal-toolbar button{min-height:40px}.goal-view-switch{display:flex;padding:3px;border:1px solid var(--line,#dfd5db);border-radius:10px;background:var(--paper,#fffdf8);gap:2px}.goal-view-switch button{border:0;background:transparent;min-height:32px;padding:6px 10px;border-radius:7px;color:inherit}.goal-view-switch button[aria-pressed=true]{background:var(--ink,#292329);color:var(--paper,#fffdf8)}.goal-board{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:14px;overflow-x:auto;align-items:start;overscroll-behavior-x:contain;padding-bottom:12px}.goal-lane{min-width:0;border-radius:14px;padding:12px;background:rgba(140,113,130,.06);border:1px solid var(--line,#e4dbe1);min-height:240px}.goal-lane>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 3px}.goal-lane h2{font:600 14px var(--sans);margin:0}.goal-lane>header>span{font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted,#786d74)}.goal-lane-cards{display:grid;gap:10px}.goal-board .goal-card{margin:0;padding:16px;min-width:0}.goal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:16px}.goal-card{min-width:0;overflow-wrap:anywhere}.goal-title-button{display:block;text-align:left;width:100%;padding:0!important;border:0!important;background:transparent!important;font-size:16px;line-height:1.4}.goal-title-button strong{font-weight:600}.goal-meta{gap:8px;flex-wrap:wrap}.goal-meta span{min-width:0}.goal-parent,.goal-notes{font-size:13px;line-height:1.5;color:var(--muted,#786d74);margin:10px 0}.goal-notes{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.goal-status-control{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px}.goal-status-control select{min-height:36px;max-width:100%;font:inherit;font-size:12px}.goal-status-control button{font-size:12px;min-height:36px}.goal-card progress{width:100%;height:6px;accent-color:var(--blue,#284bd2)}.goal-card .goal-progress{margin:16px 0 0}.goal-card .goal-progress-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}.goal-card .goal-progress-label strong{font-size:14px}.goal-progress-label small{font-size:11px;color:var(--muted,#786d74)}.goal-card details{font-size:12px;margin-top:12px}.goal-card summary{cursor:pointer;padding:7px 0;min-height:32px}.goal-results ul{list-style:none;padding:0;display:grid;gap:12px}.goal-results li{display:grid;gap:3px}.goal-results li span,.goal-results>small{color:var(--muted,#786d74);line-height:1.5}.goal-linked-tasks ul{padding:0;list-style:none}.goal-linked-tasks li{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;justify-content:space-between;padding:5px 0}.goal-linked-tasks li button{min-width:0;white-space:normal;text-align:left}.goal-list{display:grid;gap:10px}.goal-list .goal-card{display:grid;grid-template-columns:minmax(180px,2fr) minmax(160px,1fr) minmax(170px,1fr);column-gap:20px;align-items:start;padding:16px 20px}.goal-list .goal-meta{grid-column:1/-1;margin-bottom:8px}.goal-list .goal-title-button{grid-column:1;grid-row:2}.goal-list .goal-progress{grid-column:2;grid-row:2;margin:0}.goal-list .goal-status-control{grid-column:3;grid-row:2;margin:0}.goal-list .goal-parent,.goal-list .goal-notes,.goal-list details{grid-column:1/-1}.goal-limit-note,.goal-form-help{font-size:12px;line-height:1.5;color:var(--muted,#786d74)}.goal-view-error:empty{display:none}.goal-form-details{margin:10px 0}.goal-form-details>summary{padding:10px 0;cursor:pointer}.goal-result-editor{border:1px solid var(--line,#dfd5db);border-radius:10px;padding:12px;margin:12px 0;min-width:0}.goal-result-editor legend{font-size:12px;padding:0 6px}.goal-metric-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.goal-metric-fields input{width:100%;min-width:0}.goal-result-editor>button{font-size:12px;margin-top:6px}#goal-dialog{max-height:calc(100dvh - 32px);overscroll-behavior:contain}#goal-form{padding-bottom:env(safe-area-inset-bottom,0px)}#goal-form [data-results-section]>h3{font-size:14px;margin:16px 0 6px}.goal-toolbar button,.goal-card button,.goal-card select,#goal-form button{touch-action:manipulation;user-select:none;-webkit-user-select:none}.goal-toolbar button:active,.goal-card button:active,#goal-form button:active{transform:scale(.98)}.goal-toolbar :focus-visible,.goal-card :focus-visible,#goal-form :focus-visible{outline:2px solid var(--blue,#284bd2);outline-offset:3px}.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-@media(max-width:700px){.goal-toolbar{align-items:stretch}.goal-filter-row,.goal-action-row{width:100%}.goal-filter-row>label{flex:1;min-width:0}.goal-filter-row .goal-search{flex-basis:100%}.goal-toolbar input[type=search]{width:100%}.goal-action-row{justify-content:space-between}.goal-board{grid-template-columns:repeat(3,minmax(min(78vw,300px),1fr));gap:10px;scroll-snap-type:x proximity}.goal-lane{scroll-snap-align:start}.goal-list .goal-card{display:block;padding:16px}.goal-list .goal-progress,.goal-list .goal-status-control{margin-top:12px}.goal-metric-fields{grid-template-columns:repeat(2,minmax(0,1fr))}#goal-dialog{max-height:calc(100dvh - 20px)}}
-@media(pointer:coarse){.goal-toolbar input,.goal-toolbar select,.goal-status-control select,#goal-form input,#goal-form select,#goal-form textarea{font-size:16px}.goal-toolbar button,.goal-status-control button,.goal-status-control select{min-height:44px}.goal-view-switch button{min-height:38px}}
+/* Quiet surfaces keep the goal and its next action easy to scan. */
+#goals{--goal-line:#dfe3e8;--goal-muted:#626c7a;--goal-blue:var(--blue,#284bd2)}
+.goal-toolbar{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.goal-filter-row,.goal-action-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap;min-width:0}
+.goal-toolbar label{display:flex;flex-direction:column;gap:6px;min-width:0;margin:0;font-size:12px;color:var(--goal-muted)}
+.goal-toolbar label[hidden]{display:none}
+.goal-toolbar input,.goal-toolbar select{min-height:44px;max-width:100%;min-width:0;margin:0;font:inherit;font-size:14px;background:#fff;border-color:var(--goal-line)}
+.goal-toolbar input[type=search]{width:210px}
+.goal-toolbar .select-control{margin:0;min-width:0}
+.goal-toolbar .select-trigger{min-height:44px;margin:0;background:#fff;border-color:var(--goal-line);white-space:nowrap;overflow-wrap:normal;gap:12px}
+.goal-toolbar button{min-height:44px;white-space:nowrap}
+.goal-view-switch{display:flex;padding:3px;border:1px solid var(--goal-line);border-radius:10px;background:#fff;gap:2px}
+.goal-view-switch button{border:0;background:transparent;min-height:36px;padding:6px 12px;border-radius:7px;color:var(--goal-muted)}
+.goal-view-switch button[aria-pressed=true]{background:var(--goal-blue);color:#fff}
+.goal-board{display:grid;grid-template-columns:repeat(3,minmax(260px,1fr));gap:14px;overflow-x:auto;align-items:start;overscroll-behavior-x:contain;padding-bottom:12px}
+.goal-lane{min-width:0;border-radius:14px;padding:12px;background:#f2f4f6;border:1px solid var(--goal-line);min-height:240px}
+.goal-lane>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 3px}
+.goal-lane h2{font:600 14px var(--sans);margin:0}
+.goal-lane>header>span{font-size:12px;font-variant-numeric:tabular-nums;color:var(--goal-muted)}
+.goal-lane-cards{display:grid;gap:10px}
+.goal-card{min-width:0;padding:18px;background:#fff;border:1px solid var(--goal-line);border-radius:14px;overflow-wrap:anywhere}
+.goal-board .goal-card{margin:0;padding:16px}
+.goal-title-button{display:block;text-align:left;width:100%;padding:0!important;border:0!important;background:transparent!important;font-size:16px;line-height:1.45;white-space:normal;overflow-wrap:anywhere}
+.goal-title-button strong{font-weight:600}
+.goal-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;color:var(--goal-muted);font-size:12px}
+.goal-meta span{min-width:0}
+.goal-meta span:first-child{background:transparent;padding:0;border-radius:0}
+.goal-parent,.goal-card .goal-notes,.goal-area,.goal-linked-mode{font-size:13px;line-height:1.55;color:var(--goal-muted);margin:10px 0}
+.goal-status-control{display:block;min-width:0;margin-top:14px}
+.goal-status-control .select-control{width:100%;margin:0}
+.goal-status-control select,.goal-status-control .select-trigger{width:100%;min-width:0;min-height:44px;font:inherit;font-size:13px;white-space:nowrap;overflow-wrap:normal;background:#fff;border-color:var(--goal-line)}
+.goal-status-control .select-trigger{gap:12px;padding:10px 12px}
+.goal-card progress{display:block;width:100%;height:6px;margin-top:8px;accent-color:var(--goal-blue)}
+.goal-card .goal-progress{margin:16px 0 0}
+.goal-card .goal-progress-label{display:flex;align-items:center;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums}
+.goal-card .goal-progress-label strong{font-size:14px}
+.goal-card .goal-progress-label small{font-size:12px;color:var(--goal-muted);margin:0}
+.goal-card details{font-size:12px;margin-top:12px;border-top:1px solid var(--goal-line)}
+.goal-card summary{cursor:pointer;padding:10px 0;min-height:40px;color:var(--goal-muted)}
+.goal-results ul{list-style:none;padding:0;display:grid;gap:12px}
+.goal-results li{display:grid;gap:3px}
+.goal-results li span{color:var(--goal-muted);line-height:1.5}
+.goal-linked-tasks ul{padding:0;list-style:none}
+.goal-linked-tasks li{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;justify-content:space-between;padding:5px 0}
+.goal-linked-tasks li button{min-width:0;white-space:normal;text-align:left;overflow-wrap:anywhere}
+.goal-linked-tasks li span{color:var(--goal-muted)}
+.goal-list{display:grid;gap:12px}
+.goal-list .goal-card{display:grid;grid-template-columns:minmax(0,2fr) minmax(100px,1fr) minmax(145px,1fr);column-gap:24px;align-items:center;padding:18px 20px}
+.goal-list .goal-meta{grid-column:1/-1;margin-bottom:8px}
+.goal-list .goal-title-button{grid-column:1;grid-row:2}
+.goal-list .goal-progress{grid-column:2;grid-row:2;margin:0}
+.goal-list .goal-status-control{grid-column:3;grid-row:2;margin:0}
+.goal-list .goal-card-details{grid-column:1/-1}
+.goal-limit-note,.goal-form-help{font-size:12px;line-height:1.5;color:var(--goal-muted,var(--muted))}
+.goal-view-error:empty{display:none}
+.goal-form-details{margin:16px 0;border-top:1px solid #dfe3e8}
+.goal-form-details>summary{padding:12px 0;min-height:44px;cursor:pointer;color:var(--blue,#284bd2)}
+.goal-result-editor{border:1px solid #dfe3e8;border-radius:10px;padding:12px;margin:12px 0;min-width:0}
+.goal-result-editor legend{font-size:12px;padding:0 6px}
+.goal-metric-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.goal-metric-fields input{width:100%;min-width:0}
+.goal-result-editor>button{font-size:12px;margin-top:6px}
+#goal-dialog{max-height:calc(100dvh - 32px);overscroll-behavior:contain}
+#goal-form{padding-bottom:env(safe-area-inset-bottom,0px)}
+#goal-form [data-results-section]>h3{font-size:14px;margin:16px 0 6px}
+.goal-toolbar button,.goal-card button,.goal-card select,#goal-form button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.goal-toolbar button:active,.goal-card button:active,#goal-form button:active{transform:scale(.98)}
+.goal-toolbar :focus-visible,.goal-card :focus-visible,#goal-form :focus-visible{outline:2px solid var(--blue,#284bd2);outline-offset:3px}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:900px){.goal-list .goal-card{column-gap:16px;grid-template-columns:minmax(0,2fr) minmax(85px,1fr) minmax(135px,1fr)}}
+@media(max-width:700px){
+ .goal-toolbar{align-items:stretch}
+ .goal-filter-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
+ .goal-filter-row .goal-search{grid-column:1/-1}
+ .goal-filter-row>label:first-child:has(+label[hidden]){grid-column:1/-1}
+ .goal-toolbar input[type=search]{width:100%}
+ .goal-action-row{width:100%;justify-content:space-between;gap:8px}
+ .goal-board{grid-template-columns:repeat(3,minmax(min(78vw,300px),1fr));gap:10px;scroll-snap-type:x proximity}
+ .goal-lane{scroll-snap-align:start}
+ .goal-list .goal-card{display:block;padding:16px}
+ .goal-list .goal-progress,.goal-list .goal-status-control{margin-top:14px}
+ .goal-metric-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #goal-dialog{max-height:calc(100dvh - 20px)}
+ #goal-form .field-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #goal-form .field-row>label{min-width:0}
+ #goal-form .field-row input{width:100%;min-width:0}
+}
+@media(pointer:coarse){.goal-toolbar input,.goal-toolbar select,.goal-toolbar .select-trigger,.goal-status-control select,.goal-status-control .select-trigger,#goal-form input,#goal-form select,#goal-form textarea{font-size:16px}.goal-toolbar button,.goal-status-control select,.goal-status-control .select-trigger{min-height:44px}}
+.goal-period-picker{min-width:0;max-width:100%;background:#fff;border-color:#dfe3e8;white-space:normal!important;overflow-wrap:normal;line-height:1.45}
+.goal-period-clear{align-self:flex-start;min-height:32px!important;padding:4px 0;border:0;background:transparent;color:var(--blue,#284bd2);font-size:12px;text-align:left}
+#goal-form .goal-period-picker{margin-top:7px}
+#goal-form .goal-period-clear{margin-top:4px}

@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {createApplications} from '../life/applications.js';
+const state={trackers:[],categories:[],opportunities:[],documents:[],events:[]};
+let version=1;const writes=[],dialogs=[];
+const listeners={};
+const root={hidden:false,innerHTML:'',addEventListener:(n,fn)=>listeners[n]=fn,setAttribute(){},removeAttribute(){},querySelector(){return null;}};
+function panel(){const children=new Map();const d={innerHTML:'',isConnected:true,setAttribute(){},addEventListener(){},showModal(){},close(){this.isConnected=false;},querySelectorAll(){return [];},querySelector(selector){if(selector.includes('add-stage'))return null;if(!children.has(selector))children.set(selector,{value:selector==='[name=trackerId]'?state.trackers[0]?.id:'',innerHTML:'',setAttribute(){},removeAttribute(){},focus(){}});return children.get(selector);}};dialogs.push(d);return d;}
+globalThis.document={body:{append(){}},createElement:panel,querySelectorAll:()=>[],addEventListener(){}};
+const app=createApplications({root,escape:String,getData:()=>({state:{goals:[]}}),today:()=> '2026-10-22',role:()=> 'owner',announce(){},request:async(action,body)=>{if(action==='applications')return {version,state};writes.push(body);const id=body.args.id||'new-group';state.trackers=[{...body.args,id,stages:[{id:'saved',name:'Saved'}]}];return {version:++version,state,receipt:{recordId:id,summary:'Saved'}};}});
+await app.render();
+app.createOpportunity();
+const group=dialogs.at(-1);
+assert.match(group.innerHTML,/Add group/);
+assert.equal((group.innerHTML.match(/<input /g)||[]).length,1,'First group only asks for a name');
+assert.doesNotMatch(group.innerHTML,/<select/);
+const form={elements:{name:{value:'My plans'}},setAttribute(){},removeAttribute(){},querySelector:()=>({disabled:false})};
+await group.querySelector('form').onsubmit({preventDefault(){},currentTarget:form});
+assert.equal(writes[0].args.kind,'custom');
+assert.equal(writes[0].version,1);
+assert.equal(app.selection().trackerId,'new-group');
+assert.match(dialogs.at(-1).innerHTML,/Save an opportunity/,'First group creation continues into the opportunity form');
+const mainFields=dialogs.at(-1).innerHTML.split('<details')[0];
+assert.match(mainFields,/name="title"/);assert.match(mainFields,/name="stage"/);assert.match(mainFields,/name="deadline"/);
+assert.doesNotMatch(mainFields,/name="url"|name="goalId"/);
+assert.equal(app.back(),true,'Creating a group remembers the dashboard origin');
+assert.equal(app.captureNavigation().current.tab,'groups');
+console.log('First-group creation, custom kind, minimal opportunity form and return navigation passed');

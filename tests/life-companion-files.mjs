@@ -3,9 +3,12 @@ import {createCompanion} from '../life/companion.js';
 const classes=new Set();
 const listeners={};let content='',sent,uploadResolve,uploadReject,failSend=true;
 const sendButton={disabled:true,setAttribute(){}};
+const optionsEvents={},optionsAttributes={};
+const optionsTrigger={setAttribute:(name,value)=>{optionsAttributes[name]=value},getBoundingClientRect:()=>({right:364,bottom:124})};
+const optionsMenu={style:{},offsetWidth:196,offsetHeight:112,addEventListener:(name,fn)=>{optionsEvents[name]=fn}};
 const history={scrollHeight:100,clientHeight:100,scrollTop:0},error={textContent:''},input={style:{setProperty(){}},scrollHeight:44,focus(){},setSelectionRange(){}};
-const root={get innerHTML(){return content},set innerHTML(v){content=v},addEventListener:(n,fn)=>(listeners[n]??=[]).push(fn),querySelector:s=>s==='.chat-history'?history:s==='#ai-message'?input:s==='.ramble-send'?sendButton:s==='.error'||s==='#ai-error'?error:null,classList:{toggle(name){if(classes.has(name)){classes.delete(name);return false}classes.add(name);return true},contains:name=>classes.has(name),add:name=>classes.add(name),remove:name=>classes.delete(name)},replaceChildren(){content=''}};
-globalThis.document={getElementById:id=>id==='companion'?root:null,activeElement:null,addEventListener(){},dispatchEvent(){},documentElement:{dataset:{timezone:'Africa/Lagos'},clientHeight:900,style:{setProperty(){}}}};
+const root={get innerHTML(){return content},set innerHTML(v){content=v},addEventListener:(n,fn)=>(listeners[n]??=[]).push(fn),querySelector:s=>s==='#ramble-chat-options'&&content.includes('id="ramble-chat-options"')?optionsMenu:s==='.ramble-options-toggle'?optionsTrigger:s==='.chat-history'?history:s==='#ai-message'?input:s==='.ramble-send'?sendButton:s==='.error'||s==='#ai-error'?error:null,classList:{toggle(name){if(classes.has(name)){classes.delete(name);return false}classes.add(name);return true},contains:name=>classes.has(name),add:name=>classes.add(name),remove:name=>classes.delete(name)},replaceChildren(){content=''}};
+globalThis.document={getElementById:id=>id==='companion'?root:null,activeElement:null,addEventListener(){},dispatchEvent(){},documentElement:{dataset:{timezone:'Africa/Lagos'},clientHeight:900,clientWidth:390,style:{setProperty(){}}}};
 globalThis.window={addEventListener(){}};globalThis.matchMedia=()=>({matches:false});globalThis.location={origin:'https://ramble.test'};
 const escape=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 let response={version:1,configured:true,state:{conversations:[],commands:[]}};let created=0,createWait=null,failCreate=false;
@@ -29,6 +32,20 @@ await new Promise(resolve=>setTimeout(resolve,0));assert.match(content,/Uploadin
 uploadResolve();await upload;document.activeElement=null;assert.equal(created,1);assert.match(content,/context.txt/);
 await submit();assert.deepEqual(sent.attachmentIds,['file-1']);assert.equal(sent.text,'Use this file');assert.match(content,/Use this file/);assert.match(content,/context.txt/);assert.match(content,/Offline/);
 failSend=false;await submit();assert.match(content,/ramble-attachment/);assert.doesNotMatch(content,/ramble-file-chip/);
+// Options use the browser top layer, so opening them cannot grow the conversation header.
+assert.match(content, /class="icon-action ramble-options-toggle"[^>]*popovertarget="ramble-chat-options"/);
+assert.match(content, /id="ramble-chat-options"[^>]*popover="auto"/);
+assert.doesNotMatch(content, /<details class="ramble-chat-menu"/);
+assert.doesNotMatch(content.match(/<header class="conversation-toolbar">[\s\S]*?<\/header>/)[0], /data-ai="rename"|data-ai="archive"/, 'Expanded actions never enter the header layout');
+optionsEvents.toggle({newState:'open'});
+assert.equal(optionsAttributes['aria-expanded'],'true');
+assert.equal(optionsMenu.style.left,'168px','Options align with the right edge of the trigger');
+assert.equal(optionsMenu.style.top,'128px','Options float below the trigger');
+optionsEvents.toggle({newState:'closed'});
+assert.equal(optionsAttributes['aria-expanded'],'false','Escape and outside dismissal update the trigger');
+const originalAnchor=optionsTrigger.getBoundingClientRect;optionsTrigger.getBoundingClientRect=()=>({right:170,bottom:890});
+optionsEvents.toggle({newState:'open'});assert.equal(optionsMenu.style.left,'8px');assert.equal(optionsMenu.style.top,'780px','Options stay within the visible viewport');
+optionsEvents.toggle({newState:'closed'});optionsTrigger.getBoundingClientRect=originalAnchor;
 // Removal is handled by the real delegated click handler.
 const extra=change({id:'ai-files',files:[new File(['extra'],'extra.txt',{type:'text/plain'})]});await new Promise(resolve=>setTimeout(resolve,0));
 await click({ai:'remove-file',id:'2'});assert.doesNotMatch(content,/extra.txt/);uploadResolve();await extra;assert.doesNotMatch(content,/extra.txt/);
@@ -41,7 +58,7 @@ await change({id:'ai-temporary',checked:true});assert.match(content,/Files are a
 // List navigation is explicit and idempotent, and returns to the current thread.
 companion.showHistory();companion.showHistory();assert.equal(companion.navigationState().view,'list');assert.equal(companion.back(),true);assert.equal(companion.back(),false);
 listeners.input[0]({target:{id:'ai-message',value:'Keep this draft',hasAttribute:()=>false}});
-await click({ai:'new'});assert.match(content, /placeholder="Message Ramble…"><\/textarea>/);
+await click({ai:'new'});assert.doesNotMatch(content,/id="ramble-chat-options"/,'New chats have no saved-conversation actions');assert.match(content, /placeholder="Message Ramble…"><\/textarea>/);
 listeners.input[0]({target:{id:'ai-message',value:'New draft',hasAttribute:()=>false}});
 await click({ai:'select-chat',id:'conversation-1'});assert.match(content,/Keep this draft/);
 await click({ai:'new'});assert.match(content,/New draft/);

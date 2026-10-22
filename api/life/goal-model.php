@@ -98,6 +98,7 @@ final class LifeGoalModel {
             $goal['parentId']=$args['parentGoalId'];
         }
         $goal['title']=LifeStore::text($goal['title']??'',200,true);$goal['notes']=LifeStore::text($goal['notes']??'',10000);$goal['category']=LifeStore::text($goal['category']??'Personal',60,true);
+        if($goal['type']==='day'&&($old['type']??null)!=='day')throw new LifeError('Week is the shortest goal period. Use a task for a single day.');
         $goal['period']=self::period($goal['type'],$goal['period']);$goal['parentId']=LifeStore::text($goal['parentId'],32);$goal['keyResultId']=LifeStore::text($goal['keyResultId'],32);
         if(!in_array($goal['status'],['todo','progress','done'],true))throw new LifeError('Choose a goal status.');
         if(!in_array($goal['progressMode'],['manual','linked'],true))throw new LifeError('Choose manual or linked progress.');

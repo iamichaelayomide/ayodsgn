@@ -1,0 +1,83 @@
+/* Keep primary actions and writable surfaces clear; workflow color is only a cue. */
+:root{--paper:#f4f5f7;--panel:#fff;--pink:#1f46d2;--line:#e1e4e9;--text:#171b24;--body:#343b48;--muted:#667080}
+.workspace .page-heading .eyebrow,.workspace #page-description,.board-footnote{display:none!important}
+.workspace .page-heading{padding-top:28px;padding-bottom:20px;gap:16px}
+.workspace .page-heading #page-title{font:600 28px/1.25 var(--sans);letter-spacing:-.6px;margin:0}
+.workspace .sidebar{background:#fff;background-image:none}
+.workspace .sidebar::before,.workspace .sidebar::after{display:none}
+.workspace .workspace-badge{background:#f5f7fc;border-color:var(--line)}
+.workspace .space-avatar{background:#edf2ff;color:var(--blue)}
+#nav-open,#nav-collapse,#nav-close{background:#fff;color:var(--blue);border-color:var(--line)}
+.topbar #save-status{white-space:nowrap;max-width:none;flex:none;font-size:11px}
+.topbar .app-breadcrumbs{min-width:0;overflow:hidden;flex:1}
+.topbar .app-breadcrumbs>span:last-child{overflow:hidden;text-overflow:ellipsis}
+#voice-preview.voice-fab,#voice-preview.voice-fab>span{color:#fff!important}
+#voice-preview.voice-fab{background:var(--blue);border:0}
+.workspace .board .column{background:#eef0f4;border-color:#e1e5ec;border-top:3px solid #b7c2d4}
+.workspace .board .column[data-tone=idea]{background:#f6f0f5;border-top-color:#d5aecb}
+.workspace .board .column[data-tone=progress]{border-top-color:#d8bb64;background:#f6f4ed}
+.workspace .board .column[data-tone=review]{border-top-color:#b0a6d6;background:#f2f1f7}
+.workspace .board .column[data-tone=blocked]{border-top-color:#cba38e;background:#f6f2ef}
+.workspace .board .column[data-tone=done]{border-top-color:#91b7a2;background:#f0f5f2}
+.workspace .board .task-card,.workspace .board .task-card[data-color]{background:#fff;border-color:#e1e4ea;border-radius:14px;color:var(--body)}
+.workspace .board .task-card .card-meta:empty{display:none}
+.workspace .column .empty-column{min-height:100px;padding:20px 8px;color:var(--muted)}
+.workspace .column:not([data-tone=idea]) .empty-column img{display:none}
+.workspace .column .empty-column img{width:80px;height:auto}
+.workspace .column .empty-column p{font-size:13px;margin:10px 0 0}
+.workspace .column .quick-add input{background:#fff;min-width:0;font-size:16px}
+.workspace .board.is-list{display:grid!important;grid-template-columns:minmax(0,1fr);overflow:visible;gap:16px}
+.workspace .board.is-list .column{width:100%;min-width:0;min-height:0}
+.workspace .board.is-list .empty-column{display:none}
+.workspace .board.is-list .cards{min-height:0}
+.workspace .board.is-list .task-card{margin-bottom:8px}
+.workspace .select-control{min-width:0;max-width:100%}
+.workspace .select-trigger,.workspace .date-control{background:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;word-break:normal}
+.workspace input:not([type=checkbox]):not([type=radio]),.workspace textarea,dialog input:not([type=checkbox]):not([type=radio]),dialog textarea,.select-trigger,.date-control{background-color:#fff}
+#board-mode-controls{justify-content:flex-start;gap:12px;align-items:center}
+#board-mode-controls .planner-segment{background:#e9ecf1;border:0;flex:none}
+#board-mode-controls .planner-segment button{white-space:nowrap;min-width:64px;padding-inline:16px}
+#board-mode-controls .planner-segment button[aria-pressed=true]{background:#fff;color:var(--blue)}
+#task-period-controls{margin-left:auto;flex:0 1 330px;display:grid;grid-template-columns:minmax(110px,1fr) minmax(150px,1.2fr);gap:8px}
+#task-period-controls:has(label[hidden]){display:flex;flex:0 1 150px}
+#task-period-controls:has(label[hidden])>label:not([hidden]){width:100%}
+#task-period-controls label,#task-period-controls .select-control{width:100%;min-width:0;margin:0}
+#task-period-controls .select-trigger,#task-period-controls .date-control{width:100%;min-height:44px;margin:0;font-size:14px}
+#quick-create-sheet{padding:10px 14px 18px;max-width:360px}
+#quick-create-sheet header{height:34px;justify-content:flex-end;margin:0}
+#quick-create-sheet header button{font-size:24px;min-height:32px;width:32px;padding:0;color:var(--muted)}
+#quick-create-sheet .quick-create-actions{gap:2px}
+#quick-create-sheet .quick-create-actions button{display:flex;flex-direction:row;align-items:center;gap:14px;padding:14px;min-height:54px;font-size:16px}
+#quick-create-sheet .quick-create-actions .action-icon{width:24px;height:24px;flex:none;margin:0}
+.task-extra-options{margin:14px 0}
+.task-extra-options>summary{cursor:pointer;padding:10px 0;font-size:14px;color:var(--blue)}
+.task-extra-options .task-detail-actions{margin-top:8px}
+#task-form .dialog-heading .eyebrow{display:none}
+#task-form textarea[name=title]{font:500 22px/1.4 var(--sans);min-height:70px;background:#fff}
+#task-form .task-completion{white-space:nowrap;flex:none}
+#task-form .task-save-state{font-size:12px}
+#goal-form .goal-form-details>summary{color:var(--blue)}
+@media(max-width:800px){
+ .workspace .page-heading{padding:24px 20px 18px}
+ .workspace .page-heading #page-title{font-size:24px!important}
+ #board-mode-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:0 20px 16px}
+ #board-mode-controls .planner-segment{width:fit-content;max-width:100%}
+ #board-mode-controls .planner-segment button{min-width:0;padding-inline:14px;font-size:14px}
+ #task-period-controls{grid-column:1/-1;width:100%;margin:0;grid-template-columns:minmax(110px,1fr) minmax(150px,1fr)}
+ #task-period-controls:has(label[hidden]){display:block;width:150px;grid-column:1/-1}
+ #task-period-controls .select-trigger,#task-period-controls .date-control{font-size:16px}
+ .workspace .topbar{gap:8px;padding-inline:16px}
+ .workspace .topbar #save-status{font-size:10px;white-space:nowrap;max-width:none}
+ .workspace .topbar .app-breadcrumbs{gap:6px;font-size:11px}
+ #quick-create-sheet{max-width:none;padding:10px 16px calc(16px + env(safe-area-inset-bottom));border-radius:22px 22px 0 0}
+ .workspace .board.is-list{padding-inline:20px}
+ .workspace .board.is-list .column{border-radius:16px;padding:12px}
+ .workspace .board.is-list .column .quick-add{margin-top:8px}
+ dialog{background:#f6f7f9}
+ dialog input,dialog textarea,dialog .select-trigger,dialog .date-control{background:#fff;font-size:16px}
+}
+@media(hover:hover) and (pointer:fine){#quick-create-sheet .quick-create-actions button:hover{background:#eef2ff}}
+
+.board-filter-options #task-period-controls{display:grid;grid-template-columns:1fr;width:100%;margin:0}.board-filter-options #task-period-controls label{width:100%}.board-filter-options #task-period-controls span:not(.select-control){font-size:12px;color:var(--muted)}
+
+dialog:not(.date-picker-dialog):not(.time-picker-dialog),.applications-dialog{background:#f6f7f9}
