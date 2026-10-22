@@ -26,7 +26,7 @@
 .workspace .column .empty-column img{width:80px;height:auto}
 .workspace .column .empty-column p{font-size:13px;margin:10px 0 0}
 .workspace .column .quick-add input{background:#fff;min-width:0;font-size:16px}
-.workspace .board.is-list{display:grid!important;grid-template-columns:minmax(0,1fr);overflow:visible;gap:16px}
+.workspace .board.is-list:not([hidden]){display:grid!important;grid-template-columns:minmax(0,1fr);overflow:visible;gap:16px}
 .workspace .board.is-list .column{width:100%;min-width:0;min-height:0}
 .workspace .board.is-list .empty-column{display:none}
 .workspace .board.is-list .cards{min-height:0}
