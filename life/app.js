@@ -1,3 +1,4 @@
+import {createAyoOS} from './ayo-os.js?v=1';
 import {taskColumns,periodRange,syncTaskReadiness,creationActions,laneTone} from './planner-interactions.js?v=2';
 import {createNavigationHistory} from './navigation-history.js?v=1';
 import {createApplications} from './applications.js?v=7';
@@ -24,7 +25,7 @@ import {createCalendar} from './calendar.js?v=44';
 import {installSelects} from './selects.js?v=4';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
-let csrf = '', setup = false, data = null, view = location.hash==='#applications'?'applications':'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
+let csrf = '', setup = false, data = null, view = location.hash==='#ayo-os'?'ayo-os':location.hash==='#applications'?'applications':'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
 installPWA({isBusy:()=>saving});
 let suspendedDialog = '', role='owner', selectedBoard='',boardEntity='tasks',taskPeriod='all',taskPeriodDate='',taskLayout='board';
 const commitmentWeek=()=>view==='week'?selectedWeek:periodRange('week',taskPeriodDate||today())[0];
@@ -47,7 +48,7 @@ async function request(action, body, retrySession=true) {
     if(response.status===403&&result.error==='Your session changed. Reload and try again.'&&body&&retrySession){const session=await request('session',undefined,false);csrf=session.csrf;if(session.authenticated)return request(action,body,false);}
     const error=new Error(result.error || 'The request could not be completed.'); error.status=response.status;
     if (response.status===409 && action==='mutate') { conflict=true; document.querySelectorAll('#reload,[data-reload]').forEach(b=>b.hidden=false); }
-    if (response.status===401 && action!=='login') { const openDialog=document.querySelector('dialog[open]'); if(openDialog){suspendedDialog=openDialog.id;openDialog.close();} const session=await request('session');csrf=session.csrf; $('workspace').hidden=true; $('auth').hidden=false; $('auth-copy').textContent='Your session ended. Sign in again to continue; your open draft is preserved.'; }
+    if (response.status===401 && action!=='login') { ayoOS.reset(); const openDialog=document.querySelector('dialog[open]'); if(openDialog){suspendedDialog=openDialog.id;openDialog.close();} const session=await request('session');csrf=session.csrf; $('workspace').hidden=true; $('auth').hidden=false; $('auth-copy').textContent='Your session ended. Sign in again to continue; your open draft is preserved.'; }
     throw error;
   }
   return result;
@@ -87,7 +88,7 @@ $('auth-form').addEventListener('submit',async(e)=>{
   finally { $('auth-submit').disabled=false; }
 });
 $('logout').addEventListener('click',async()=>{
-  try { let remindersRemoved=true;try{remindersRemoved=await removeLifeSubscriptions(request);}catch{remindersRemoved=false;}await request('logout',{}); data=null; viewNavigation.clear();applications.reset(); companion.reset(); $('workspace').hidden=true; $('auth').hidden=false; document.querySelectorAll('dialog[open]').forEach(d=>d.close()); $('email-auth-form').reset(); $('task-form').reset(); $('sprint-goal').value=''; await start();if(!remindersRemoved)announce('Signed out. Check browser notification settings to turn off remaining device reminders.'); }
+  try { let remindersRemoved=true;try{remindersRemoved=await removeLifeSubscriptions(request);}catch{remindersRemoved=false;}await request('logout',{}); data=null; viewNavigation.clear();applications.reset();ayoOS.reset(); companion.reset(); $('workspace').hidden=true; $('auth').hidden=false; document.querySelectorAll('dialog[open]').forEach(d=>d.close()); $('email-auth-form').reset(); $('task-form').reset(); $('sprint-goal').value=''; await start();if(!remindersRemoved)announce('Signed out. Check browser notification settings to turn off remaining device reminders.'); }
   catch(e) { pageError(e.message); }
 });
 function matches(task) {
@@ -113,8 +114,10 @@ const companion=createCompanion({getApplications:()=>applications.snapshot(),req
 $ ('mobile-chat-list').addEventListener('click',()=>{companion.showHistory();updateBreadcrumbs();});
 const taskHistory=createTaskHistory({root:$('task-history'),request,escape,getData:()=>data,mutate});
 const applications=createApplications({onNavigation:updateBreadcrumbs,root:$('applications'),request,escape,getData:()=>data,openTask,reloadBoard:loadBoard,today,announce,role:()=>role,upload:async body=>{const response=await fetch(API+'?action=applications.upload',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'X-CSRF-Token':csrf},body});const result=await response.json();if(!response.ok)throw Error(result.error||'Document could not be saved.');return result;}});
+const ayoOS=createAyoOS({root:$('ayo-os'),request,escape,role:()=>role});
+$('ayo-os').addEventListener('click',event=>{if(event.target.closest('[data-ayo-existing]')){event.preventDefault();goToView('applications');}});
 const viewNavigation=createNavigationHistory();
-const viewNames={board:'My board',goals:'Goals',today:'Today',companion:'Ramble',applications:'Opportunities','task-history':'History',analytics:'Analytics',week:'This week',calendar:'Calendar',routines:'Routines',accountability:'Accountability',notes:'Notes',mindmap:'Mind map',archive:'Archive'};
+const viewNames={'ayo-os':'Ayo OS',board:'My board',goals:'Goals',today:'Today',companion:'Ramble',applications:'Opportunities','task-history':'History',analytics:'Analytics',week:'This week',calendar:'Calendar',routines:'Routines',accountability:'Accountability',notes:'Notes',mindmap:'Mind map',archive:'Archive'};
 function updateBreadcrumbs(){const parts=view==='applications'?applications.breadcrumbs():[{label:viewNames[view]||'My board'}];$('breadcrumb').innerHTML=parts.map((part,index)=>`<span class="breadcrumb-separator" aria-hidden="true">/</span>${part.action?`<button type="button" data-app-breadcrumb="${part.action}">${escape(part.label)}</button>`:`<span ${index===parts.length-1?'aria-current="page"':''}>${escape(part.label)}</span>`}`).join('');$('view-back').hidden=!viewNavigation.canBack&&!(view==='applications'&&applications.canBack())&&!(view==='companion'&&companion.canBack());}
 function goToView(next){if(next!==view){viewNavigation.remember({view,scroll:window.scrollY,board:selectedBoard,applications:view==='applications'?applications.captureNavigation():null});if(next==='applications')applications.clearNavigation();view=next;}render();window.scrollTo(0,0);}
 document.addEventListener('life:chat-navigation',updateBreadcrumbs);
@@ -127,6 +130,8 @@ function render() {
  if($('task-period-controls'))$('task-period-controls').hidden=view!=='board'||boardEntity!=='tasks';if($('task-layout-controls'))$('task-layout-controls').hidden=view!=='board'||boardEntity!=='tasks';if($('task-period-date'))$('task-period-date').closest('label').hidden=taskPeriod==='all';
  goals.setBoardMode?.(view==='board'&&boardEntity==='goals');
  $('mobile-chat-list').hidden=view!=='companion';
+ $('ayo-os').hidden=view!=='ayo-os';
+ if(view==='ayo-os'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','companion','analytics','sprint-panel','board-footnote','new-task','task-history','applications'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;document.querySelector('.week-picker-line').hidden=true;$('workspace').dataset.view=view;$('workspace').classList.remove('ramble-view');$('page-title').textContent='Ayo OS';$('page-description').textContent='Research. Build relationships. Review your next move.';document.querySelectorAll('[data-view]').forEach(b=>b.dataset.view===view?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));ayoOS.render();return;}
  $('applications').hidden=view!=='applications';
  if(view==='applications'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','companion','analytics','sprint-panel','board-footnote','new-task','task-history'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;document.querySelector('.week-picker-line').hidden=true;$('workspace').dataset.view=view;$('workspace').classList.remove('ramble-view');$('breadcrumb').textContent='Applications';$('page-title').textContent='Opportunities';$('page-description').textContent='';document.querySelectorAll('[data-view]').forEach(b=>b.dataset.view===view?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));applications.render();return;}
 

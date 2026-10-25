@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS life_ayo_os (
+ id INT PRIMARY KEY,
+ version INT NOT NULL,
+ state LONGTEXT NOT NULL,
+ updated_at VARCHAR(30) NOT NULL
+);
