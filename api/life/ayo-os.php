@@ -1,0 +1,75 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/applications.php';
+/** Private outreach workspace. This model never performs external actions. */
+final class LifeAyoOS {
+ public const PIPELINES=['nysc','freelance','career'];
+ public const STAGES=['researched','ready','drafted','replied','conversation','offer','won','closed'];
+ public function __construct(public LifeStore $store){$store->db->exec(file_get_contents(__DIR__.'/migrations/ayo-os.sql'));}
+ public static function requireWorkspace(array $input,int $tenantId):void{if(($input['workspaceId']??null)!==$tenantId)throw new LifeError('Your account changed. Reload Ayo OS before saving.',409);}
+ public function read():array{
+  $q=$this->store->db->prepare('SELECT version,state FROM life_ayo_os WHERE id=?');$q->execute([$this->store->tenantId]);$r=$q->fetch(PDO::FETCH_ASSOC);
+  if(!$r){$s=['schema'=>1,'companies'=>[],'contacts'=>[],'opportunities'=>[],'research'=>[],'drafts'=>[],'approvals'=>[]];try{$this->store->db->prepare('INSERT INTO life_ayo_os VALUES (?,1,?,?)')->execute([$this->store->tenantId,json_encode($s,JSON_THROW_ON_ERROR),LifeStore::now()]);}catch(PDOException $e){$q->execute([$this->store->tenantId]);if(!$q->fetch())throw $e;}return $this->read();}
+  return ['workspaceId'=>$this->store->tenantId,'version'=>(int)$r['version'],'state'=>json_decode($r['state'],true,128,JSON_THROW_ON_ERROR)];
+ }
+ private static function item(array $s,string $type,mixed $id):array{return LifeApplications::find($s,$type,$id);}
+ private static function choice(mixed $v,array $choices):string{if(!is_string($v)||!in_array($v,$choices,true))throw new LifeError('Choose a valid option.');return $v;}
+ public static function snapshot(array $s,string $id):array{
+  $d=self::item($s,'drafts',$id);$o=self::item($s,'opportunities',$d['opportunityId']);$c=self::item($s,'contacts',$d['contactId']);$company=self::item($s,'companies',$o['companyId']);$notes=array_map(fn($id)=>self::item($s,'research',$id),$d['researchIds']);
+  return ['draft'=>$d,'opportunity'=>$o,'contact'=>$c,'company'=>$company,'research'=>$notes];
+ }
+ public static function approval(array $s,string $id):?array{
+  $last=null;foreach($s['approvals'] as $r)if($r['draftId']===$id)$last=$r;
+  if(!$last||$last['decision']!=='approved')return null;
+  return hash_equals($last['fingerprint'],hash('sha256',json_encode(self::snapshot($s,$id),JSON_THROW_ON_ERROR)))?$last:null;
+ }
+ public function mutate(int $version,string $operation,array $args,string $actor):array{
+  $this->read();$db=$this->store->db;$db->beginTransaction();
+  try{$current=$this->read();if($current['version']!==$version)throw new LifeError('Ayo OS changed in another tab. Your form is preserved. Reload before saving again.',409);$s=$current['state'];$at=LifeStore::now();$id=$args['id']??'';
+   $types=['company.save'=>'companies','contact.save'=>'contacts','opportunity.save'=>'opportunities','research.save'=>'research','draft.save'=>'drafts'];
+   if($operation==='review.decide'){
+    $id=LifeApplications::id($id);$snapshot=self::snapshot($s,$id);$decision=self::choice($args['decision']??'',['approved','rejected']);$reason=LifeStore::text($args['reason']??'',2000,$decision==='rejected');
+    if($decision==='approved'){
+     if(($args['reviewed']??false)!==true)throw new LifeError('Explicitly review the recipient, content, materials and schedule first.',403);
+     $d=$snapshot['draft'];$c=$snapshot['contact'];$o=$snapshot['opportunity'];
+     if(!$c['email']||!$c['sourceUrl']||!$d['subject']||!$d['body']||!$d['schedule']||!$o['materials'])throw new LifeError('Add a sourced recipient, message, materials reference and schedule before approval.');
+     $cited=array_filter($snapshot['research'],fn($r)=>$r['kind']==='observation'&&$r['sourceUrl']!=='');if(!$cited)throw new LifeError('Link at least one sourced observation before approval.');
+    }
+    if(count($s['approvals'])>=10000)throw new LifeError('Approval history limit reached.');
+    $s['approvals'][]=['id'=>LifeStore::id(),'draftId'=>$id,'decision'=>$decision,'reason'=>$reason,'actor'=>$actor,'at'=>$at,'fingerprint'=>hash('sha256',json_encode($snapshot,JSON_THROW_ON_ERROR)),'snapshot'=>$snapshot];
+   }else{
+    if(!isset($types[$operation]))throw new LifeError('This action is unavailable. Ayo OS does not send or schedule messages.',400);
+    $type=$types[$operation];$old=$id!==''?self::item($s,$type,$id):null;$id=$old['id']??LifeStore::id();$r=$old??['id'=>$id,'createdAt'=>$at];$r['updatedAt']=$at;
+    $fields=match($type){'companies'=>['name'=>200,'industry'=>100],'contacts'=>['name'=>200,'role'=>200],'opportunities'=>['title'=>200,'notes'=>10000,'materials'=>2000],'research'=>['body'=>10000],'drafts'=>['subject'=>200,'body'=>15000],default=>[]};
+    foreach($fields as $field=>$limit)$r[$field]=LifeStore::text($args[$field]??$r[$field]??'',$limit,in_array($field,['name','title','body'],true));
+    if($type==='companies')$r['website']=LifeApplications::url($args['website']??$r['website']??'');
+    if(in_array($type,['contacts','opportunities'],true)){$r['companyId']=$args['companyId']??$r['companyId']??'';self::item($s,'companies',$r['companyId']);}
+    if($type==='contacts'){
+     if(!$old&&count(array_filter($s['contacts'],fn($c)=>$c['companyId']===$r['companyId']))>=2)throw new LifeError('Use up to two contacts per company.');
+     // Prevent moving contacts referenced by drafts to a different company.
+     if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create a contact at the other company instead.');
+     $r['email']=LifeStore::text($args['email']??$r['email']??'',254);if($r['email']!==''&&!filter_var($r['email'],FILTER_VALIDATE_EMAIL))throw new LifeError('Use a valid professional email address.');
+     $r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');
+    }
+    if($type==='opportunities'){
+     if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create an opportunity at the other company instead.');
+     $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',self::PIPELINES);$r['stage']=self::choice($args['stage']??$r['stage']??'researched',self::STAGES);$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
+    }
+    if(in_array($type,['research','drafts'],true)){
+     $r['opportunityId']=$args['opportunityId']??$r['opportunityId']??'';$o=self::item($s,'opportunities',$r['opportunityId']);if($old&&$r['opportunityId']!==$old['opportunityId'])throw new LifeError('Keep records with their original opportunity.');
+    }
+    if($type==='research'){
+     $r['kind']=self::choice($args['kind']??$r['kind']??'observation',['observation','hypothesis']);$r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');if($r['kind']==='observation'&&$r['sourceUrl']==='')throw new LifeError('Observations need a source URL. Label unsourced ideas as hypotheses.');
+    }
+    if($type==='drafts'){
+     $r['contactId']=$args['contactId']??$r['contactId']??'';$c=self::item($s,'contacts',$r['contactId']);if($c['companyId']!==$o['companyId'])throw new LifeError('Choose a contact at this company.');
+     $ids=$args['researchIds']??$r['researchIds']??[];if(!is_array($ids)||!array_is_list($ids)||count($ids)>20)throw new LifeError('Link up to 20 research notes.');foreach($ids as $note){$research=self::item($s,'research',$note);if($research['opportunityId']!==$o['id'])throw new LifeError('Use research from this opportunity.');}$r['researchIds']=array_values(array_unique($ids));
+     $r['schedule']=LifeStore::text($args['schedule']??$r['schedule']??'',16);if($r['schedule']!==''){if(!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/D',$r['schedule']))throw new LifeError('Choose a valid schedule.');LifeApplications::date(substr($r['schedule'],0,10));if(substr($r['schedule'],11,2)>'23'||substr($r['schedule'],14,2)>'59')throw new LifeError('Choose a valid time.');}
+     $r['timezone']=LifeStore::text($args['timezone']??$r['timezone']??'Africa/Lagos',100,true);if(!in_array($r['timezone'],DateTimeZone::listIdentifiers(),true))throw new LifeError('Use a valid timezone.');
+    }
+    if(!$old&&count($s[$type])>=2000)throw new LifeError('Workspace record limit reached.');$found=false;foreach($s[$type] as $i=>$row)if($row['id']===$id){$s[$type][$i]=$r;$found=true;break;}if(!$found)$s[$type][]=$r;
+   }
+   $json=json_encode($s,JSON_THROW_ON_ERROR);if(strlen($json)>20*1024*1024)throw new LifeError('Workspace storage limit reached.');$q=$db->prepare('UPDATE life_ayo_os SET version=version+1,state=?,updated_at=? WHERE id=? AND version=?');$q->execute([$json,$at,$this->store->tenantId,$version]);if($q->rowCount()!==1)throw new LifeError('Ayo OS changed while saving. Reload before retrying.',409);$db->commit();return $this->read()+['recordId'=>$id];
+  }catch(Throwable $e){if($db->inTransaction())$db->rollBack();throw $e;}
+ }
+}
