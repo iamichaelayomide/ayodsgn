@@ -1,4 +1,4 @@
-import {createOpportunityAgents} from './opportunity-agents-ui.js?v=1';
+import {createOpportunityAgents} from './opportunity-agents-ui.js?v=2';
 import {pipelines,stages,safeLink,opportunityLabel,opportunityStatus,pipelineFor,messageText,isActivityNote,summaryCounts} from './opportunities-view.js?v=2';
 
 export function createAyoOS({root,request,escape:e,role,uploadDocument}){
