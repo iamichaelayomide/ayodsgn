@@ -1,0 +1,194 @@
+{
+  "name": "Ayo research coordinator — setup required",
+  "active": false,
+  "nodes": [
+    {
+      "id": "manual-test",
+      "name": "Manual test",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "daily-9-am-lagos",
+      "name": "Daily 9 AM Lagos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        180
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "connection-gate",
+      "name": "Connection gate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "jsCode": "// Configure only after importing all four child workflows and selecting credentials.\nconst enabled=false;\nconst model=''; // Verified web-search-capable OpenAI model available to your account.\nconst workflowIds={nysc:'',freelance:'',career:'',ai_testing:''};\nif(!enabled||!model||Object.values(workflowIds).some(id=>!id))throw new Error('Setup required: workflow disabled; configure model, four child IDs and credentials before enabling');\nreturn [{json:{model,workflowIds}}];"
+      }
+    },
+    {
+      "id": "launch-nysc",
+      "name": "Launch nysc",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflowIds.nysc }}",
+          "mode": "id"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "launch-freelance",
+      "name": "Launch freelance",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        500,
+        160
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflowIds.freelance }}",
+          "mode": "id"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "launch-career",
+      "name": "Launch career",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        500,
+        320
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflowIds.career }}",
+          "mode": "id"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    },
+    {
+      "id": "launch-ai_testing",
+      "name": "Launch ai_testing",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        500,
+        480
+      ],
+      "parameters": {
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "={{ $json.workflowIds.ai_testing }}",
+          "mode": "id"
+        },
+        "mode": "once",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Manual test": {
+      "main": [
+        [
+          {
+            "node": "Connection gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 9 AM Lagos": {
+      "main": [
+        [
+          {
+            "node": "Connection gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Connection gate": {
+      "main": [
+        [
+          {
+            "node": "Launch nysc",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Launch freelance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Launch career",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Launch ai_testing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "timezone": "Africa/Lagos",
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all"
+  }
+}

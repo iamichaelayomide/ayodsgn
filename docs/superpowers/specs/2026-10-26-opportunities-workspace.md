@@ -1,0 +1,9 @@
+# Company-first Opportunities
+
+Implement the user's explicit redesign in Life, preserving portfolio and all existing data. One sidebar entry named Opportunities opens the Ayo OS records; legacy application records/documents remain reachable within it. Old #ayo-os links resolve to Opportunities. Cards show company and role, with a small status/pipeline indicator, not notes or contacts. Search and four pipeline filters: NYSC, Freelance, Career, AI testing. AI testing acceptance is Pending / Accepted / Not accepted, never inferred from profile activation.
+
+A native modal detail panel opens above the list with independent scroll, focus trap, Escape and close focus restoration. List scroll does not move. Within it Company, People, Emails, Research sections expose company description/website/social/LinkedIn, up to two sourced contacts with role/email/LinkedIn, dated correspondence with Gmail links, follow-up reminders, and drafts with copy and mail compose handoff. No automatic sending. Sensitive reports are excluded. Editors are modal too, do not scroll the page. Preserve conflict forms and tenant/session safety.
+
+Use existing Life typography/tokens and sourced icon assets. Even padding, shorter labels, no Next conversations wording, no repeated warnings on cards. Evidence is disclosed in details. Existing imported verbose titles are shortened for presentation only; raw saved values and notes remain intact. Historical notes stay accessible. New communication records are optional structured additions and old snapshots normalize missing arrays.
+
+Parallel agent orchestration is prepared as an inactive n8n workflow because no workspace/credentials exist. Four bounded research/monitor workers produce source-grounded proposals for review. It is not advertised as connected or running until a real host and credentials have been configured and a run verified.
