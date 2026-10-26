@@ -32,7 +32,7 @@ denied(fn()=>save('research.save',['opportunityId'=>$o,'kind'=>'observation','bo
 $h=save('research.save',['opportunityId'=>$o,'kind'=>'hypothesis','body'=>'Possible onboarding opportunity'])['recordId'];
 save('draft.save',['id'=>$d,'researchIds'=>[$h]]);denied(fn()=>save('review.decide',['id'=>$d,'decision'=>'approved','reviewed'=>true]));
 denied(fn()=>save('contact.save',['companyId'=>$c,'name'=>'Other','email'=>'bad']));
-save('contact.save',['companyId'=>$c,'name'=>'Second']);denied(fn()=>save('contact.save',['companyId'=>$c,'name'=>'Third']));
+save('contact.save',['companyId'=>$c,'name'=>'Second']);save('contact.save',['companyId'=>$c,'name'=>'Third']);
 denied(fn()=>save('draft.save',['id'=>$d,'timezone'=>'Nowhere/Invalid']));
 check($store->read()===$before,'Planner preserved');
 // Company-first details are optional, persistent and safe.
@@ -56,5 +56,25 @@ denied(fn()=>$other->mutate($other->read()['version'],'communication.save',$hist
 save('communication.save',array_replace($history,['messageId'=>'gmail-message-2','direction'=>'received']));check(count($os->read()['state']['communications'])===3,'Distinct messages in the same Gmail thread remain separate');
 $withoutId=array_replace($history,['messageId'=>'','occurredAt'=>'2026-10-26T08:00:00Z']);$fallback=save('communication.save',$withoutId);denied(fn()=>save('communication.save',$withoutId),409);check($fallback['state']['communications'][3]['occurredAt']==='2026-10-26T08:00:00Z','UTC timestamps round trip');
 check($os->read()['state']['opportunities'][1]['stage']==='pending','Email history never infers AI acceptance');
-$legacy=$os->read()['state'];unset($legacy['communications']);$db->prepare('UPDATE life_ayo_os SET state=? WHERE id=1')->execute([json_encode($legacy)]);check($os->read()['state']['communications']===[],'Legacy history defaults safely');check($store->read()===$before,'Planner preserved after enrichment');
+$legacy=$os->read()['state'];unset($legacy['communications'],$legacy['pipelines'],$legacy['statuses']);$db->prepare('UPDATE life_ayo_os SET state=? WHERE id=1')->execute([json_encode($legacy)]);check($os->read()['state']['communications']===[]&&$os->read()['state']['pipelines']===[]&&$os->read()['state']['statuses']===[],'Legacy collections default safely');check($store->read()===$before,'Planner preserved after enrichment');
+// Custom dimensions belong to the workspace and cannot silently accept arbitrary IDs.
+check($os->read()['state']['pipelines']===[]&&$os->read()['state']['statuses']===[],'Custom dimensions default empty');check(($os->read()['state']['opportunities'][0]['documentIds']??[])===[],'Legacy document links default empty');
+$pipeline=save('pipeline.save',['name'=>'Consulting'])['recordId'];$status=save('status.save',['name'=>'Assessment complete'])['recordId'];
+check((bool)preg_match('/^[a-f0-9]{32}$/',$pipeline),'Custom pipeline uses generated record ID');
+save('opportunity.save',['id'=>$ai,'pipeline'=>$pipeline,'stage'=>$status]);check($os->read()['state']['opportunities'][1]['stage']===$status,'Custom dimensions selectable');
+save('pipeline.save',['id'=>$pipeline,'name'=>'Consulting placements']);check($os->read()['state']['pipelines'][0]['name']==='Consulting placements','Custom label renamed without changing links');
+denied(fn()=>save('pipeline.save',['name'=>'']));denied(fn()=>save('pipeline.save',['name'=>str_repeat('x',61)]));denied(fn()=>save('pipeline.save',['name'=>'consulting placements']),409);denied(fn()=>save('status.save',['name'=>'Pending']),409);
+denied(fn()=>$other->mutate($other->read()['version'],'opportunity.save',['companyId'=>$c,'pipeline'=>$pipeline,'title'=>'Wrong tenant'],'owner:2'),404);
+for($i=4;$i<=10;$i++)save('contact.save',['companyId'=>$c,'name'=>'Person '.$i]);denied(fn()=>save('contact.save',['companyId'=>$c,'name'=>'Eleventh']));check(count($os->read()['state']['contacts'])===10,'Named people coexist with a general inbox');
+save('company.save',['id'=>$c,'recentNews'=>'New public launch','problem'=>'Possible onboarding complexity','fit'=>'Operational product design']);check($os->read()['state']['companies'][0]['fit']==='Operational product design','Structured company research persists');
+save('research.save',['id'=>$r,'category'=>'activity']);check($os->read()['state']['research'][0]['category']==='activity','Email activity can be separated from company research');denied(fn()=>save('research.save',['id'=>$r,'category'=>'secret']));
+$event=save('communication.save',$history)['recordId'];save('communication.save',['id'=>$event,'from'=>'Ayo <ayo@example.com>','to'=>'Founder <founder@example.com>']);check($os->read()['state']['communications'][0]['to']==='Founder <founder@example.com>','Communication addresses preserved as plain text');denied(fn()=>save('communication.save',['id'=>$event,'to'=>['email'=>'bad']]));
+// Link real existing document records without disclosing private extracted content or storage IDs.
+$apps=new LifeApplications($store);$tracker=$apps->mutate($apps->read()['version'],'tracker.save',['name'=>'Document bank','kind'=>'career'])['receipt']['recordId'];
+$document=$apps->mutate($apps->read()['version'],'document.add',['trackerId'=>$tracker,'name'=>'Ayo Consulting CV.pdf','mime'=>'application/pdf','kind'=>'cv','fileId'=>str_repeat('a',32),'size'=>100,'text'=>'PRIVATE EXTRACTED CV'])['receipt']['recordId'];
+$bank=$os->read();check($bank['documentVersion']===$apps->read()['version'],'Document version matches upload concurrency token');check(count($bank['documents'])===1&&$bank['documents'][0]['name']==='Ayo Consulting CV.pdf','Existing document bank exposed');check(!array_key_exists('text',$bank['documents'][0])&&!array_key_exists('fileId',$bank['documents'][0]),'Document bank hides content and storage IDs');check($other->read()['documents']===[],'Document bank tenant isolation');
+save('opportunity.save',['id'=>$o,'documentIds'=>[$document,$document]]);check($os->read()['state']['opportunities'][0]['documentIds']===[$document],'Document links persist and deduplicate');save('opportunity.save',['id'=>$o,'notes'=>'Keep linked CV']);check($os->read()['state']['opportunities'][0]['documentIds']===[$document],'Partial edits preserve document links');
+denied(fn()=>save('opportunity.save',['id'=>$o,'documentIds'=>[str_repeat('f',32)]]),404);denied(fn()=>save('opportunity.save',['id'=>$o,'documentIds'=>array_fill(0,21,$document)]));
+$apps->mutate($apps->read()['version'],'document.archive',['id'=>$document]);denied(fn()=>save('opportunity.save',['id'=>$o,'documentIds'=>[$document]]),409);check($os->read()['documents']===[],'Archived documents are not offered');
+save('opportunity.save',['id'=>$o,'description'=>'Job description for tailored CV']);check($os->read()['state']['opportunities'][0]['description']==='Job description for tailored CV','Job description persists independently of evidence notes');denied(fn()=>save('opportunity.save',['id'=>$o,'description'=>str_repeat('x',10001)]));
 echo "$n Ayo OS persistence and approval checks passed\n";

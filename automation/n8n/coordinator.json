@@ -1,5 +1,5 @@
 {
-  "name": "Ayo research coordinator — setup required",
+  "name": "Ayo scoped research coordinator — connect credentials first",
   "active": false,
   "nodes": [
     {
@@ -14,8 +14,8 @@
       "parameters": {}
     },
     {
-      "id": "daily-9-am-lagos",
-      "name": "Daily 9 AM Lagos",
+      "id": "poll-each-minute",
+      "name": "Poll each minute",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
@@ -27,7 +27,7 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "0 9 * * *"
+              "expression": "* * * * *"
             }
           ]
         }
@@ -43,7 +43,42 @@
         0
       ],
       "parameters": {
-        "jsCode": "// Configure only after importing all four child workflows and selecting credentials.\nconst enabled=false;\nconst model=''; // Verified web-search-capable OpenAI model available to your account.\nconst workflowIds={nysc:'',freelance:'',career:'',ai_testing:''};\nif(!enabled||!model||Object.values(workflowIds).some(id=>!id))throw new Error('Setup required: workflow disabled; configure model, four child IDs and credentials before enabling');\nreturn [{json:{model,workflowIds}}];"
+        "jsCode": "const enabled=false;\nconst workflowIds={nysc:'',freelance:'',career:'',ai_testing:''};\nif(!enabled||Object.values(workflowIds).some(id=>!id))throw new Error('Import four child workflows, configure their model/credentials, select their IDs, then enable this coordinator');\nreturn [{json:{workflowIds}}];"
+      }
+    },
+    {
+      "id": "claim-public-research-jobs",
+      "name": "Claim public research jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://life.ayodsgn.com/api/life/?action=opportunity-agents.poll",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"limit\":4}",
+        "options": {
+          "timeout": 30000
+        }
+      }
+    },
+    {
+      "id": "select-nysc",
+      "name": "Select nysc",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"nysc\").map(j=>({json:j}));"
       }
     },
     {
@@ -52,20 +87,33 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        500,
+        1000,
         0
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $json.workflowIds.nysc }}",
+          "value": "={{ $('Connection gate').first().json.workflowIds.nysc }}",
           "mode": "id"
         },
-        "mode": "once",
+        "mode": "each",
         "options": {
           "waitForSubWorkflow": false
         }
+      }
+    },
+    {
+      "id": "select-freelance",
+      "name": "Select freelance",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        200
+      ],
+      "parameters": {
+        "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"freelance\").map(j=>({json:j}));"
       }
     },
     {
@@ -74,20 +122,33 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        500,
-        160
+        1000,
+        200
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $json.workflowIds.freelance }}",
+          "value": "={{ $('Connection gate').first().json.workflowIds.freelance }}",
           "mode": "id"
         },
-        "mode": "once",
+        "mode": "each",
         "options": {
           "waitForSubWorkflow": false
         }
+      }
+    },
+    {
+      "id": "select-career",
+      "name": "Select career",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        400
+      ],
+      "parameters": {
+        "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"career\").map(j=>({json:j}));"
       }
     },
     {
@@ -96,20 +157,33 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        500,
-        320
+        1000,
+        400
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $json.workflowIds.career }}",
+          "value": "={{ $('Connection gate').first().json.workflowIds.career }}",
           "mode": "id"
         },
-        "mode": "once",
+        "mode": "each",
         "options": {
           "waitForSubWorkflow": false
         }
+      }
+    },
+    {
+      "id": "select-ai_testing",
+      "name": "Select ai_testing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        740,
+        600
+      ],
+      "parameters": {
+        "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"ai-testing\").map(j=>({json:j}));"
       }
     },
     {
@@ -118,17 +192,17 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        500,
-        480
+        1000,
+        600
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $json.workflowIds.ai_testing }}",
+          "value": "={{ $('Connection gate').first().json.workflowIds.ai_testing }}",
           "mode": "id"
         },
-        "mode": "once",
+        "mode": "each",
         "options": {
           "waitForSubWorkflow": false
         }
@@ -147,7 +221,7 @@
         ]
       ]
     },
-    "Daily 9 AM Lagos": {
+    "Poll each minute": {
       "main": [
         [
           {
@@ -162,20 +236,75 @@
       "main": [
         [
           {
-            "node": "Launch nysc",
+            "node": "Claim public research jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim public research jobs": {
+      "main": [
+        [
+          {
+            "node": "Select nysc",
             "type": "main",
             "index": 0
           },
+          {
+            "node": "Select freelance",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Select career",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Select ai_testing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select nysc": {
+      "main": [
+        [
+          {
+            "node": "Launch nysc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select freelance": {
+      "main": [
+        [
           {
             "node": "Launch freelance",
             "type": "main",
             "index": 0
-          },
+          }
+        ]
+      ]
+    },
+    "Select career": {
+      "main": [
+        [
           {
             "node": "Launch career",
             "type": "main",
             "index": 0
-          },
+          }
+        ]
+      ]
+    },
+    "Select ai_testing": {
+      "main": [
+        [
           {
             "node": "Launch ai_testing",
             "type": "main",

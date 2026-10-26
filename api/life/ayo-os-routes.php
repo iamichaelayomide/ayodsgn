@@ -9,6 +9,13 @@ function life_ayo_os_route(LifeStore $store,string $method,string $action,array 
   if(!is_int($input['version']??null)||!is_array($input['args']??null))throw new LifeError('Reload Ayo OS before saving.',409);
   life_json(life_ayo_os_public($os->mutate($input['version'],LifeStore::text($input['operation']??'',60,true),$input['args'],$actor)));
  }
+ if($method==='POST'&&in_array($action,['ayo-os.ai.research','ayo-os.ai.rewrite','ayo-os.ai.tailor','ayo-os.automation.status'],true)){
+  LifeAyoOS::requireWorkspace($input,$store->tenantId);require_once __DIR__.'/opportunity-ai.php';$ai=new LifeOpportunityAI($os);
+  life_json(match($action){'ayo-os.ai.research'=>$ai->research($input),'ayo-os.ai.rewrite'=>$ai->rewrite($input),'ayo-os.ai.tailor'=>$ai->tailor($input),'ayo-os.automation.status'=>$ai->automation($input)});
+ }
+ if($method==='POST'&&in_array($action,['ayo-os.agents.status','ayo-os.agents.queue','ayo-os.agents.token','ayo-os.agents.revoke','ayo-os.agents.review'],true)){
+  LifeAyoOS::requireWorkspace($input,$store->tenantId);require_once __DIR__.'/opportunity-agents.php';life_json((new LifeOpportunityAgents($os))->handleOwner($action,$input));
+ }
  throw new LifeError('Unknown Ayo OS request.',404);
 }
 function life_ayo_os_public(array $result):array{
