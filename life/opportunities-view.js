@@ -17,3 +17,6 @@ export function opportunityLabel(o){
  s=s.replace(/^(?:Pouchers|Acceede|Foregate|Platos|Trade Lenda|STAXIS|Growwr|CreditChek|Datab|Indigenius|Mobihealth|Overite|Codar|BioVana|Tuteria|Fertitude|Swoop|AiWaziri)(?:'s)?\s+/i,'');
  return s.charAt(0).toUpperCase()+s.slice(1);
 }
+export function messageText(value){return String(value||'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"').split(/\n\s*On [^\n]+wrote:\s*\n|\n\s*-{2,}\s*Forwarded message/i)[0].trim();}
+export function isActivityNote(r){return r.category==='activity'||/^(?:Correspondence \/ tracker evidence|Evidence checked|Gmail delivery-status notice)/i.test(r.body||'');}
+export function summaryCounts(rows,today){return {tracking:rows.length,applied:rows.filter(o=>['sent','submitted'].includes(opportunityStatus(o))).length,followups:rows.filter(o=>o.followUpDate&&o.followUpDate<=today).length,accepted:rows.filter(o=>['accepted','won'].includes(opportunityStatus(o))).length};}

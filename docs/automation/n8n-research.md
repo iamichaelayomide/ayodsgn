@@ -1,38 +1,30 @@
-# Ayo research agents: prepared, not connected
+# Scoped n8n research bridge
 
-The exports in `automation/n8n/` are an inactive setup kit. They have not run against a real n8n instance or provider account. They do not change Life, send email, schedule outreach, approve materials or apply for jobs. The existing Codex daily Gmail reconciliation is separate and remains the only configured daily check.
+The five exports in `automation/n8n/` implement polling from n8n to Life. They are inactive until the user finishes connection setup. Localhost n8n need not be publicly reachable: it claims jobs from Life over HTTPS and returns proposals. Life never calls localhost.
 
-## What the exports do
+## User setup
 
-`coordinator.json` has manual and 09:00 Africa/Lagos triggers, a fail-closed configuration gate, and four non-waiting child-workflow launches. Import `nysc.json`, `freelance.json`, `career.json` and `ai_testing.json` first. Each performs one bounded web research request through the OpenAI Responses API and returns at most five proposals with sources and up to two professional contacts. Empty results are valid. Each child ends at **Review proposals only**. Its output is visible in that child execution; there is no combined dashboard import yet.
+1. Complete the local owner setup at http://localhost:5678 (see `local-n8n.md`). No owner password was created by the assistant.
+2. In Life's signed-in research connection controls, explicitly approve creating a research-only connection token. It is returned once; store it in an n8n Header Auth credential: name `Authorization`, value `Bearer <token>`. Do not paste it into chat, a URL, source files or workflow node parameters. The token expires after 90 days, and creating a replacement revokes the previous token.
+3. Create a second Header Auth credential for your own existing billing-disabled Gemini project: header `x-goog-api-key`, value the project key. This is a user-controlled credential transfer; the assistant must not extract Life's server key or change billing. No OpenAI account is needed. Confirm the selected model and Google Search allowance are available in that project.
+4. Import `nysc.json`, `freelance.json`, `career.json`, `ai_testing.json`. In every **Agent brief**, set the available Gemini model. Select Gemini Header Auth on **Grounded Gemini research** and the research bridge Header Auth on **Submit proposal only**.
+5. Import `coordinator.json`. Select the bridge credential on **Claim public research jobs**. Put the four real child IDs into **Connection gate** and set enabled=true only after the children are configured. Exports contain no credentials or account-specific IDs.
+6. Queue a small public research task in Life, run coordinator manually, inspect all child executions and review returned results in Life. Only then publish/activate the coordinator's once-per-minute schedule. Four non-waiting sub-workflow launches allow independent execution; actual overlap depends on instance resources.
 
-The branches dispatch independent child executions rather than waiting for one agent to finish before launching the next. Actual overlap depends on n8n hosting capacity and execution concurrency. A successful coordinator dispatch is not proof that its children succeeded: inspect all four child executions, including failures. There is no automated retry to prevent accidental repeat charges.
+## Contract and limits
 
-## Minimum setup still required
+Owner-session actions `ayo-os.agents.status/queue/token/revoke/review` retain normal workspace and CSRF controls. Queue input: `{workspaceId,pipelines:["nysc","freelance","career","ai-testing"],query,maxProspects:3}`; one to four agents, one to five prospects each,20 active jobs and500 retained jobs per tenant. Token/revoke also require `confirm:true`. Token scope permits public query claims and proposal submission only. It cannot read mail/CVs/documents, mutate companies/opportunities or send messages.
 
-1. A user-owned n8n Cloud workspace or supported self-hosted n8n instance. No account or paid infrastructure was created by this change. Existing Hostinger shared PHP hosting is not assumed to support an n8n runtime.
-2. An OpenAI API account, spending limit, and model available to that account which supports Responses web search. Select the model explicitly in **Connection gate**; no provider/model access is presumed.
-3. Import all four child exports. In each **Research with web sources** HTTP Request node, select a **Header Auth** credential with header name `Authorization` and value `Bearer <your API key>`. Store the key only in n8n credentials, never in the workflow JSON or Git.
-4. Import coordinator; paste the four real child workflow IDs and model into its **Connection gate** Code node. Set `enabled=true` only once credentials and the configuration have been checked. The exported workflow is inactive and the gate intentionally throws before any provider request.
-5. Test manually, inspect child results and spending, configure failure monitoring and execution-data retention appropriate to private research, then publish/activate the schedule. Verify workflow timezone stays Africa/Lagos. Do not activate a duplicate Gmail sync.
+The worker POSTs to `https://life.ayodsgn.com/api/life/?action=opportunity-agents.poll` with `{limit:4}` and the bearer credential. Each returned job has `id,pipeline,query,maxProspects,leaseToken,leaseUntil`. Claims last 600 seconds and can retry up to 3 attempts; poll at most once every 10 seconds. The coordinator polls once per minute. Empty queues yield no provider calls.
 
-## Review and integration boundary
+Each child performs a bounded grounded Gemini request, checks source URLs against provider grounding, validates contacts, then POSTs `{jobId,leaseToken,proposals}` to `?action=opportunity-agents.result`. Valid empty results complete normally. Provider/format failure submits a generic error without raw provider details. Source URLs support human checking; neither model quotes nor the presence of a link proves a claim true. Read every source before applying a proposal. Never execute model/web content or treat it as HTML.
 
-Proposals are untrusted suggestions, even when they contain source URLs. The validator checks JSON shape, HTTPS source URLs, maximum counts, contact provenance links, explicit source claims for emails, duplicate company/role entries within the run, and forces `needs_review`, `applicationStatus=not_verified`, `acceptance=unknown`, `externalActionsAllowed=false`. It cannot prove that a cited page actually says the claim. Ayo or a reviewer must open the sources, verify dates/contact identity and match existing Life records before applying changes. Render all strings as text and links with normal safe-link handling. Never treat model output as HTML, commands or further instructions.
+Server validation bounds proposal/source/contact counts, requires public HTTPS sources and explicit published-email evidence, rejects duplicate company/role proposals, strips unsupported fields and forces `stage=researched`, `acceptance=unknown`, `requiresReview=true`. It stores results only in the isolated research queue. Company/application/document snapshots stay unchanged. Duplicate callback retries are idempotent; mismatched results, stale lease tokens, expired leases and revoked/expired bearer tokens are rejected. Reviewing marks the result reviewed/rejected; applying changes uses the ordinary explicit Life save flow with its version conflict handling.
 
-AI testing discovery cannot determine whether Ayo has been accepted. Acceptance requires verified private correspondence or the relevant application portal, reconciled separately by the authorised Gmail check. A public role or invitation never counts as acceptance.
+The local editor is not 24/7 hosting. Keep the computer/process running for polling. A permanent host is a separate decision. n8n successful executions and leases contain public research plus scoped job tokens, so retain data only as long as useful and protect the local owner account. Last-seen means authenticated polling, not proof that research or applications succeeded. All child failures must be inspected; dispatch success does not imply research success.
 
-No Gmail credential or mailbox access is included. No direct MySQL, browser cookie or Life session credential is used. A future bridge needs a tenant-bound, narrowly scoped proposal endpoint with idempotency keys, optimistic version checks and manual approval. Do not point these workflows at Life's owner-session mutation endpoint or add unrestricted writes. Cross-run duplicate reconciliation and preserving manual records belong in that bridge; this kit intentionally has no database writes.
+## Verification
 
-## Local verification
+`node automation/n8n/generate.mjs` regenerates exports. `node automation/n8n/test.mjs` checks gates, grounded proposal validation and independent dispatch structure. `tests/life-opportunity-agents.php` checks tenant isolation, token hash/revocation/expiry, leases, bounded claims, callback retries and no implicit application changes. Real account connection/provider execution remains unverified until the user finishes setup.
 
-Run `node automation/n8n/generate.mjs` to regenerate exports, then `node automation/n8n/test.mjs`. These tests exercise the exported validation code with accepted, missing-source, unsafe-source, guessed-email and duplicate fixtures; they do not substitute for importing into the selected n8n version and making a small manual test.
-
-Node versions used: Execute Sub-workflow 1.3, Execute Workflow Trigger 1, Code 2, Schedule Trigger 1.2, HTTP Request 4.2. Check compatibility with the actual installed n8n version before activating. Exports contain no credentials or workflow IDs.
-
-## Official references checked 26 October 2026
-
-- [Execute Sub-workflow parameters and wait option](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflow/)
-- [Execute Sub-workflow implementation and node versions](https://github.com/n8n-io/n8n/blob/master/packages/nodes-base/nodes/ExecuteWorkflow/ExecuteWorkflow/ExecuteWorkflow.node.ts)
-- [Schedule Trigger timezone and activation](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/)
-- [OpenAI web search tool](https://developers.openai.com/api/docs/guides/tools-web-search)
+Official references checked 26 October 2026: [n8n sub-workflows](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflow/), [Schedule Trigger](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/), [Gemini Google Search](https://ai.google.dev/gemini-api/docs/google-search).

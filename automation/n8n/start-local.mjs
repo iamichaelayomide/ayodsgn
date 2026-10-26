@@ -1,0 +1,11 @@
+import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync } from 'node:fs';
+import { dirname, delimiter } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const runtime=fileURLToPath(new URL('../../../n8n-runtime/node_modules/n8n/bin/n8n',import.meta.url));
+const data=fileURLToPath(new URL('../../../private-n8n',import.meta.url));
+if(!existsSync(runtime))throw new Error('Local n8n package is not installed beside this checkout. Follow docs/automation/local-n8n.md.');
+mkdirSync(data,{recursive:true,mode:0o700});
+const child=spawn(process.execPath,[runtime,'start'],{stdio:'inherit',env:{...process.env,PATH:dirname(process.execPath)+delimiter+(process.env.PATH||''),N8N_USER_FOLDER:data,N8N_LISTEN_ADDRESS:'127.0.0.1',N8N_HOST:'localhost',N8N_PORT:'5678',N8N_PROTOCOL:'http',N8N_DIAGNOSTICS_ENABLED:'false',N8N_VERSION_NOTIFICATIONS_ENABLED:'false',N8N_PERSONALIZATION_ENABLED:'false',GENERIC_TIMEZONE:'Africa/Lagos'}});
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>child.kill(signal));
+child.on('exit',code=>process.exit(code??1));

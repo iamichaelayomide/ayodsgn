@@ -1,0 +1,10 @@
+import{readFileSync}from'node:fs';import assert from'node:assert/strict';
+const source=readFileSync(new URL('../life/opportunity-agents-ui.js',import.meta.url),'utf8');const{companyDomain,matchResearchCompany,matchResearchContact}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+assert.equal(companyDomain('https://www.example.com/about'),'example.com');assert.equal(companyDomain('javascript:alert(1)'),'');
+const company={id:'a',name:'Example Company',website:'https://www.example.com/'};
+assert.equal(matchResearchCompany([company],{name:'Example Company',website:''}),company);assert.equal(matchResearchCompany([company],{name:'New brand label',website:'https://example.com'}),company);assert.equal(matchResearchCompany([company],{name:'  EXAMPLE   COMPANY ',website:'https://example.com/team'}),company);
+assert.throws(()=>matchResearchCompany([company,{...company,id:'b'}],{name:'Example Company'}),/More than one/);assert.throws(()=>matchResearchCompany([company],{name:'Example Company',website:'https://other.example.com'}),/different website/);
+assert.equal(matchResearchCompany([{name:'Brand One',website:'https://pages.example.com/brand-one'}],{name:'Brand Two',website:'https://pages.example.com/brand-two'}),null);
+const person={name:'Jane Example',email:'Jane@Example.com'};assert.equal(matchResearchContact([person],{name:'Jane E',email:'jane@example.com'}),person);assert.equal(matchResearchContact([person],{name:' jane example ',email:''}),person);assert.throws(()=>matchResearchContact([person,{name:'Different',email:'jane@example.com'}],{name:'Jane Example',email:'jane@example.com'}),/More than one/);
+assert(!source.includes('ayo-os.agents.token'),'Panel must not mint access tokens');assert(!source.includes('innerHTML = p.'),'Research must not be inserted as trusted HTML');assert(!source.includes("job.status==='completed'?'open'"),'Research details should start collapsed');
+console.log('14 research panel matching, safe defaults and no credential creation checks passed');

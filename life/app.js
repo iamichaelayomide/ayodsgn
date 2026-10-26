@@ -1,4 +1,4 @@
-import {createAyoOS} from './ayo-os.js?v=2';
+import {createAyoOS} from './ayo-os.js?v=4';
 import {taskColumns,periodRange,syncTaskReadiness,creationActions,laneTone} from './planner-interactions.js?v=2';
 import {createNavigationHistory} from './navigation-history.js?v=1';
 import {createApplications} from './applications.js?v=7';
@@ -22,7 +22,7 @@ import {createGoals} from './goals.js?v=8';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=44';
-import {installSelects} from './selects.js?v=4';
+import {installSelects} from './selects.js?v=5';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = ['#ayo-os','#applications'].includes(location.hash)?'ayo-os':location.hash==='#application-library'?'applications':'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
@@ -114,12 +114,12 @@ const companion=createCompanion({getApplications:()=>applications.snapshot(),req
 $ ('mobile-chat-list').addEventListener('click',()=>{companion.showHistory();updateBreadcrumbs();});
 const taskHistory=createTaskHistory({root:$('task-history'),request,escape,getData:()=>data,mutate});
 const applications=createApplications({onNavigation:updateBreadcrumbs,root:$('applications'),request,escape,getData:()=>data,openTask,reloadBoard:loadBoard,today,announce,role:()=>role,upload:async body=>{const response=await fetch(API+'?action=applications.upload',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'X-CSRF-Token':csrf},body});const result=await response.json();if(!response.ok)throw Error(result.error||'Document could not be saved.');return result;}});
-const ayoOS=createAyoOS({root:$('ayo-os'),request,escape,role:()=>role});
+const ayoOS=createAyoOS({root:$('ayo-os'),request,escape,role:()=>role,uploadDocument:async body=>{const response=await fetch(API+'?action=applications.upload',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'X-CSRF-Token':csrf},body});const result=await response.json();if(!response.ok)throw Error(result.error||'CV could not be uploaded.');return result;}});
 $('ayo-os').addEventListener('click',event=>{if(event.target.closest('[data-ayo-existing]')){event.preventDefault();goToView('application-library');}});
 const viewNavigation=createNavigationHistory();
 const viewNames={'ayo-os':'Opportunities',board:'My board',goals:'Goals',today:'Today',companion:'Ramble',applications:'Opportunities','task-history':'History',analytics:'Analytics',week:'This week',calendar:'Calendar',routines:'Routines',accountability:'Accountability',notes:'Notes',mindmap:'Mind map',archive:'Archive'};
 function updateBreadcrumbs(){const parts=view==='applications'?applications.breadcrumbs():[{label:viewNames[view]||'My board'}];$('breadcrumb').innerHTML=parts.map((part,index)=>`<span class="breadcrumb-separator" aria-hidden="true">/</span>${part.action?`<button type="button" data-app-breadcrumb="${part.action}">${escape(part.label)}</button>`:`<span ${index===parts.length-1?'aria-current="page"':''}>${escape(part.label)}</span>`}`).join('');$('view-back').hidden=!viewNavigation.canBack&&!(view==='applications'&&applications.canBack())&&!(view==='companion'&&companion.canBack());}
-function goToView(next){if(next==='applications')next='ayo-os';else if(next==='application-library')next='applications';if(next!==view){viewNavigation.remember({view,scroll:window.scrollY,board:selectedBoard,applications:view==='applications'?applications.captureNavigation():null});if(next==='applications')applications.clearNavigation();view=next;}render();window.scrollTo(0,0);}
+function goToView(next){if(next==='today')next='board';if(next==='applications')next='ayo-os';else if(next==='application-library')next='applications';if(next!==view){viewNavigation.remember({view,scroll:window.scrollY,board:selectedBoard,applications:view==='applications'?applications.captureNavigation():null});if(next==='applications')applications.clearNavigation();view=next;if(next==='ayo-os')ayoOS.reload();}render();window.scrollTo(0,0);}
 document.addEventListener('life:chat-navigation',updateBreadcrumbs);
 $('view-back').onclick=()=>{if(view==='companion'&&companion.back()){updateBreadcrumbs();return;}if(view==='applications'&&applications.back())return;const previous=viewNavigation.back();if(!previous)return;view=previous.view;selectedBoard=previous.board;if(previous.applications)applications.restoreNavigation(previous.applications);render();window.scrollTo(0,previous.scroll);};
 $('breadcrumb-home').onclick=()=>goToView('board');

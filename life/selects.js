@@ -82,7 +82,7 @@ export function installSelects() {
       sync(control);
     }
     document.querySelectorAll('select').forEach(select => {
-      if (controls.has(select)) return;
+      if (controls.has(select) || select.closest('#ayo-os')) return;
       const wrapper=document.createElement('span'); wrapper.className='select-control';
       select.before(wrapper); wrapper.append(select); select.hidden=true;
       const button=document.createElement('button'); button.type='button'; button.className='select-trigger';
