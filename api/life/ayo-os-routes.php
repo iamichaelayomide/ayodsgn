@@ -13,6 +13,7 @@ function life_ayo_os_route(LifeStore $store,string $method,string $action,array 
   LifeAyoOS::requireWorkspace($input,$store->tenantId);require_once __DIR__.'/opportunity-ai.php';$ai=new LifeOpportunityAI($os);
   life_json(match($action){'ayo-os.ai.research'=>$ai->research($input),'ayo-os.ai.rewrite'=>$ai->rewrite($input),'ayo-os.ai.tailor'=>$ai->tailor($input),'ayo-os.automation.status'=>$ai->automation($input)});
  }
+ if($method==='POST'&&in_array($action,['ayo-os.agents.private.preview','ayo-os.agents.private.status','ayo-os.agents.private.token','ayo-os.agents.private.revoke'],true)){LifeAyoOS::requireWorkspace($input,$store->tenantId);require_once __DIR__.'/opportunity-private-context.php';life_json((new LifeOpportunityPrivateContext($os))->handleOwner($action,$input));}
  if($method==='POST'&&in_array($action,['ayo-os.agents.status','ayo-os.agents.queue','ayo-os.agents.token','ayo-os.agents.revoke','ayo-os.agents.review'],true)){
   LifeAyoOS::requireWorkspace($input,$store->tenantId);require_once __DIR__.'/opportunity-agents.php';life_json((new LifeOpportunityAgents($os))->handleOwner($action,$input));
  }

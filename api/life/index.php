@@ -7,9 +7,9 @@ try {
     $config=life_config();
     // Scoped research workers use a bearer token, never a browser session or owner cookie.
     $externalAction=$_GET['action']??'';
-    if(is_string($externalAction)&&str_starts_with($externalAction,'opportunity-agents.')){
+    if(is_string($externalAction)&&(str_starts_with($externalAction,'opportunity-agents.')||str_starts_with($externalAction,'opportunity-private.'))){
         if(($_SERVER['REQUEST_METHOD']??'')!=='POST')throw new LifeError('Method not allowed.',405);
-        if(!in_array($externalAction,['opportunity-agents.poll','opportunity-agents.result'],true))throw new LifeError('Research action unavailable.',404);
+        if(!in_array($externalAction,['opportunity-agents.poll','opportunity-agents.result','opportunity-private.context'],true))throw new LifeError('Research action unavailable.',404);
         $authorization=$_SERVER['HTTP_AUTHORIZATION']??$_SERVER['REDIRECT_HTTP_AUTHORIZATION']??'';
         if(!is_string($authorization)||!preg_match('/^Bearer [a-f0-9]{64}$/D',$authorization))throw new LifeError('Research connection authentication required.',401);
         if(!preg_match('~^application/json(?:\s*;|\s*$)~i',trim($_SERVER['CONTENT_TYPE']??'')))throw new LifeError('Send JSON data.',415);
@@ -18,7 +18,7 @@ try {
         $object=json_decode($raw,false,64,JSON_THROW_ON_ERROR);if(!($object instanceof stdClass))throw new LifeError('Send a JSON object.',400);
         $input=json_decode($raw,true,64,JSON_THROW_ON_ERROR);
         $db=new PDO($config['dsn'],$config['user']??null,$config['password']??null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC,PDO::ATTR_EMULATE_PREPARES=>false]);
-        require_once __DIR__.'/opportunity-agents.php';life_json(life_opportunity_agents_external($externalAction,$db,$input,$authorization));
+        header('Cache-Control: no-store');if($externalAction==='opportunity-private.context'){require_once __DIR__.'/opportunity-private-context.php';life_json(life_opportunity_private_external($externalAction,$db,$input,$authorization));}require_once __DIR__.'/opportunity-agents.php';life_json(life_opportunity_agents_external($externalAction,$db,$input,$authorization));
     }
     if(($_GET['action']??'')==='google.webhook'){if(($_SERVER['REQUEST_METHOD']??'')!=='POST')throw new LifeError('Method not allowed.',405);$webhookStore=life_store($config);require_once __DIR__.'/google-sync.php';if(!LifeGoogleSync::webhook($webhookStore->db,['channel'=>$_SERVER['HTTP_X_GOOG_CHANNEL_ID']??'','token'=>$_SERVER['HTTP_X_GOOG_CHANNEL_TOKEN']??'','resource'=>$_SERVER['HTTP_X_GOOG_RESOURCE_ID']??'']))throw new LifeError('Unknown notification channel.',403);http_response_code(204);exit;} life_session();$store=life_store($config);require_once __DIR__.'/accounts.php';require_once __DIR__.'/google-auth.php';$accounts=new LifeAccounts($store->db);require_once __DIR__.'/remember.php';$device=new LifeRemember($store->db);if(LifeRemember::identity($_SESSION)===null&&!empty($_COOKIE[LifeRemember::COOKIE])){$resumed=$device->resume((string)$_COOKIE[LifeRemember::COOKIE],time());if($resumed){session_regenerate_id(true);$_SESSION=$resumed;}else life_device_cookie('',time()-3600);}
     if(isset($_SESSION['userId'])){if(!$accounts->find((int)$_SESSION['userId'])||(isset($_SESSION['emailCredential'])&&(!hash_equals($accounts->credentialFingerprint((int)$_SESSION['userId']),(string)$_SESSION['emailCredential'])||$accounts->credentialFingerprint((int)$_SESSION['userId'])===''))){$_SESSION=[];$_SESSION['csrf']=bin2hex(random_bytes(32));}else $store=new LifeStore($store->db,(int)$_SESSION['userId']);}

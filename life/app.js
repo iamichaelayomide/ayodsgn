@@ -1,4 +1,4 @@
-import {createAyoOS} from './ayo-os.js?v=5';
+import {createAyoOS} from './ayo-os.js?v=6';
 import {taskColumns,periodRange,syncTaskReadiness,creationActions,laneTone} from './planner-interactions.js?v=2';
 import {createNavigationHistory} from './navigation-history.js?v=1';
 import {createApplications} from './applications.js?v=7';
@@ -117,7 +117,7 @@ const applications=createApplications({onNavigation:updateBreadcrumbs,root:$('ap
 const ayoOS=createAyoOS({root:$('ayo-os'),request,escape,role:()=>role,uploadDocument:async body=>{const response=await fetch(API+'?action=applications.upload',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'X-CSRF-Token':csrf},body});const result=await response.json();if(!response.ok)throw Error(result.error||'CV could not be uploaded.');return result;}});
 $('ayo-os').addEventListener('click',event=>{if(event.target.closest('[data-ayo-existing]')){event.preventDefault();goToView('application-library');}});
 const viewNavigation=createNavigationHistory();
-const viewNames={'ayo-os':'Opportunities',board:'My board',goals:'Goals',today:'Today',companion:'Ramble',applications:'Opportunities','task-history':'History',analytics:'Analytics',week:'This week',calendar:'Calendar',routines:'Routines',accountability:'Accountability',notes:'Notes',mindmap:'Mind map',archive:'Archive'};
+const viewNames={'ayo-os':'Opportunities',board:'My board',goals:'Goals',today:'Today',companion:'Ramble',applications:'CVs & saved applications','task-history':'History',analytics:'Analytics',week:'This week',calendar:'Calendar',routines:'Routines',accountability:'Accountability',notes:'Notes',mindmap:'Mind map',archive:'Archive'};
 function updateBreadcrumbs(){const parts=view==='applications'?applications.breadcrumbs():[{label:viewNames[view]||'My board'}];$('breadcrumb').innerHTML=parts.map((part,index)=>`<span class="breadcrumb-separator" aria-hidden="true">/</span>${part.action?`<button type="button" data-app-breadcrumb="${part.action}">${escape(part.label)}</button>`:`<span ${index===parts.length-1?'aria-current="page"':''}>${escape(part.label)}</span>`}`).join('');$('view-back').hidden=!viewNavigation.canBack&&!(view==='applications'&&applications.canBack())&&!(view==='companion'&&companion.canBack());}
 function goToView(next){if(next==='today')next='board';if(next==='applications')next='ayo-os';else if(next==='application-library')next='applications';if(next!==view){viewNavigation.remember({view,scroll:window.scrollY,board:selectedBoard,applications:view==='applications'?applications.captureNavigation():null});if(next==='applications')applications.clearNavigation();view=next;if(next==='ayo-os')ayoOS.reload();}render();window.scrollTo(0,0);}
 document.addEventListener('life:chat-navigation',updateBreadcrumbs);
