@@ -1,5 +1,5 @@
 import{readFileSync}from'node:fs';import assert from'node:assert/strict';
-const source=readFileSync(new URL('../life/opportunity-agents-ui.js',import.meta.url),'utf8');const{companyDomain,matchResearchCompany,matchResearchContact}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const source=readFileSync(new URL('../life/opportunity-agents-ui.js',import.meta.url),'utf8');const privateModule=readFileSync(new URL('../life/opportunity-permissions-ui.js',import.meta.url),'utf8');const prepared=source.replace("'./opportunity-permissions-ui.js?v=1'",JSON.stringify('data:text/javascript;base64,'+Buffer.from(privateModule).toString('base64')));const{companyDomain,matchResearchCompany,matchResearchContact}=await import('data:text/javascript;base64,'+Buffer.from(prepared).toString('base64'));
 assert.equal(companyDomain('https://www.example.com/about'),'example.com');assert.equal(companyDomain('javascript:alert(1)'),'');
 const company={id:'a',name:'Example Company',website:'https://www.example.com/'};
 assert.equal(matchResearchCompany([company],{name:'Example Company',website:''}),company);assert.equal(matchResearchCompany([company],{name:'New brand label',website:'https://example.com'}),company);assert.equal(matchResearchCompany([company],{name:'  EXAMPLE   COMPANY ',website:'https://example.com/team'}),company);

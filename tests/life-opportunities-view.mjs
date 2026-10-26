@@ -20,3 +20,14 @@ assert.equal(messageText('Hello &amp; welcome.\n\nOn Monday, X wrote:\nOld mail'
 assert.equal(isActivityNote({body:'Correspondence / tracker evidence checked 26 Oct. Thread abc; sent message xyz.'}),true);
 assert.equal(isActivityNote({body:'The company expanded into Ghana; possible onboarding work.'}),false);
 assert.deepEqual(summaryCounts([{stage:'sent',title:'Role',followUpDate:'2026-10-26'},{stage:'accepted',title:'Role'},{stage:'researched',title:'Role'}],'2026-10-26'),{tracking:3,applied:1,followups:1,accepted:1});
+const stageView=await import('../life/opportunities-view.js');
+assert.equal(typeof stageView.stageForPipeline,'function','Pipeline transitions expose one tested status mapping');
+const custom=[{id:'custom-assessment',name:'Assessment complete'}];
+assert.equal(stageView.stageForPipeline('custom-assessment','ai-testing',custom),'custom-assessment','Moving into AI testing preserves custom status');
+assert.equal(stageView.stageForPipeline('custom-assessment','career',custom),'custom-assessment','Moving out preserves custom status');
+assert.equal(stageView.stageForPipeline('won','ai-testing',custom),'accepted','Existing accepted work must not become pending');
+assert.equal(stageView.stageForPipeline('closed','ai-testing',custom),'not-accepted','Closed AI application retains its outcome');
+assert.equal(stageView.stageForPipeline('accepted','career',custom),'won','Moving accepted work out of AI preserves acceptance');
+assert.equal(stageView.stageForPipeline('not-accepted','career',custom),'closed','Moving declined work out preserves closure');
+assert.equal(stageView.stageForPipeline('submitted','ai-testing',custom),'pending');
+assert.equal(stageView.stageForPipeline('pending','career',custom),'researched');
