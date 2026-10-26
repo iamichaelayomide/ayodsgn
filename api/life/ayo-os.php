@@ -3,14 +3,15 @@ declare(strict_types=1);
 require_once __DIR__.'/applications.php';
 /** Private outreach workspace. This model never performs external actions. */
 final class LifeAyoOS {
- public const PIPELINES=['nysc','freelance','career'];
- public const STAGES=['researched','ready','drafted','replied','conversation','offer','won','closed'];
+ public const PIPELINES=['nysc','freelance','career','ai-testing'];
+ public const STAGES=['researched','ready','drafted','replied','conversation','offer','won','closed','sent','submitted','scheduled','bounced','pending','accepted','not-accepted','paused','incomplete'];
  public function __construct(public LifeStore $store){$store->db->exec(file_get_contents(__DIR__.'/migrations/ayo-os.sql'));}
  public static function requireWorkspace(array $input,int $tenantId):void{if(($input['workspaceId']??null)!==$tenantId)throw new LifeError('Your account changed. Reload Ayo OS before saving.',409);}
  public function read():array{
   $q=$this->store->db->prepare('SELECT version,state FROM life_ayo_os WHERE id=?');$q->execute([$this->store->tenantId]);$r=$q->fetch(PDO::FETCH_ASSOC);
-  if(!$r){$s=['schema'=>1,'companies'=>[],'contacts'=>[],'opportunities'=>[],'research'=>[],'drafts'=>[],'approvals'=>[]];try{$this->store->db->prepare('INSERT INTO life_ayo_os VALUES (?,1,?,?)')->execute([$this->store->tenantId,json_encode($s,JSON_THROW_ON_ERROR),LifeStore::now()]);}catch(PDOException $e){$q->execute([$this->store->tenantId]);if(!$q->fetch())throw $e;}return $this->read();}
-  return ['workspaceId'=>$this->store->tenantId,'version'=>(int)$r['version'],'state'=>json_decode($r['state'],true,128,JSON_THROW_ON_ERROR)];
+  if(!$r){$s=['schema'=>1,'companies'=>[],'contacts'=>[],'opportunities'=>[],'research'=>[],'drafts'=>[],'approvals'=>[],'communications'=>[]];try{$this->store->db->prepare('INSERT INTO life_ayo_os VALUES (?,1,?,?)')->execute([$this->store->tenantId,json_encode($s,JSON_THROW_ON_ERROR),LifeStore::now()]);}catch(PDOException $e){$q->execute([$this->store->tenantId]);if(!$q->fetch())throw $e;}return $this->read();}
+  $state=json_decode($r['state'],true,128,JSON_THROW_ON_ERROR);$state['communications']=$state['communications']??[];
+  return ['workspaceId'=>$this->store->tenantId,'version'=>(int)$r['version'],'state'=>$state];
  }
  private static function item(array $s,string $type,mixed $id):array{return LifeApplications::find($s,$type,$id);}
  private static function choice(mixed $v,array $choices):string{if(!is_string($v)||!in_array($v,$choices,true))throw new LifeError('Choose a valid option.');return $v;}
@@ -26,7 +27,7 @@ final class LifeAyoOS {
  public function mutate(int $version,string $operation,array $args,string $actor):array{
   $this->read();$db=$this->store->db;$db->beginTransaction();
   try{$current=$this->read();if($current['version']!==$version)throw new LifeError('Ayo OS changed in another tab. Your form is preserved. Reload before saving again.',409);$s=$current['state'];$at=LifeStore::now();$id=$args['id']??'';
-   $types=['company.save'=>'companies','contact.save'=>'contacts','opportunity.save'=>'opportunities','research.save'=>'research','draft.save'=>'drafts'];
+   $types=['company.save'=>'companies','contact.save'=>'contacts','opportunity.save'=>'opportunities','research.save'=>'research','draft.save'=>'drafts','communication.save'=>'communications'];
    if($operation==='review.decide'){
     $id=LifeApplications::id($id);$snapshot=self::snapshot($s,$id);$decision=self::choice($args['decision']??'',['approved','rejected']);$reason=LifeStore::text($args['reason']??'',2000,$decision==='rejected');
     if($decision==='approved'){
@@ -40,23 +41,38 @@ final class LifeAyoOS {
    }else{
     if(!isset($types[$operation]))throw new LifeError('This action is unavailable. Ayo OS does not send or schedule messages.',400);
     $type=$types[$operation];$old=$id!==''?self::item($s,$type,$id):null;$id=$old['id']??LifeStore::id();$r=$old??['id'=>$id,'createdAt'=>$at];$r['updatedAt']=$at;
-    $fields=match($type){'companies'=>['name'=>200,'industry'=>100],'contacts'=>['name'=>200,'role'=>200],'opportunities'=>['title'=>200,'notes'=>10000,'materials'=>2000],'research'=>['body'=>10000],'drafts'=>['subject'=>200,'body'=>15000],default=>[]};
-    foreach($fields as $field=>$limit)$r[$field]=LifeStore::text($args[$field]??$r[$field]??'',$limit,in_array($field,['name','title','body'],true));
-    if($type==='companies')$r['website']=LifeApplications::url($args['website']??$r['website']??'');
+    $fields=match($type){'companies'=>['name'=>200,'industry'=>100,'about'=>2000],'contacts'=>['name'=>200,'role'=>200,'notes'=>2000],'opportunities'=>['title'=>200,'notes'=>10000,'materials'=>2000],'research'=>['body'=>10000],'drafts'=>['subject'=>200,'body'=>15000],'communications'=>['subject'=>200,'body'=>15000,'messageId'=>200,'attachments'=>2000],default=>[]};
+    foreach($fields as $field=>$limit)$r[$field]=LifeStore::text($args[$field]??$r[$field]??'',$limit,in_array($field,['name','title','body'],true)&&$type!=='communications');
+    if($type==='companies')foreach(['website','linkedin','socialUrl'] as $field)$r[$field]=LifeApplications::url($args[$field]??$r[$field]??'');
     if(in_array($type,['contacts','opportunities'],true)){$r['companyId']=$args['companyId']??$r['companyId']??'';self::item($s,'companies',$r['companyId']);}
     if($type==='contacts'){
      if(!$old&&count(array_filter($s['contacts'],fn($c)=>$c['companyId']===$r['companyId']))>=2)throw new LifeError('Use up to two contacts per company.');
      // Prevent moving contacts referenced by drafts to a different company.
      if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create a contact at the other company instead.');
      $r['email']=LifeStore::text($args['email']??$r['email']??'',254);if($r['email']!==''&&!filter_var($r['email'],FILTER_VALIDATE_EMAIL))throw new LifeError('Use a valid professional email address.');
-     $r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');
+     $r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');$r['linkedin']=LifeApplications::url($args['linkedin']??$r['linkedin']??'');
     }
     if($type==='opportunities'){
      if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create an opportunity at the other company instead.');
      $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',self::PIPELINES);$r['stage']=self::choice($args['stage']??$r['stage']??'researched',self::STAGES);$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
     }
-    if(in_array($type,['research','drafts'],true)){
+    if(in_array($type,['research','drafts','communications'],true)){
      $r['opportunityId']=$args['opportunityId']??$r['opportunityId']??'';$o=self::item($s,'opportunities',$r['opportunityId']);if($old&&$r['opportunityId']!==$old['opportunityId'])throw new LifeError('Keep records with their original opportunity.');
+    }
+    if($type==='communications'){
+     // Evidence only: this records observed mail and never performs an external action.
+     $r['direction']=self::choice($args['direction']??$r['direction']??'',['sent','received','scheduled']);
+     $r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');if($r['sourceUrl']==='')throw new LifeError('Email history needs a source URL.');
+     $r['occurredAt']=LifeStore::text($args['occurredAt']??$r['occurredAt']??'',40,true);
+     if(!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:Z|[+-]\d{2}:\d{2})$/D',$r['occurredAt']))throw new LifeError('Use a timestamp with seconds and timezone.');
+     $date=DateTimeImmutable::createFromFormat('!Y-m-d\TH:i:sP',$r['occurredAt']);$errors=DateTimeImmutable::getLastErrors();
+     if(!$date||($errors&&($errors['warning_count']||$errors['error_count']))||($r['occurredAt']!==$date->format('Y-m-d\TH:i:sP')&&$r['occurredAt']!==$date->format('Y-m-d\TH:i:s\Z')))throw new LifeError('Use a valid email timestamp.');
+     foreach($s['communications'] as $entry){
+      if($entry['id']===$id||$entry['opportunityId']!==$r['opportunityId'])continue;
+      $sameMessage=$r['messageId']!==''&&$r['messageId']===($entry['messageId']??'');
+      $sameSource=$r['messageId']===''&&($entry['messageId']??'')===''&&$entry['sourceUrl']===$r['sourceUrl']&&$entry['direction']===$r['direction']&&$entry['occurredAt']===$r['occurredAt'];
+      if($sameMessage||$sameSource)throw new LifeError('This email is already recorded for this opportunity.',409);
+     }
     }
     if($type==='research'){
      $r['kind']=self::choice($args['kind']??$r['kind']??'observation',['observation','hypothesis']);$r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');if($r['kind']==='observation'&&$r['sourceUrl']==='')throw new LifeError('Observations need a source URL. Label unsourced ideas as hypotheses.');

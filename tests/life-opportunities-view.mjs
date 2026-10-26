@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {opportunityLabel,opportunityStatus,pipelineFor,safeLink} from '../life/opportunities-view.js';
+assert.equal(opportunityLabel({title:'SENT — NYSC interest in Pouchers payment journeys'}),'Payment journeys');
+assert.equal(opportunityLabel({title:'SUBMITTED — Application Submitted - UI/UX Designers (Must own MacBook) on Mercor'}),'UI/UX Designers (Must own MacBook)');
+assert.equal(opportunityStatus({title:'SENT — NYSC enquiry',stage:'researched'}),'sent');
+assert.equal(opportunityStatus({title:'PROFILE ACTIVE — Arts & Design Expert',stage:'researched'},true),'pending');
+assert.equal(opportunityStatus({title:'INVITED TO APPLY — Work',stage:'researched'},true),'pending');
+assert.equal(opportunityStatus({title:'DECLINED — Work',stage:'closed'},true),'not-accepted');
+assert.equal(opportunityStatus({title:'Work',stage:'accepted'},true),'accepted');
+assert.equal(pipelineFor({pipeline:'career'},{name:'Mercor'}),'ai-testing');
+assert.equal(pipelineFor({pipeline:'career'},{name:'Octotasker'}),'career');
+assert.equal(safeLink('javascript:alert(1)'), '');
+assert.equal(safeLink('https://example.com/team'),'https://example.com/team');
+assert.equal(safeLink('https://user:secret@example.com'),'');
+console.log('Company-first labels, status truth and safe-link checks passed');
+assert.equal(opportunityStatus({title:'SENT — NYSC enquiry',stage:'replied'}),'replied','Manual status overrides legacy import prefix');
+assert.equal(opportunityStatus({title:'SUBMITTED — AI project',stage:'accepted'},true),'accepted','Explicit acceptance overrides historical submitted title');

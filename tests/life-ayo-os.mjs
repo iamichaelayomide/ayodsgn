@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {createAyoOS} from '../life/ayo-os.js';
-const root={innerHTML:'',addEventListener(){},querySelector(){return null;}};
+const root={innerHTML:'',addEventListener(){},querySelector(){return null;},querySelectorAll(){return [];}};
 let resolve;const pending=new Promise(r=>resolve=r);
 const os=createAyoOS({root,request:()=>pending,escape:s=>String(s),role:()=> 'owner'});
 os.render();os.reset();resolve({version:1,state:{companies:[{name:'PRIVATE'}],contacts:[],opportunities:[],research:[],drafts:[],approvals:[]},approvalIds:{}});
