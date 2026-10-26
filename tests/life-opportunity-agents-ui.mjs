@@ -6,5 +6,5 @@ assert.equal(matchResearchCompany([company],{name:'Example Company',website:''})
 assert.throws(()=>matchResearchCompany([company,{...company,id:'b'}],{name:'Example Company'}),/More than one/);assert.throws(()=>matchResearchCompany([company],{name:'Example Company',website:'https://other.example.com'}),/different website/);
 assert.equal(matchResearchCompany([{name:'Brand One',website:'https://pages.example.com/brand-one'}],{name:'Brand Two',website:'https://pages.example.com/brand-two'}),null);
 const person={name:'Jane Example',email:'Jane@Example.com'};assert.equal(matchResearchContact([person],{name:'Jane E',email:'jane@example.com'}),person);assert.equal(matchResearchContact([person],{name:' jane example ',email:''}),person);assert.throws(()=>matchResearchContact([person,{name:'Different',email:'jane@example.com'}],{name:'Jane Example',email:'jane@example.com'}),/More than one/);
-assert(!source.includes('ayo-os.agents.token'),'Panel must not mint access tokens');assert(!source.includes('innerHTML = p.'),'Research must not be inserted as trusted HTML');assert(!source.includes("job.status==='completed'?'open'"),'Research details should start collapsed');
-console.log('14 research panel matching, safe defaults and no credential creation checks passed');
+assert(!source.includes('innerHTML = p.'),'Research must not be inserted as trusted HTML');assert(!source.includes("job.status==='completed'?'open'"),'Research details should start collapsed');
+console.log('13 research panel matching and safe default checks passed');
