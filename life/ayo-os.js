@@ -1,5 +1,5 @@
 import {queueCompanyResearch} from './company-research.js?v=1';
-import {createOpportunityCVPicker} from './opportunity-cv-picker.js?v=2';
+import {createOpportunityCVPicker} from './opportunity-cv-picker.js?v=3';
 import {createOpportunityComposer} from './opportunity-composer.js?v=1';
 import {createOpportunityAgents} from './opportunity-agents-ui.js?v=hosted-1';
 import {pipelines,stages,safeLink,opportunityLabel,opportunityStatus,pipelineFor,messageText,isActivityNote,summaryCounts,stageForPipeline} from './opportunities-view.js?v=3';
