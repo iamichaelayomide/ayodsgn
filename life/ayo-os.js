@@ -1,8 +1,10 @@
+import {createOpportunityCVPicker} from './opportunity-cv-picker.js?v=1';
 import {createOpportunityAgents} from './opportunity-agents-ui.js?v=2';
 import {pipelines,stages,safeLink,opportunityLabel,opportunityStatus,pipelineFor,messageText,isActivityNote,summaryCounts} from './opportunities-view.js?v=2';
 
 export function createAyoOS({root,request,escape:e,role,uploadDocument}){
  let data=null,tab='opportunities',pipeline='all',selected='',section='company',query='',epoch=0,busy=false,loading=false,returnFocus=null,scrollLock=null,createAfterLoad=false,summary='tracking',editorReturn=null,aiPreview=null,aiEpoch=0;
+ const cvPicker=createOpportunityCVPicker({request,getData:()=>data,uploadDocument,escape:e,onSaved:async next=>{data=next;data.state.communications??=[];if(selected)paintSection();}});
  const agents=createOpportunityAgents({request,getData:()=>data,saveOperation,onChanged:()=>{root.querySelector('.ayo-status').textContent='Saved to tracking.';},escape:e});
  const pipelineNames=()=>({...pipelines,...Object.fromEntries((data?.state.pipelines||[]).map(p=>[p.id,p.name]))});
  const statusNames=()=>({...stages,...Object.fromEntries((data?.state.statuses||[]).map(p=>[p.id,p.name]))});
@@ -25,7 +27,7 @@ export function createAyoOS({root,request,escape:e,role,uploadDocument}){
  const badge=o=>{const s=data.state.statuses?.some(v=>v.id===o.stage)?o.stage:opportunityStatus(o,pipelineOf(o)==='ai-testing');return `<span class="ayo-badge" data-status="${s}"><span aria-hidden="true"></span>${e(statusNames()[s]||s)}</span>`;};
  function unlock(){if(scrollLock===null)return;document.body.style.overflow=scrollLock;scrollLock=null;}
  function closeDialogs(){root.querySelectorAll('dialog[open]').forEach(d=>d.close());unlock();}
- function reset(){agents.reset();epoch++;createAfterLoad=false;closeDialogs();data=null;busy=false;loading=false;selected='';tab='opportunities';pipeline='all';query='';summary='tracking';aiEpoch++;root.innerHTML='';}
+ function reset(){cvPicker.reset();agents.reset();epoch++;createAfterLoad=false;closeDialogs();data=null;busy=false;loading=false;selected='';tab='opportunities';pipeline='all';query='';summary='tracking';aiEpoch++;root.innerHTML='';}
  async function load(){if(loading)return;loading=true;const current=epoch;root.innerHTML='<p role="status">Loading opportunities…</p>';try{const result=await request('ayo-os');if(current!==epoch)return;data=result;data.state.communications??=[];loading=false;paint();if(createAfterLoad){createAfterLoad=false;editor('opportunity');}}catch(error){if(current!==epoch)return;loading=false;root.innerHTML=`<p role="alert">${e(error.message)}</p>${button('Try again','reload')}`;}}
  function render(){if(role()!=='owner'){root.innerHTML='<p>Opportunities belongs to the account owner.</p>';return;}if(!data){load();return;}if(!root.querySelector('dialog[open]'))paint();}
  function paint(){
@@ -58,7 +60,7 @@ export function createAyoOS({root,request,escape:e,role,uploadDocument}){
  function sourceLinks(o){const urls=[...new Set(data.state.research.filter(r=>r.opportunityId===o.id&&!isActivityNote(r)).map(r=>r.sourceUrl).filter(Boolean))];return urls.length?`<details class="ayo-sources"><summary>Sources</summary><div class="ayo-link-row">${urls.map(u=>link(u,sourceName(u))).join('')}</div></details>`:'';}
  function paintSection(){
   const s=data.state,o=find('opportunities',selected),c=company(o),box=root.querySelector('.ayo-detail-body');
-  if(section==='company')box.innerHTML=`<div class="ayo-section-heading"><h3>What they do</h3>${button('Edit company','company',c.id)}</div>${text(c.about||'Add a short company summary, or ask Ramble to research it.')}<div class="ayo-link-row">${link(c.website,'Website')}${link(c.linkedin,'LinkedIn')}${link(c.socialUrl,'Socials')}</div><div class="ayo-section-heading"><h3>Your application</h3>${button('Edit','opportunity',o.id)}</div><dl class="ayo-facts"><div><dt>Role</dt><dd>${e(opportunityLabel(o))}</dd></div><div><dt>Status</dt><dd>${badge(o)}</dd></div><div><dt>Follow-up</dt><dd>${o.followUpDate?e(dateLabel(o.followUpDate)):'Not set'}${button('Set date','opportunity',o.id)}</dd></div></dl><div class="ayo-section-heading"><h3>CV</h3>${button('Choose or upload','opportunity',o.id)}</div>${cvRows(o)}${(o.documentIds||[]).length?button('Tailor CV with Ramble','tailor',o.id):''}${o.description?`<details class="ayo-disclosure"><summary>Job description</summary>${text(o.description)}</details>`:''}`;
+  if(section==='company')box.innerHTML=`<div class="ayo-section-heading"><h3>What they do</h3>${button('Edit company','company',c.id)}</div>${text(c.about||'Add a short company summary, or ask Ramble to research it.')}<div class="ayo-link-row">${link(c.website,'Website')}${link(c.linkedin,'LinkedIn')}${link(c.socialUrl,'Socials')}</div><div class="ayo-section-heading"><h3>Your application</h3>${button('Edit','opportunity',o.id)}</div><dl class="ayo-facts"><div><dt>Role</dt><dd>${e(opportunityLabel(o))}</dd></div><div><dt>Status</dt><dd>${badge(o)}</dd></div><div><dt>Follow-up</dt><dd>${o.followUpDate?e(dateLabel(o.followUpDate)):'Not set'}${button('Set date','opportunity',o.id)}</dd></div></dl><div class="ayo-section-heading"><h3>CV</h3>${button('Choose or upload','cv-picker',o.id)}</div>${cvRows(o)}${(o.documentIds||[]).length?button('Tailor CV with Ramble','tailor',o.id):''}${o.description?`<details class="ayo-disclosure"><summary>Job description</summary>${text(o.description)}</details>`:''}`;
   if(section==='people')box.innerHTML=`<div class="ayo-section-heading"><h3>People</h3>${button('Add person','new-contact',c.id)}</div>${items(s.contacts.filter(p=>p.companyId===c.id),p=>`<article class="ayo-person"><div class="ayo-section-heading"><div><h4>${e(p.name.replace(/ — correspondence address$/,''))}</h4><p class="ayo-muted">${e(/correspondence|recruiting authority/i.test(p.role||'')?'Company contact':p.role||'')}</p></div>${button('Edit','contact',p.id)}</div>${p.email?`<div class="ayo-email-address"><span>${e(p.email)}</span>${button('Copy email','copy-email',p.id)}</div>`:'<p class="ayo-muted">Email not found yet</p>'}<div class="ayo-link-row">${link(p.linkedin,'LinkedIn')}${link(p.sourceUrl,'Profile')}</div></article>`,'No people added yet. Ask Ramble to find the right contacts.')}`;
   if(section==='emails'){
    const messages=(s.communications||[]).filter(m=>m.opportunityId===o.id).sort((a,b)=>a.occurredAt.localeCompare(b.occurredAt));
@@ -135,6 +137,7 @@ export function createAyoOS({root,request,escape:e,role,uploadDocument}){
   if(action==='reload'){selected='';closeDialogs();data=null;load();}
   else if(action==='tab'){tab=id;selected='';paint();}
   else if(action==='pipeline'){pipeline=id;selected='';paintList();}else if(action==='summary'){summary=id;paintList();}else if(action==='pipeline-create'){editorReturn=null;editor('pipeline');}
+  else if(action==='cv-picker')cvPicker.open(id);
   else if(action==='open')open(id);
   else if(action==='close-detail'){root.querySelector('.ayo-detail').close();}
   else if(action==='section'){section=id;root.querySelectorAll('[data-ayo-action=section]').forEach(t=>t.setAttribute('aria-pressed',String(t.dataset.id===id)));paintSection();root.querySelector('.ayo-detail-body').scrollTop=0;}
