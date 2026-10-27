@@ -1,10 +1,10 @@
 {
-  "name": "Ayo scoped research coordinator — connect credentials first",
+  "name": "Ayo background research coordinator — approval required",
   "active": false,
   "nodes": [
     {
-      "id": "manual-test",
-      "name": "Manual test",
+      "id": "manual-check",
+      "name": "Manual check",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
@@ -14,8 +14,8 @@
       "parameters": {}
     },
     {
-      "id": "poll-each-minute",
-      "name": "Poll each minute",
+      "id": "daily-9-am-lagos",
+      "name": "Daily 9 AM Lagos",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
@@ -27,10 +27,69 @@
           "interval": [
             {
               "field": "cronExpression",
-              "expression": "* * * * *"
+              "expression": "0 9 * * *"
             }
           ]
         }
+      }
+    },
+    {
+      "id": "check-queued-jobs-each-minute",
+      "name": "Check queued jobs each minute",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        360
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "1-59 * * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "manual-mode",
+      "name": "Manual mode",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{queueDaily:false}}];"
+      }
+    },
+    {
+      "id": "daily-mode",
+      "name": "Daily mode",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        180
+      ],
+      "parameters": {
+        "jsCode": "return [{json:{queueDaily:true}}];"
+      }
+    },
+    {
+      "id": "polling-mode",
+      "name": "Polling mode",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        360
+      ],
+      "parameters": {
+        "jsCode": "const hour=Number(new Intl.DateTimeFormat('en-GB',{hour:'2-digit',hourCycle:'h23',timeZone:'Africa/Lagos'}).format(new Date()));return [{json:{queueDaily:hour>=9}}];"
       }
     },
     {
@@ -39,21 +98,77 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        240,
-        0
+        450,
+        140
       ],
       "parameters": {
-        "jsCode": "const enabled=false;\nconst workflowIds={nysc:'',freelance:'',career:'',ai_testing:''};\nif(!enabled||Object.values(workflowIds).some(id=>!id))throw new Error('Import four child workflows, configure their model/credentials, select their IDs, then enable this coordinator');\nreturn [{json:{workflowIds}}];"
+        "jsCode": "const enabled=false;const workflowIds={nysc:'',freelance:'',career:'',ai_testing:''};\nif(!enabled||Object.values(workflowIds).some(id=>!id))throw new Error('Select Life research & tracking credential and four child workflow IDs after owner approval, then enable');\nreturn [{json:{...$input.first().json,workflowIds}}];"
       }
     },
     {
-      "id": "claim-public-research-jobs",
-      "name": "Claim public research jobs",
+      "id": "queue-today-s-batch",
+      "name": "Queue today’s batch",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        140
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "approved-condition",
+              "leftValue": "={{ $json.queueDaily === true }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "queue-bounded-daily-prospects",
+      "name": "Queue bounded daily prospects",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        480,
+        900,
         0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://life.ayodsgn.com/api/life/?action=opportunity-agents.daily",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "claim-research-jobs",
+      "name": "Claim research jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        140
       ],
       "parameters": {
         "method": "POST",
@@ -64,7 +179,7 @@
         "specifyBody": "json",
         "jsonBody": "{\"limit\":4}",
         "options": {
-          "timeout": 30000
+          "timeout": 120000
         }
       }
     },
@@ -74,7 +189,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        740,
+        1360,
         0
       ],
       "parameters": {
@@ -87,14 +202,14 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        1000,
+        1580,
         0
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $('Connection gate').first().json.workflowIds.nysc }}",
+          "value": "={{ $(\"Connection gate\").first().json.workflowIds.nysc }}",
           "mode": "id"
         },
         "mode": "each",
@@ -109,8 +224,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        740,
-        200
+        1360,
+        170
       ],
       "parameters": {
         "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"freelance\").map(j=>({json:j}));"
@@ -122,14 +237,14 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        1000,
-        200
+        1580,
+        170
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $('Connection gate').first().json.workflowIds.freelance }}",
+          "value": "={{ $(\"Connection gate\").first().json.workflowIds.freelance }}",
           "mode": "id"
         },
         "mode": "each",
@@ -144,8 +259,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        740,
-        400
+        1360,
+        340
       ],
       "parameters": {
         "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"career\").map(j=>({json:j}));"
@@ -157,14 +272,14 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        1000,
-        400
+        1580,
+        340
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $('Connection gate').first().json.workflowIds.career }}",
+          "value": "={{ $(\"Connection gate\").first().json.workflowIds.career }}",
           "mode": "id"
         },
         "mode": "each",
@@ -179,8 +294,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        740,
-        600
+        1360,
+        510
       ],
       "parameters": {
         "jsCode": "return ($input.first().json.jobs||[]).filter(j=>j.pipeline===\"ai-testing\").map(j=>({json:j}));"
@@ -192,14 +307,14 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        1000,
-        600
+        1580,
+        510
       ],
       "parameters": {
         "source": "database",
         "workflowId": {
           "__rl": true,
-          "value": "={{ $('Connection gate').first().json.workflowIds.ai_testing }}",
+          "value": "={{ $(\"Connection gate\").first().json.workflowIds.ai_testing }}",
           "mode": "id"
         },
         "mode": "each",
@@ -210,7 +325,40 @@
     }
   ],
   "connections": {
-    "Manual test": {
+    "Manual check": {
+      "main": [
+        [
+          {
+            "node": "Manual mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 9 AM Lagos": {
+      "main": [
+        [
+          {
+            "node": "Daily mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check queued jobs each minute": {
+      "main": [
+        [
+          {
+            "node": "Polling mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual mode": {
       "main": [
         [
           {
@@ -221,7 +369,18 @@
         ]
       ]
     },
-    "Poll each minute": {
+    "Daily mode": {
+      "main": [
+        [
+          {
+            "node": "Connection gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Polling mode": {
       "main": [
         [
           {
@@ -236,14 +395,43 @@
       "main": [
         [
           {
-            "node": "Claim public research jobs",
+            "node": "Queue today’s batch",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Claim public research jobs": {
+    "Queue today’s batch": {
+      "main": [
+        [
+          {
+            "node": "Queue bounded daily prospects",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Claim research jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue bounded daily prospects": {
+      "main": [
+        [
+          {
+            "node": "Claim research jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim research jobs": {
       "main": [
         [
           {
@@ -317,7 +505,9 @@
   "settings": {
     "timezone": "Africa/Lagos",
     "executionOrder": "v1",
-    "saveDataSuccessExecution": "all",
-    "saveDataErrorExecution": "all"
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "saveExecutionProgress": false
   }
 }

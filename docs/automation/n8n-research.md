@@ -1,30 +1,62 @@
-# Scoped n8n research bridge
+# Background research and tracking worker
 
-The five exports in `automation/n8n/` implement polling from n8n to Life. They are inactive until the user finishes connection setup. Localhost n8n need not be publicly reachable: it claims jobs from Life over HTTPS and returns proposals. Life never calls localhost.
+The prepared coordinator and four child workflows now call **Life's server-side Gemini bridge**. No Gemini/OpenAI provider key is entered into n8n or exported from Life. Existing private billing-disabled provider configuration remains on the server. Last verified live research returned429 because the free allowance was unavailable; no paid fallback is introduced.
 
-## User setup
+## One explicit owner-approved worker grant
 
-1. Complete the local owner setup at http://localhost:5678 (see `local-n8n.md`). No owner password was created by the assistant.
-2. In Life's signed-in research connection controls, explicitly approve creating a research-only connection token. It is returned once; store it in an n8n Header Auth credential: name `Authorization`, value `Bearer <token>`. Do not paste it into chat, a URL, source files or workflow node parameters. The token expires after 90 days, and creating a replacement revokes the previous token.
-3. Create a second Header Auth credential for your own existing billing-disabled Gemini project: header `x-goog-api-key`, value the project key. This is a user-controlled credential transfer; the assistant must not extract Life's server key or change billing. No OpenAI account is needed. Confirm the selected model and Google Search allowance are available in that project.
-4. Import `nysc.json`, `freelance.json`, `career.json`, `ai_testing.json`. In every **Agent brief**, set the available Gemini model. Select Gemini Header Auth on **Grounded Gemini research** and the research bridge Header Auth on **Submit proposal only**.
-5. Import `coordinator.json`. Select the bridge credential on **Claim public research jobs**. Put the four real child IDs into **Connection gate** and set enabled=true only after the children are configured. Exports contain no credentials or account-specific IDs.
-6. Queue a small public research task in Life, run coordinator manually, inspect all child executions and review returned results in Life. Only then publish/activate the coordinator's once-per-minute schedule. Four non-waiting sub-workflow launches allow independent execution; actual overlap depends on instance resources.
+In Life Settings, review and approve the selected worker permissions. Token creation still requires an explicit action and the unchecked consent control. Recommended permissions are:
 
-## Contract and limits
+`research:claim`, `research:execute`, `research:propose`, `daily:queue`, `context:use`, `tracking:read`, `company:write`, `contact:write`, `research:write`, `opportunity:write`, `pipeline:write`, `status:write`.
 
-Owner-session actions `ayo-os.agents.status/queue/token/revoke/review` retain normal workspace and CSRF controls. Queue input: `{workspaceId,pipelines:["nysc","freelance","career","ai-testing"],query,maxProspects:3}`; one to four agents, one to five prospects each,20 active jobs and500 retained jobs per tenant. Token/revoke also require `confirm:true`. Token scope permits public query claims and proposal submission only. It cannot read mail/CVs/documents, mutate companies/opportunities or send messages.
+Tracking read can instead be limited per collection with `company:read`, `contact:read`, `research:read`, `opportunity:read`, `pipeline:read`, `status:read`. Write permissions are checked separately. Legacy proposal-only grants do not automatically gain execution or write access. Creating a token with write scopes requires `confirmWrites:true`; server Gemini execution requires `confirmProvider:true`, in addition to ordinary owner/CSRF/workspace and `confirm:true` controls. No live grant was minted during implementation.
 
-The worker POSTs to `https://life.ayodsgn.com/api/life/?action=opportunity-agents.poll` with `{limit:4}` and the bearer credential. Each returned job has `id,pipeline,query,maxProspects,leaseToken,leaseUntil`. Claims last 600 seconds and can retry up to 3 attempts; poll at most once every 10 seconds. The coordinator polls once per minute. Empty queues yield no provider calls.
+Store the token in an n8n Header Auth credential named **Life research & tracking**: header `Authorization`, value `Bearer <token>`. Keep it out of chat, URLs, node parameters and source files. It expires after 90 days and is revocable/replaced by the owner. No email permissions or provider keys are contained in this credential.
 
-Each child performs a bounded grounded Gemini request, checks source URLs against provider grounding, validates contacts, then POSTs `{jobId,leaseToken,proposals}` to `?action=opportunity-agents.result`. Valid empty results complete normally. Provider/format failure submits a generic error without raw provider details. Source URLs support human checking; neither model quotes nor the presence of a link proves a claim true. Read every source before applying a proposal. Never execute model/web content or treat it as HTML.
+## Daily plan
 
-Server validation bounds proposal/source/contact counts, requires public HTTPS sources and explicit published-email evidence, rejects duplicate company/role proposals, strips unsupported fields and forces `stage=researched`, `acceptance=unknown`, `requiresReview=true`. It stores results only in the isolated research queue. Company/application/document snapshots stay unchanged. Duplicate callback retries are idempotent; mismatched results, stale lease tokens, expired leases and revoked/expired bearer tokens are rejected. Reviewing marks the result reviewed/rejected; applying changes uses the ordinary explicit Life save flow with its version conflict handling.
+At 09:00 Africa/Lagos, the coordinator asks Life to queue today's bounded plan, once per tenant/date:
 
-The local editor is not 24/7 hosting. Keep the computer/process running for polling. A permanent host is a separate decision. n8n successful executions and leases contain public research plus scoped job tokens, so retain data only as long as useful and protect the local owner account. Last-seen means authenticated polling, not proof that research or applications succeeded. All child failures must be inspected; dispatch success does not imply research success.
+- 5 NYSC prospects: Lagos/Nigeria technology consulting and digital transformation first; healthtech, enterprise AI, edtech/govtech, venture building and technology teams beyond design titles.
+- 5 Nigerian freelance prospects: paying B2B SaaS, agencies, AI, enterprise software and healthtech, with dated business signals and a specific potential service.
+- 5 international freelance prospects: remote/client geography and current signals verified.
+- 5 career roles spanning product, technology, healthcare, AI and business.
+- 5 AI evaluation/testing niches, without inferring acceptance.
 
-## Verification
+These are ceilings, not promised results. Recent 2–9-month funding and small teams are heuristics. The provider prompt prioritises official sources, published contacts, up to two named decision-makers, distinct NYSC/freelance positioning and Ayo's actual experience. No invented qualifications, guessed emails or internal business problems.
 
-`node automation/n8n/generate.mjs` regenerates exports. `node automation/n8n/test.mjs` checks gates, grounded proposal validation and independent dispatch structure. `tests/life-opportunity-agents.php` checks tenant isolation, token hash/revocation/expiry, leases, bounded claims, callback retries and no implicit application changes. Real account connection/provider execution remains unverified until the user finishes setup.
+The once-per-minute polling trigger claims up to four jobs and dispatches independent child executions; remaining jobs are claimed on the next check. Actual overlap depends on the n8n host. Manual check only processes already queued jobs; it does not automatically create 25 prospects. Daily queue retries are idempotent. Server provider reservations cap all worker executions to 25 requested prospect slots per Lagos date, including failed attempts; quota failure does not trigger paid/repeated fallbacks.
 
-Official references checked 26 October 2026: [n8n sub-workflows](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.executeworkflow/), [Schedule Trigger](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/), [Gemini Google Search](https://ai.google.dev/gemini-api/docs/google-search).
+## Execution and updates
+
+Worker POST endpoints are under `https://life.ayodsgn.com/api/life/?action=opportunity-agents.`:
+
+- `daily`: once-per-day bounded queue.
+- `poll`: up to four leased jobs, ten-minute leases, three claim attempts, no faster than ten seconds.
+- `execute`: validates worker scope, tenant, lease and daily budget; calls Life's free-only Gemini configuration; verifies proposal sources against provider grounding; stores the result. Repeating a completed execution does not call the provider again.
+- `apply`: requires company/opportunity/research write scopes and contact write if contacts exist. It applies only a stored completed result, with deterministic dedupe and an atomic receipt/audit trail. It fills missing company/person details, preserves existing manual details/statuses, and adds sourced research. New AI testing records are pending; other prospects are researched. It never marks acceptance, submission, sending or revenue.
+- `read`: scoped, paginated projection of allowed tracker collections, excluding documents, mail and approval content.
+- `write`: specific approved `company/contact/research/opportunity/pipeline/status.save` operations only, optimistic version required, stable request ID, atomic audit/idempotency. No mail, drafts, approvals, documents, arbitrary actions or destructive deletes. Outcome/status assertions are blocked.
+
+`execute` and `apply` have different purposes: execution alone does not update tracked records. Each child has `autoWriteEnabled=false` until the matching owner-approved write grant and workflow setting are deliberately enabled. `usePrivateContext=false` is also default. All imported/exported workflows remain inactive until setup and one verified manual test.
+
+## Selected private context
+
+The optional `context:use` execution permission does not read the whole CV bank or live mailbox. The owner separately selects exact CV versions and saved email context, approving Gemini processing; that grant is bound to this exact worker token and expires after 7 days. When enabled, the server attaches only that approved pipeline context directly to Gemini. Raw CVs and saved mail are not returned to n8n by the server-execution path. A missing or changed grant stops private-context execution. Public token rotation invalidates the selected grant.
+
+Live Gmail OAuth is separate and unconnected unless the user personally completes it; current saved correspondence in Life can provide selected context. No worker permission enables sending, changing Gmail or submitting applications. Even when owner-only mail features are separately connected, external worker routes cannot invoke them.
+
+## Setup and remaining dependencies
+
+1. Finish owner approval of the worker's explicit scopes and, if desired, selected private context.
+2. Select **Life research & tracking** on the coordinator's HTTP nodes and each child execute/apply node. No Gemini credential is required.
+3. Set the coordinator's four real child IDs and `enabled=true` only after credentials are selected. Enable each child's tracking writes/private-context switches only for approved capabilities.
+4. Wait for free Gemini allowance. Queue one small manual research task, run manual check, verify Life's job result and audited saved records, then activate/publish the coordinator schedules.
+5. Keep the local n8n process/computer running, or choose an always-on host separately. Localhost setup does not imply 24/7 hosting.
+
+Success/error/manual execution persistence and progress saving are disabled. Do not pin private outputs. Failed provider runs remain visible in Life instead of being represented as successful research. A successful dispatch/last-seen is not proof of research, applications or accepted outcomes.
+
+Tests: `node automation/n8n/test.mjs`, `tests/life-opportunity-agent-access.php` plus existing lease/private-context suites. These are deterministic fixture tests; a live authenticated end-to-end run remains required before claiming connected background research.
+
+## Company research from Life
+
+The owner queues `ayo-os.agents.queue` with `workspaceId`, `opportunityId`, an optional focused `query`, and explicit boolean `usePrivateContext` and `autoApply` preferences. The server pins the selected opportunity’s pipeline and limits the job to one company; execution rejects results for a different company. Private context requires the separate active selected-source grant and `context:use` permission. Manual jobs default to research-only. Applying a stored result requires both an explicit job `autoApply: true` policy and the matching tracking write permissions. Daily prospecting jobs request automatic sourced tracking additions; they still cannot mark outreach sent or infer accepted outcomes.

@@ -45,7 +45,7 @@ final class LifeAyoOS {
      if(($args['reviewed']??false)!==true)throw new LifeError('Explicitly review the recipient, content, materials and schedule first.',403);
      $d=$snapshot['draft'];$c=$snapshot['contact'];$o=$snapshot['opportunity'];
      if(!$c['email']||!$c['sourceUrl']||!$d['subject']||!$d['body']||!$d['schedule']||(!$o['materials']&&empty($o['documentIds'])))throw new LifeError('Add a sourced recipient, message, materials reference and schedule before approval.');
-     $cited=array_filter($snapshot['research'],fn($r)=>$r['kind']==='observation'&&$r['sourceUrl']!=='');if(!$cited)throw new LifeError('Link at least one sourced observation before approval.');
+     $cited=array_filter($snapshot['research'],fn($r)=>$r['kind']==='observation'&&($r['category']??'company')!=='note'&&$r['sourceUrl']!=='');if(!$cited)throw new LifeError('Link at least one sourced observation before approval.');
     }
     if(count($s['approvals'])>=10000)throw new LifeError('Approval history limit reached.');
     $s['approvals'][]=['id'=>LifeStore::id(),'draftId'=>$id,'decision'=>$decision,'reason'=>$reason,'actor'=>$actor,'at'=>$at,'fingerprint'=>hash('sha256',json_encode($snapshot,JSON_THROW_ON_ERROR)),'snapshot'=>$snapshot];
@@ -72,9 +72,7 @@ final class LifeAyoOS {
     if($type==='opportunities'){
      if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create an opportunity at the other company instead.');
      $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',array_merge(self::PIPELINES,array_column($s['pipelines'],'id')));$r['stage']=self::choice($args['stage']??$r['stage']??'researched',array_merge(self::STAGES,array_column($s['statuses'],'id')));$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
-     if(array_key_exists('documentIds',$args)){
-      $ids=$args['documentIds'];if(!is_array($ids)||!array_is_list($ids)||count($ids)>20)throw new LifeError('Choose up to 20 documents.');$bank=(new LifeApplications($this->store))->read()['state'];foreach($ids as $docId)$this->activeDocument($bank,$docId);$r['documentIds']=array_values(array_unique($ids));
-     }else $r['documentIds']=$r['documentIds']??[];
+
 
     }
     if(in_array($type,['research','drafts','communications'],true)){
@@ -96,8 +94,13 @@ final class LifeAyoOS {
      }
     }
     if($type==='research'){
-     $r['category']=self::choice($args['category']??$r['category']??'company',['company','activity']);
-     $r['kind']=self::choice($args['kind']??$r['kind']??'observation',['observation','hypothesis']);$r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');if($r['kind']==='observation'&&$r['sourceUrl']==='')throw new LifeError('Observations need a source URL. Label unsourced ideas as hypotheses.');
+     $r['category']=self::choice($args['category']??$r['category']??'company',['company','activity','note']);
+     $r['kind']=self::choice($args['kind']??$r['kind']??($r['category']==='note'?'hypothesis':'observation'),['observation','hypothesis']);if($r['category']==='note')$r['kind']='hypothesis';$r['sourceUrl']=LifeApplications::url($args['sourceUrl']??$r['sourceUrl']??'');if($r['kind']==='observation'&&$r['sourceUrl']==='')throw new LifeError('Observations need a source URL. Label unsourced ideas as hypotheses.');
+    }
+    if(in_array($type,['opportunities','drafts'],true)){
+     if(array_key_exists('documentIds',$args)){
+      $ids=$args['documentIds'];if(!is_array($ids)||!array_is_list($ids)||count($ids)>20)throw new LifeError('Choose up to 20 documents.');$bank=(new LifeApplications($this->store))->read()['state'];foreach($ids as $docId)$this->activeDocument($bank,$docId);$r['documentIds']=array_values(array_unique($ids));
+     }else $r['documentIds']=$r['documentIds']??[];
     }
     if($type==='drafts'){
      $r['contactId']=$args['contactId']??$r['contactId']??'';$c=self::item($s,'contacts',$r['contactId']);if($c['companyId']!==$o['companyId'])throw new LifeError('Choose a contact at this company.');

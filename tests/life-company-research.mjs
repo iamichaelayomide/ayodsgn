@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const source=readFileSync(new URL('../life/company-research.js',import.meta.url),'utf8');
+const {queueCompanyResearch}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const snapshot={workspaceId:7,state:{opportunities:[{id:'job',pipeline:'nysc'}]}};
+let calls=[],current=true;
+const request=async(action,args)=>{calls.push({action,args});if(action.endsWith('private.status'))return {configured:true,selection:{documentsByPipeline:{nysc:[]}}};return {jobs:[{id:'queued'}]};};
+await queueCompanyResearch({request,snapshot,id:'job',isCurrent:()=>current});
+assert.equal(calls[1].action,'ayo-os.agents.queue');
+assert.deepEqual({owner:calls[1].args.workspaceId,target:calls[1].args.opportunityId,private:calls[1].args.usePrivateContext,save:calls[1].args.autoApply},{owner:7,target:'job',private:true,save:true});
+calls=[];await queueCompanyResearch({request:async(action,args)=>{calls.push({action,args});return {configured:true,selection:{documentsByPipeline:{freelance:['cv']}}};},snapshot,id:'job',isCurrent:()=>true});assert.equal(calls[1].args.usePrivateContext,false,'A grant for another pipeline must not break public research');
+calls=[];await queueCompanyResearch({request:async(action,args)=>{calls.push({action,args});current=false;return {configured:true};},snapshot,id:'job',isCurrent:()=>current});assert.equal(calls.length,1,'Account changes abort before queuing');
+await assert.rejects(()=>queueCompanyResearch({request,snapshot,id:'missing',isCurrent:()=>true}),/unavailable/);
+console.log('Company research: selected target, approved context and account-change checks passed');

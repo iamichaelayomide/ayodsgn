@@ -10,11 +10,20 @@ export function opportunityStatus(o,ai=false){
  if(ai)return stage==='accepted'||stage==='won'?'accepted':stage==='not-accepted'||stage==='closed'?'not-accepted':'pending';
  return stage;
 }
+/** Keep explicit outcomes and custom statuses when moving between pipeline views. */
+export function stageForPipeline(stage,pipeline,customStatuses=[]){
+ if(customStatuses.some(s=>s.id===stage))return stage;
+ if(pipeline==='ai-testing')return ['accepted','won'].includes(stage)?'accepted':['not-accepted','closed'].includes(stage)?'not-accepted':'pending';
+ return stage==='accepted'?'won':stage==='not-accepted'?'closed':stage==='pending'?'researched':Object.hasOwn(stages,stage)?stage:'researched';
+}
 export function opportunityLabel(o){
  let s=(o.title||'Opportunity').replace(/^(?:DELIVERY FAILED|SENT|SUBMITTED|FORM SUBMITTED|SCHEDULED|REPLIED|DECLINED|INCOMPLETE|PROFILE ACTIVE|INVITED TO APPLY|PROJECT PAUSED|STAGE 2|VIDEO REQUESTED) — /,'');
  s=s.replace(/^Application Submitted - /,'').replace(/ on Mercor$/,'').replace(/^Your profile is live — /,'').replace(/^Thank you for filling out: /,'');
+ s=s.replace(/^Your (.+) application is incomplete$/i,'$1').replace(/^\[LONG PROJECT\]\s*/,'');
+ s=s.replace(/^(?:Helium Health|Signal Alliance Consulting|TeKnowledge)\s*[-—]\s*/i,'');
  s=s.replace(/^NYSC (?:interest in|enquiry (?:on|for)|placement enquiry on) /i,'').replace(/^NYSC Placement (?:Enquiry|Application) \| /i,'').replace(/^For Recruitment Team \| NYSC Placement Enquiry - /i,'');
  s=s.replace(/^(?:Pouchers|Acceede|Foregate|Platos|Trade Lenda|STAXIS|Growwr|CreditChek|Datab|Indigenius|Mobihealth|Overite|Codar|BioVana|Tuteria|Fertitude|Swoop|AiWaziri)(?:'s)?\s+/i,'');
+ s=s.replace(/^(?:Helium Health|Signal Alliance Consulting|TeKnowledge)\s*[-—]\s*/i,'');
  return s.charAt(0).toUpperCase()+s.slice(1);
 }
 export function messageText(value){return String(value||'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&#39;/g,"'").replace(/&quot;/g,'"').split(/\n\s*On [^\n]+wrote:\s*\n|\n\s*-{2,}\s*Forwarded message/i)[0].trim();}
