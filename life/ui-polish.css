@@ -40,3 +40,27 @@
  .ramble-view #companion .ramble-history-row{padding:4px 0}
  .ramble-view #companion .ramble-chat-link{padding:10px 8px!important}
 }
+
+/* Consistent disclosure affordance, preserving native keyboard/expanded semantics. */
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)>summary{position:relative;list-style:none;padding-right:30px;cursor:pointer}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)>summary::-webkit-details-marker{display:none}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)>summary::after{content:'';position:absolute;right:4px;top:.75em;width:16px;height:16px;background:url('./icons/chevron-down.svg') center/contain no-repeat;opacity:.6;transform:translateY(-50%)}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)[open]>summary::after{transform:translateY(-50%) rotate(180deg)}
+:where(.workspace,dialog) summary:focus-visible{outline:2px solid #829be0;outline-offset:4px;border-radius:5px}
+.ayo-mail-row>summary::after{top:26px!important;right:8px!important}
+.ayo-mail-row>summary{padding:16px 32px 16px 0}
+.ayo-mail-row[open]{background:#fafbfe}
+.ayo-mail-row[open]>summary p{display:none}
+.ayo-mail-expanded{padding:0 12px 20px 0}
+.ayo-detail-body,.ayo-email-list,.ayo-mail-row,.ayo-mail-row>summary{min-width:0;max-width:100%;box-sizing:border-box}
+.ayo-mail-row h4{overflow-wrap:anywhere}
+.ayo-email-list{grid-template-columns:minmax(0,1fr)}
+.ayo-agent-run[open]>summary>.ayo-icon{transform:rotate(180deg)}
+dialog.ayo-dialog .ayo-close{display:grid;place-items:center;min-width:32px;width:32px;height:32px;min-height:32px;border:0;background:transparent;padding:4px;font-size:24px;line-height:1;color:#7b8391;border-radius:8px;flex:none}
+dialog.ayo-dialog .ayo-detail-header{padding-bottom:14px}
+dialog.ayo-dialog .ayo-detail-tabs{gap:8px}
+.ayo-agent-settings{max-width:720px}
+.ayo-agent-settings .ayo-agent-setup{padding:22px;border-radius:14px}
+.ayo-agent-settings .ayo-agent-setup p{line-height:1.6}
+.workspace .select-trigger,dialog .select-trigger,dialog input:not([type=checkbox]):not([type=radio]),dialog textarea{border-color:#dfe3ea;border-radius:10px}
+@media(hover:hover) and (pointer:fine){.ayo-mail-row>summary:hover{background:#f5f7fb}dialog.ayo-dialog .ayo-close:hover{background:#eef1f6}}
