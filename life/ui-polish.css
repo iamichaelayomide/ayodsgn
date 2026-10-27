@@ -1,0 +1,42 @@
+/* Compact tracking and responsive chat; existing actions and mobile navigation stay intact. */
+#ayo-os .ayo-row{min-height:62px;padding:10px 16px;gap:14px}
+#ayo-os .ayo-row-company{gap:3px}
+#ayo-os .ayo-table-head{padding-inline:16px;gap:14px}
+#ayo-os .ayo-summary{gap:10px;margin-bottom:20px}
+#ayo-os .ayo-summary button{padding:12px 16px;gap:8px}
+#ayo-os .ayo-summary strong{font-size:23px}
+#companion .ramble-history-row{margin:2px 0}
+#companion .ramble-chat-link{gap:4px;padding:10px!important}
+#companion .ramble-chat-link span{-webkit-line-clamp:1}
+#companion .ramble-chat-link[aria-pressed=true]{background:#edf1ff;color:#2448cb}
+#companion .ramble-chat-search{border-radius:10px;min-height:42px;margin-bottom:12px}
+#companion .ramble-chat-search input{min-height:40px;padding:8px 0}
+#companion .chat-message{margin-bottom:18px!important}
+@media(min-width:1101px){
+ .ramble-view #companion .ramble-layout{grid-template-columns:minmax(0,1fr) 244px;grid-template-rows:minmax(0,1fr);height:calc(100dvh - 112px);min-height:420px;gap:28px}
+ .ramble-view #companion .ramble-thread{grid-column:1;grid-row:1;height:100%;min-height:0;overflow:hidden}
+ .ramble-view #companion .ramble-chats{grid-column:2;grid-row:1;padding:12px 0 0 20px;border-right:0;border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+ .ramble-view #companion .ramble-chat-rows{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ .ramble-view #companion .chat-history{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px 8px 20px}
+ .ramble-view #companion #ai-composer{position:relative;bottom:auto;flex:none;margin-top:auto;border-color:var(--line);border-radius:18px}
+ .ramble-view #companion .ramble-welcome{min-height:0;height:100%;padding:24px 0}
+ .ramble-view #companion .ramble-suggestions{flex:none;margin:8px 0}
+ .ramble-view #companion .ramble-list-heading{margin-bottom:12px}
+}
+@media(min-width:801px) and (max-width:1100px){
+ .ramble-view #companion .ramble-layout{grid-template-columns:minmax(0,1fr);gap:0}
+ .ramble-view #companion .ramble-chats{display:none}
+ .ramble-view #companion .ramble-history-toggle{display:inline-flex!important}
+ .ramble-view #companion.show-ramble-history .ramble-chats{display:block;max-height:none;border:0;padding:12px 0}
+ .ramble-view #companion.show-ramble-history .ramble-thread{display:none}
+}
+@media(max-width:800px){
+ #ayo-os .ayo-row{min-height:72px;padding:12px 14px;gap:6px 12px}
+ #ayo-os .ayo-summary{gap:7px;margin-bottom:18px}
+ #ayo-os .ayo-summary button{padding:11px 10px;gap:7px}
+ #ayo-os .ayo-summary strong{font-size:21px}
+ .ramble-view #companion .chat-history{gap:14px}
+ .ramble-view #companion .chat-message{margin:0!important}
+ .ramble-view #companion .ramble-history-row{padding:4px 0}
+ .ramble-view #companion .ramble-chat-link{padding:10px 8px!important}
+}
