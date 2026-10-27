@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS life_opportunity_mail_connection (id INT PRIMARY KEY,token LONGTEXT NOT NULL,sender VARCHAR(254) NOT NULL,connected_at VARCHAR(30) NOT NULL);
+CREATE TABLE IF NOT EXISTS life_opportunity_mail_preparations (id VARCHAR(32) PRIMARY KEY,tenant_id INT NOT NULL,snapshot LONGTEXT NOT NULL,fingerprint VARCHAR(64) NOT NULL,dedupe_key VARCHAR(64) NOT NULL,created_at VARCHAR(30) NOT NULL,expires_at VARCHAR(30) NOT NULL,status VARCHAR(20) NOT NULL,remote_json LONGTEXT NOT NULL,attempt_at VARCHAR(30) NOT NULL);
+CREATE TABLE IF NOT EXISTS life_opportunity_mail_locks (id VARCHAR(64) PRIMARY KEY, preparation_id VARCHAR(32) NOT NULL);
