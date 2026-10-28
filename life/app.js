@@ -1,4 +1,4 @@
-import {createAyoOS} from './ayo-os.js?v=goal-controls-1';
+import {createAyoOS} from './ayo-os.js?v=research-flow-1';
 import {taskColumns,periodRange,syncTaskReadiness,creationActions,laneTone} from './planner-interactions.js?v=2';
 import {createNavigationHistory} from './navigation-history.js?v=1';
 import {createApplications} from './applications.js?v=7';
