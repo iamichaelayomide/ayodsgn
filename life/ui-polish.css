@@ -64,3 +64,6 @@ dialog.ayo-dialog .ayo-detail-tabs{gap:8px}
 .ayo-agent-settings .ayo-agent-setup p{line-height:1.6}
 .workspace .select-trigger,dialog .select-trigger,dialog input:not([type=checkbox]):not([type=radio]),dialog textarea{border-color:#dfe3ea;border-radius:10px}
 @media(hover:hover) and (pointer:fine){.ayo-mail-row>summary:hover{background:#f5f7fb}dialog.ayo-dialog .ayo-close:hover{background:#eef1f6}}
+
+/* Quiet creation and goal controls. */
+.goal-view-switch{border:0;background:transparent;padding:2px;gap:2px}.goal-view-switch button{min-height:32px;padding:5px 10px;font-size:12px}.goal-view-switch button[aria-pressed=true]{background:#e8ecf4;color:#303c52}.goal-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}.goal-archive{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;min-height:30px;padding:6px;border:0;background:transparent;border-radius:7px;opacity:.65}.goal-archive img{width:16px;height:16px}.goal-archive:hover{background:#f0f3f8;opacity:1}.ayo-filters .ayo-add-pipeline{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;min-width:30px;font-size:20px;border:1px solid #e0e5ee;border-radius:8px;background:transparent}
