@@ -1,4 +1,4 @@
-import {createAyoOS} from './ayo-os.js?v=cv-layout-1';
+import {createAyoOS} from './ayo-os.js?v=goal-controls-1';
 import {taskColumns,periodRange,syncTaskReadiness,creationActions,laneTone} from './planner-interactions.js?v=2';
 import {createNavigationHistory} from './navigation-history.js?v=1';
 import {createApplications} from './applications.js?v=7';
@@ -18,7 +18,7 @@ import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
-import {createGoals} from './goals.js?v=8';
+import {createGoals} from './goals.js?v=goal-controls-8';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=44';
@@ -125,6 +125,7 @@ $('view-back').onclick=()=>{if(view==='companion'&&companion.back()){updateBread
 $('breadcrumb-home').onclick=()=>goToView('board');
 $('breadcrumb').addEventListener('click',event=>{const target=event.target.closest('[data-app-breadcrumb]');if(target&&view==='applications')applications.navigate(target.dataset.appBreadcrumb);});
 function render() {
+ if($('voice-preview')&&view==='goals'){$('voice-preview').setAttribute('aria-label','New goal');$('voice-preview').title='New goal';}
  queueMicrotask(updateBreadcrumbs);
  if($('board-mode-controls'))$('board-mode-controls').hidden=view!=='board';
  if($('task-period-controls'))$('task-period-controls').hidden=view!=='board'||boardEntity!=='tasks';if($('task-layout-controls'))$('task-layout-controls').hidden=view!=='board'||boardEntity!=='tasks';if($('task-period-date'))$('task-period-date').closest('label').hidden=taskPeriod==='all';
@@ -321,5 +322,5 @@ const changeTaskPeriod=event=>{if(!['task-period','task-period-date'].includes(e
 document.addEventListener('input',event=>{const form=event.target.closest('.quick-add,#task-form');if(form&&event.target.name==='title')syncTaskReadiness(form,saving,role==='owner');});
 const quickSheet=document.createElement('dialog');quickSheet.id='quick-create-sheet';quickSheet.setAttribute('aria-labelledby','quick-create-title');quickSheet.innerHTML='<header><h2 id="quick-create-title" class="sr-only">Add</h2><button type="button" data-sheet-close aria-label="Close add menu">×</button></header><div class="quick-create-actions"></div>';document.body.append(quickSheet);
 $('ayo-os').addEventListener('ayo:context',event=>{const tab=event.detail.tab,control=$('voice-preview'),labels={opportunities:'Add opportunity',review:'Review next draft',agents:'Find opportunities',settings:'Find opportunities'},icons={opportunities:'opportunity',review:'tick-square',agents:'search-normal',settings:'search-normal'};control.setAttribute('aria-label',labels[tab]||'Add opportunity');control.title=labels[tab]||'Add opportunity';control.innerHTML=`<img src="./icons/${icons[tab]||'opportunity'}.svg" alt="" aria-hidden="true">`;});
-const quickTrigger=$('voice-preview');quickTrigger.setAttribute('aria-label','Add');quickTrigger.title='Add';quickTrigger.innerHTML='<span aria-hidden="true">+</span>';quickTrigger.setAttribute('aria-haspopup','dialog');quickTrigger.onclick=()=>{if(role!=='owner')return;if(view==='ayo-os'){ayoOS.primaryAction();return;}const choices=creationActions(view,boardEntity),labels={task:'New task',goal:'New goal',opportunity:'New opportunity',group:'New group',note:'New note',map:'New map'},icons={task:'tick-square',goal:'chart',opportunity:'archive',group:'organize',note:'edit',map:'link'};quickSheet.querySelector('.quick-create-actions').innerHTML=choices.map(a=>`<button type="button" data-create="${a}"><img class="action-icon" src="./icons/${icons[a]}.svg" alt=""><span>${labels[a]}</span></button>`).join('');quickSheet.showModal();};
+const quickTrigger=$('voice-preview');quickTrigger.setAttribute('aria-label','Add');quickTrigger.title='Add';quickTrigger.innerHTML='<span aria-hidden="true">+</span>';quickTrigger.setAttribute('aria-haspopup','dialog');quickTrigger.onclick=()=>{if(role!=='owner')return;if(view==='ayo-os'){ayoOS.primaryAction();return;}if(view==='goals'){goals.open('','week');return;}const choices=creationActions(view,boardEntity),labels={task:'New task',goal:'New goal',opportunity:'New opportunity',group:'New group',note:'New note',map:'New map'},icons={task:'tick-square',goal:'chart',opportunity:'archive',group:'organize',note:'edit',map:'link'};quickSheet.querySelector('.quick-create-actions').innerHTML=choices.map(a=>`<button type="button" data-create="${a}"><img class="action-icon" src="./icons/${icons[a]}.svg" alt=""><span>${labels[a]}</span></button>`).join('');quickSheet.showModal();};
 quickSheet.querySelector('[data-sheet-close]').onclick=()=>quickSheet.close();quickSheet.addEventListener('click',async event=>{const button=event.target.closest('[data-create]');if(!button)return;quickSheet.close();const action=button.dataset.create;if(action==='task')openTask('','',{dueDate:view==='calendar'||view==='today'?today():''});else if(action==='goal')goals.open('','week');else if(action==='opportunity'){goToView('applications');ayoOS.createOpportunity();}else if(action==='group'){goToView('application-library');await applications.render();applications.createGroup();}else if(action==='note'){goToView('notes');$('thinking').querySelector('[data-thinking=new-note]')?.click();}else if(action==='map'){goToView('mindmap');$('thinking').querySelector('[data-thinking=new-map]')?.click();}});quickSheet.addEventListener('close',()=>quickTrigger.focus({preventScroll:true}));
