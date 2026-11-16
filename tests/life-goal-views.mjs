@@ -12,7 +12,7 @@ assert.equal(goals.goalPeriodDate('quarter','2026-Q4'),'2026-10-01','The quarter
 assert.equal(goals.goalPeriodDate('month','2026-10'),'2026-10-01');
 assert.equal(goals.goalPeriodLabel('week','2026-10-19'),'Week of 19 Oct 2026');
 assert.equal(goals.goalPeriodLabel('month','2026-10'),'October 2026');
-assert.equal(goals.goalPeriodLabel('quarter','2026-Q4'),'Oct–Dec 2026');
+assert.equal(goals.goalPeriodLabel('quarter','2026-Q4'),'Q4 2026');
 
 assert.equal(typeof goals.keyResultProgress,'function','measured result progress is available');
 assert.equal(goals.keyResultProgress({baseline:100,current:60,target:20}),50);
@@ -34,15 +34,14 @@ const makeElement=()=>({events:{},addEventListener(name,fn){this.events[name]=fn
 const root={...makeElement(),dataset:{},classList:{toggle(){}},innerHTML:'',querySelector(){return null;}};
 const inserted=[];
 const field=()=>({...makeElement(),value:'',closest:()=>({hidden:false}),focus(){},after(element){inserted.push(element);}});
-const controls=Object.fromEntries(['id','title','notes','type','period','category','status','progressMode','parentId','keyResultId'].map(name=>[name,field()]));
+const controls=Object.fromEntries(['id','title','notes','type','period','category','status','parentId'].map(name=>[name,field()]));
 const form={...makeElement(),elements:controls,reset(){},querySelector:()=>({hidden:false,disabled:false,innerHTML:'',querySelectorAll:()=>[]}),querySelectorAll:()=>[]};
-form.elements.progressMode.value='linked';
 const dialog={showModal(){},close(){}};
 const detail={...makeElement(),open:false};
 globalThis.document={createElement:()=>({...makeElement(),dataset:{},setAttribute(name,value){this[name]=value;},after(element){inserted.push(element);}}),documentElement:{dataset:{timezone:'Africa/Lagos'}},getElementById:id=>id==='goals'?root:id==='goal-form'?form:id==='goal-dialog'?dialog:id==='period-goal-detail'?detail:{},body:{classList:{contains:()=>false}}};
 const actions=[],data={state:{goals:[{id:'g',title:'Ship it',type:'adhoc',status:'todo',progressMode:'linked',keyResults:[]}],tasks:[],lists:[]}};
-let calendar;
-const controller=goals.createGoals({pickDate:options=>{calendar=options;},getData:()=>data,mutate:async(action,args)=>{actions.push({action,args});Object.assign(data.state.goals[0],args);},escape:String,refreshSelects:()=>{},openTask:()=>{},week:()=> '2026-10-19'});
+let calendar,periodPicker;
+const controller=goals.createGoals({pickDate:options=>{calendar=options;},pickPeriod:options=>{periodPicker=options;},getData:()=>data,mutate:async(action,args)=>{actions.push({action,args});Object.assign(data.state.goals[0],args);},escape:String,refreshSelects:()=>{},openTask:()=>{},week:()=> '2026-10-19'});
 controller.render();
 assert.match(root.innerHTML,/Quarterly goals[\s\S]*Monthly goals[\s\S]*Weekly goals/,'Overview renders all three timeframes');
 assert.doesNotMatch(root.innerHTML,/Browse all goals|data-plan-library/,'There is one Goals view');
@@ -55,8 +54,6 @@ inserted[0].onclick();calendar.onSelect('2026-10-29');
 assert.equal(form.elements.period.value,'2026-10-26','Picking a date in the form saves that week’s Monday');
 assert.equal(inserted[0].textContent,'Week of 26 Oct 2026');
 controller.open();assert.equal(inserted.length,2,'Reopening the form reuses its picker and optional clear button');
-form.elements.status.events.change?.();
-assert.equal(form.elements.progressMode.value,'manual','Changing dialog status explicitly switches linked progress to manual');
 
 controller.open('','day');assert.equal(form.elements.type.value,'week','Week is the shortest new goal period');assert.doesNotMatch(root.innerHTML,/<option value="day"/,'Daily creation is not offered in filters');
 
@@ -71,10 +68,10 @@ assert.match(root.innerHTML,/data-plan-goal="weekly"/,'Choosing Thursday finds a
 assert.match(root.innerHTML,/data-plan-goal="weekly-other-area"/,'The Week shows all areas together');
 assert.doesNotMatch(root.innerHTML,/Outside selected week/);
 assert.match(root.innerHTML,/Week of 19 Oct 2026/,'The view names the normalized week');
-controller.open('','quarter');inserted[0].onclick();calendar.onSelect('2027-05-09');
+controller.open('','quarter');inserted[0].onclick();periodPicker.onSelect('2027-Q2');
 assert.equal(form.elements.period.value,'2027-Q2','The quarterly picker preserves the backend period format');
-assert.equal(inserted[0].textContent,'Apr–Jun 2027');
-controller.open('','month');inserted[0].onclick();calendar.onSelect('2027-05-09');
+assert.equal(inserted[0].textContent,'Q2 2027');
+controller.open('','month');inserted[0].onclick();periodPicker.onSelect('2027-05');
 assert.equal(form.elements.period.value,'2027-05');
 controller.open('','adhoc');inserted[0].onclick();calendar.onSelect('2027-05-09');inserted[1].onclick();
 assert.equal(form.elements.period.value,'','An independent goal can clear its optional date');
@@ -83,7 +80,7 @@ console.log('Goal calendar selection and normalized period filters passed');
 controller.open('','month');inserted[0].onclick();calendar.onSelect('2027-05-09');
 form.elements.type.value='quarter';form.elements.type.events.change();
 assert.equal(form.elements.period.value,'2027-Q2','Changing period type translates the selected calendar period');
-assert.equal(inserted[0].textContent,'Apr–Jun 2027');
+assert.equal(inserted[0].textContent,'Q2 2027');
 tap({},'data-plan-date');
 calendar.onSelect('2026-10-25');
 assert.match(root.innerHTML,/data-plan-goal="weekly"/,'The filter calendar normalizes a Sunday to its Monday');

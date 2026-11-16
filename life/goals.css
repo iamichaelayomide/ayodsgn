@@ -51,18 +51,11 @@
 .goal-list .goal-progress{grid-column:2;grid-row:2;margin:0}
 .goal-list .goal-status-control{grid-column:3;grid-row:2;margin:0}
 .goal-list .goal-card-details{grid-column:1/-1}
-.goal-limit-note,.goal-form-help{font-size:12px;line-height:1.5;color:var(--goal-muted,var(--muted))}
 .goal-view-error:empty{display:none}
 .goal-form-details{margin:16px 0;border-top:1px solid #dfe3e8}
 .goal-form-details>summary{padding:12px 0;min-height:44px;cursor:pointer;color:var(--blue,#284bd2)}
-.goal-result-editor{border:1px solid #dfe3e8;border-radius:10px;padding:12px;margin:12px 0;min-width:0}
-.goal-result-editor legend{font-size:12px;padding:0 6px}
-.goal-metric-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.goal-metric-fields input{width:100%;min-width:0}
-.goal-result-editor>button{font-size:12px;margin-top:6px}
 #goal-dialog{max-height:calc(100dvh - 32px);overscroll-behavior:contain}
 #goal-form{padding-bottom:env(safe-area-inset-bottom,0px)}
-#goal-form [data-results-section]>h3{font-size:14px;margin:16px 0 6px}
 .goal-toolbar button,.goal-card button,.goal-card select,#goal-form button{touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .goal-toolbar button:active,.goal-card button:active,#goal-form button:active{transform:scale(.98)}
 .goal-toolbar :focus-visible,.goal-card :focus-visible,#goal-form :focus-visible{outline:2px solid var(--blue,#284bd2);outline-offset:3px}
@@ -79,7 +72,6 @@
  .goal-lane{scroll-snap-align:start}
  .goal-list .goal-card{display:block;padding:16px}
  .goal-list .goal-progress,.goal-list .goal-status-control{margin-top:14px}
- .goal-metric-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
  #goal-dialog{max-height:calc(100dvh - 20px)}
  #goal-form .field-row{grid-template-columns:repeat(2,minmax(0,1fr))}
  #goal-form .field-row>label{min-width:0}
@@ -168,3 +160,11 @@ body:has(.workspace[data-view=goals]) #voice-preview{display:none}
 
 .period-archive{margin-top:18px;background:transparent;border:0;color:#96374d;padding-inline:0;min-height:44px}
 .period-detail-inner [data-plan-error]:empty{display:none}
+.goal-choice-dialog{width:min(440px,calc(100% - 28px));max-height:calc(100dvh - 28px);overflow:auto}
+.goal-choice-dialog .dialog-heading h2{font-family:var(--sans);font-size:20px;font-weight:650}
+.goal-choice-year{display:flex;align-items:center;justify-content:space-between;margin:12px 0}
+.goal-choice-year button{width:44px;min-height:44px;padding:0;font-size:22px}
+.goal-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.goal-choice-grid[data-kind=quarter]{grid-template-columns:repeat(2,minmax(0,1fr))}
+.goal-choice-grid button{min-width:0;min-height:44px;padding:6px;font-size:13px}
+.goal-choice-grid button[aria-pressed=true]{color:var(--blue);background:#e9eeff;border-color:#afbef5;font-weight:650}

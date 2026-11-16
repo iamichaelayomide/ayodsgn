@@ -13,7 +13,7 @@ export function goalsByArea(goals) {
   return [...areas.values()].sort((a,b) => a.area.localeCompare(b.area));
 }
 
-export function createPeriodGoals({root, detail, getData, open, openTask, createTask, archiveGoal, escape, today, partner, pickDate, periodOf, labelOf, statusOf}) {
+export function createPeriodGoals({root, detail, getData, open, openTask, createTask, archiveGoal, escape, today, partner, pickDate, pickPeriod, periodOf, dateOf, labelOf, statusOf}) {
   let date = '', mode = 'overview', area = '', goalId = '';
   const active = () => (getData()?.state.goals || []).filter(goal => !goal.archived);
   const period = type => periodOf(type,date || today());
@@ -73,7 +73,6 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       <p class="period-detail-status"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span>${({todo:'To do',progress:'In progress',done:'Done'})[statusOf(goal)]}</p>
       ${parent ? `<p class="period-parent">Supports <button type="button" data-plan-goal="${escape(parent.id)}">${escape(parent.title)}</button></p>` : ''}
       ${goal.notes ? `<p class="period-notes">${escape(goal.notes)}</p>` : ''}
-      ${goal.keyResults?.length ? `<section><h3>Measured results</h3><ul class="period-detail-list">${goal.keyResults.map(result => `<li>${escape(result.title)}${result.target == null ? '' : `<small>${escape(result.current ?? '—')} / ${escape(result.target)} ${escape(result.unit || '')}</small>`}</li>`).join('')}</ul></section>` : ''}
       ${childType || children.length ? `<section><header><h3>${childType ? (childType === 'month' ? 'Monthly goals' : 'Weekly goals') : 'Linked goals'}</h3>${childType && !partner() ? `<button type="button" data-plan-child="${childType}">+ Add ${childType} goal</button>` : ''}</header>${children.length ? `<ul class="period-detail-list">${children.map(child => goalRow(child,records)).join('')}</ul>` : '<p class="period-empty">No linked goals yet.</p>'}</section>` : ''}
       <section><header><h3>Linked tasks</h3>${isDated && !partner() ? '<button type="button" data-plan-task-new>+ Add weekly task</button>' : ''}</header>
       ${tasks.length ? `<ul class="period-detail-list">${tasks.map(task => `<li><button type="button" data-plan-task="${escape(task.id)}">${escape(task.title)}</button><small>${state.lists.find(list => list.id === task.listId)?.isDone ? 'Done' : 'Open'}</small></li>`).join('')}</ul>` : '<p class="period-empty">No linked tasks yet.</p>'}</section>
@@ -116,7 +115,14 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       root.querySelector(`[data-plan-mode="${mode}"]`)?.focus();
     } else if (planShift) shift(Number(planShift));
     else if (button.hasAttribute('data-plan-date')) {
-      pickDate({value:date || today(),title:'Choose a planning date',onSelect:value => {date = value; render();}});
+      const type = mode === 'overview' ? 'month' : mode;
+      const apply = value => {date = value; render(); queueMicrotask(()=>root.querySelector('[data-plan-date]')?.focus());};
+      if (type === 'week') pickDate({value:date || today(),title:'Choose a planning week',onSelect:apply});
+      else pickPeriod({type,value:period(type),onSelect:selected => {
+        if (selected === period(type)) apply(date || today());
+        else if (selected === periodOf(type,today())) apply(today());
+        else apply(dateOf(type,selected));
+      }});
     } else if (planArea !== undefined) {
       area = planArea;
       render();
