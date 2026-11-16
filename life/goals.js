@@ -1,4 +1,4 @@
-import {createPeriodGoals} from './period-goals.js?v=2';
+import {createPeriodGoals} from './period-goals.js?v=3';
 import {plannerTimezone} from './accounts.js?v=1';
 import {chooseDate} from './date-controls.js?v=1';
 const types={adhoc:'Independent',day:'Day',week:'Week',month:'Month',quarter:'Quarter'};
@@ -19,7 +19,7 @@ export function goalPeriodDate(type,period){
 export function goalPeriodLabel(type,period){
  const value=goalPeriodDate(type,period);if(!value)return period||({week:'Choose week',month:'Choose month',quarter:'Choose quarter',day:'Choose date',adhoc:'Any time'}[type]||'Choose date');
  const date=new Date(value+'T12:00:00Z'),format=options=>new Intl.DateTimeFormat('en-GB',{...options,timeZone:'UTC'}).format(date);
- if(type==='quarter'){const end=new Date(date);end.setUTCMonth(end.getUTCMonth()+2);return `${format({month:'short'})}–${new Intl.DateTimeFormat('en-GB',{month:'short',timeZone:'UTC'}).format(end)} ${format({year:'numeric'})}`;}
+ if(type==='quarter')return `${period.slice(-2)} ${format({year:'numeric'})}`;
  if(type==='month')return format({month:'long',year:'numeric'});
  return `${type==='week'?'Week of ':''}${format({day:'numeric',month:'short',year:'numeric'})}`;
 }
@@ -40,58 +40,111 @@ export function goalDeliveryProgress(state,goalId){
  const total=tasks.linked.length+childGoals.length,done=tasks.done+childGoals.filter(g=>goalStatus(g)==='done').length;
  return {...tasks,childGoals,total,done,percent:total?Math.round(done*100/total):0};
 }
-export function createGoals({getData,mutate,escape,refreshSelects,openTask,createTask,archiveGoal,week,pickDate=chooseDate}){
+export function chooseGoalPeriod({type,value,onSelect}){
+ const isQuarter=type==='quarter',label=isQuarter?'quarter':'month';
+ let year=Number(value.slice(0,4));
+ const picker=document.createElement('dialog');
+ picker.className='goal-choice-dialog';
+ picker.setAttribute('aria-label',`Choose a ${label}`);
+ picker.innerHTML=`<div class="dialog-heading"><h2>Choose a ${label}</h2><button type="button" aria-label="Close period picker">×</button></div>
+ <div class="goal-choice-year"><button type="button" data-year-step="-1" aria-label="Previous year">‹</button><strong aria-live="polite"></strong><button type="button" data-year-step="1" aria-label="Next year">›</button></div>
+ <div class="goal-choice-grid" data-kind="${type}"></div>`;
+ const grid=picker.querySelector('.goal-choice-grid');
+ const yearLabel=picker.querySelector('.goal-choice-year strong');
+ const monthName=new Intl.DateTimeFormat('en-GB',{month:'long',timeZone:'UTC'});
+ function draw(){
+  yearLabel.textContent=year;
+  grid.replaceChildren();
+  for(let index=0;index<(isQuarter?4:12);index++){
+   const option=isQuarter?`Q${index+1}`:String(index+1).padStart(2,'0');
+   const period=`${String(year).padStart(4,'0')}-${option}`;
+   const button=document.createElement('button');
+   button.type='button';button.textContent=isQuarter?option:monthName.format(new Date(Date.UTC(2026,index,1)));
+   button.setAttribute('aria-pressed',String(period===value));
+   button.onclick=()=>{picker.close();onSelect(period);};
+   grid.append(button);
+  }
+ }
+ picker.querySelector('[aria-label="Close period picker"]').onclick=()=>picker.close();
+ picker.querySelectorAll('[data-year-step]').forEach(button=>{button.onclick=()=>{
+  year=Math.max(1000,Math.min(9999,year+Number(button.dataset.yearStep)));
+  draw();
+ };});
+ picker.addEventListener('close',()=>picker.remove(),{once:true});
+ document.body.append(picker);
+ draw();
+ picker.showModal();
+ (grid.querySelector('[aria-pressed=true]')||grid.firstElementChild)?.focus();
+}
+
+export function createGoals({getData,mutate,escape,refreshSelects,openTask,createTask,archiveGoal,week,pickDate=chooseDate,pickPeriod=chooseGoalPeriod}){
  const root=document.getElementById('goals'),dialog=document.getElementById('goal-dialog'),form=document.getElementById('goal-form');
  const all=()=>getData().state.goals||[],partner=()=>document.body.classList.contains('partner-mode');
  const today=()=>{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:plannerTimezone(),year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const part=k=>parts.find(p=>p.type===k).value;return `${part('year')}-${part('month')}-${part('day')}`;};
  const defaultPeriod=type=>{const date=today();return {quarter:`${date.slice(0,4)}-Q${Math.ceil(Number(date.slice(5,7))/3)}`,month:date.slice(0,7),week:week(),day:date,adhoc:''}[type]||'';};
- let keyResults=[],lastFormType='adhoc',periodButton=null,clearPeriodButton=null;
+ let lastFormType='adhoc',periodButton=null,clearPeriodButton=null;
  const error=message=>{document.getElementById('goal-error').textContent=message;};
- const resultRoot=()=>form.querySelector('[data-key-results]');
- function readResults(){return [...resultRoot().querySelectorAll('[data-result]')].map(row=>{const result=keyResults[Number(row.dataset.result)]||{};return {...result,...Object.fromEntries([...row.querySelectorAll('[data-result-field]')].map(input=>[input.dataset.resultField,['baseline','current','target'].includes(input.dataset.resultField)?input.value===''?null:Number(input.value):input.value]))};});}
- function renderResults(){
-  form.querySelector('[data-results-section]').hidden=form.elements.type.value!=='quarter';
-  resultRoot().innerHTML=keyResults.map((r,i)=>`<fieldset class="goal-result-editor" data-result="${i}"><legend>Result ${i+1}</legend><label>Measurable outcome<input data-result-field="title" value="${escape(r.title||'')}" maxlength="200" placeholder="What will be different?" ${form.elements.type.value==='quarter'?'required':''}></label><div class="goal-metric-fields">${['baseline','current','target'].map(k=>`<label>${k[0].toUpperCase()+k.slice(1)}<input type="number" step="any" inputmode="decimal" data-result-field="${k}" value="${escape(String(r[k]??''))}"></label>`).join('')}<label>Unit<input data-result-field="unit" value="${escape(r.unit||'')}" maxlength="40" placeholder="e.g. %"></label></div><button type="button" data-remove-result="${i}" ${partner()?'disabled':''}>Remove result</button></fieldset>`).join('');
-  form.querySelector('[data-add-result]').disabled=keyResults.length>=4||partner();
+ function options(){
+  const field=form.elements.parentId;
+  const requiredType={month:'quarter',week:'month',day:'week'}[form.elements.type.value],previous=field.value;
+  const parents=all().filter(goal=>!goal.archived&&goal.type===requiredType&&goal.id!==form.elements.id.value);
+  field.innerHTML='<option value="">Independent goal</option>'+parents.map(goal=>
+   `<option value="${escape(goal.id)}">${escape(goal.title)} · ${escape(goalPeriodLabel(goal.type,goal.period))}</option>`).join('');
+  field.value=parents.some(goal=>goal.id===previous)?previous:'';
+  field.closest('label').hidden=!requiredType;
+  refreshSelects();
  }
- function resultOptions(){const parent=all().find(g=>g.id===form.elements.parentId.value),old=form.elements.keyResultId.value;form.elements.keyResultId.innerHTML='<option value="">No specific key result</option>'+(parent?.keyResults||[]).map(r=>`<option value="${escape(r.id)}">${escape(r.title)}</option>`).join('');form.elements.keyResultId.value=old;form.elements.keyResultId.closest('label').hidden=form.elements.type.value!=='month'||!parent;refreshSelects();}
- function options(){const need={month:'quarter',week:'month',day:'week'}[form.elements.type.value],old=form.elements.parentId.value;form.elements.parentId.innerHTML='<option value="">Independent goal</option>'+all().filter(g=>!g.archived&&g.type===need&&g.id!==form.elements.id.value).map(g=>`<option value="${escape(g.id)}">${escape(g.title)} · ${escape(g.period||'Anytime')}</option>`).join('');form.elements.parentId.value=old;form.elements.parentId.closest('label').hidden=!need;resultOptions();refreshSelects();}
  function syncPeriodControl(){
   const input=form.elements.period,type=form.elements.type.value;input.type='hidden';const hint=input.closest('label')?.querySelector?.('small');if(hint)hint.hidden=type!=='adhoc';
   if(!periodButton){
    periodButton=document.createElement('button');periodButton.type='button';periodButton.className='date-control goal-period-picker';periodButton.setAttribute('aria-label','Choose goal date or period');input.after(periodButton);
    clearPeriodButton=document.createElement('button');clearPeriodButton.type='button';clearPeriodButton.className='goal-period-clear';clearPeriodButton.textContent='Clear date';periodButton.after(clearPeriodButton);
-   periodButton.onclick=()=>{if(partner())return;const type=form.elements.type.value;pickDate({value:goalPeriodDate(type,input.value),title:{week:'Choose a date in your week',month:'Choose a date in your month',quarter:'Choose a date in your quarter'}[type]||'Choose date',onSelect:value=>{input.value=goalPeriodFromDate(type,value);syncPeriodControl();}});};
+   periodButton.onclick=()=>{
+    if(partner())return;
+    const kind=form.elements.type.value;
+    const apply=period=>{input.value=period;syncPeriodControl();};
+    if(kind==='quarter'||kind==='month')pickPeriod({type:kind,value:input.value||defaultPeriod(kind),onSelect:apply});
+    else pickDate({value:goalPeriodDate(kind,input.value),title:kind==='week'?'Choose a date in your week':'Choose date',onSelect:value=>apply(goalPeriodFromDate(kind,value))});
+   };
    clearPeriodButton.onclick=()=>{if(partner()||form.elements.type.value!=='adhoc')return;input.value='';syncPeriodControl();};
   }
   periodButton.textContent=goalPeriodLabel(type,input.value);periodButton.disabled=partner();clearPeriodButton.disabled=partner();clearPeriodButton.hidden=type!=='adhoc'||!input.value;
  }
  function open(id='',newType='week',defaults={}){
   const goal=all().find(g=>g.id===id);form.reset();const more=form.querySelector('.goal-form-details');if(more)more.open=Boolean(goal||defaults.parentId);const type=goal?.type||(types[newType]&&newType!=='day'?newType:'week');lastFormType=type;
-  for(const key of ['id','title','notes','type','period','category','status','progressMode'])form.elements[key].value=goal?.[key]??defaults[key]??({type,category:'',period:defaultPeriod(type),status:goalStatus(goal||{}),progressMode:'manual'}[key]||'');
-  const dayOption=form.elements.type.querySelector?.('option[value=day]');if(goal?.type==='day'){if(!dayOption)form.elements.type.insertAdjacentHTML?.('beforeend','<option value="day">Day</option>');form.elements.type.value='day';}else dayOption?.remove();form.elements.status.value=goalStatus(goal||{});options();form.elements.parentId.value=goal?.parentId||defaults.parentId||'';resultOptions();form.elements.keyResultId.value=goal?.keyResultId||'';
+  for(const key of ['id','title','notes','type','period','category','status'])form.elements[key].value=goal?.[key]??defaults[key]??({type,category:'',period:defaultPeriod(type),status:goalStatus(goal||{})}[key]||'');
+  const dayOption=form.elements.type.querySelector?.('option[value=day]');if(goal?.type==='day'){if(!dayOption)form.elements.type.insertAdjacentHTML?.('beforeend','<option value="day">Day</option>');form.elements.type.value='day';}else dayOption?.remove();form.elements.status.value=goalStatus(goal||{});options();form.elements.parentId.value=goal?.parentId||defaults.parentId||'';
   const areaOptions=document.getElementById('life-areas');
   if(areaOptions){
    const names=new Set(['Personal','Master’s','Research','NYSC','Full-time work','Business','Health','Family',...all().filter(g=>!g.archived).map(g=>g.category).filter(Boolean)]);
    areaOptions.innerHTML=[...names].map(name=>`<option value="${escape(name)}"></option>`).join('');
   }
-  keyResults=(goal?.keyResults||[]).map(r=>({...r}));renderResults();refreshSelects();error('');
-  form.querySelectorAll('input,select,textarea,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=partner();});form.querySelector('[data-add-result]').disabled=keyResults.length>=4||partner();
+  refreshSelects();error('');
+  form.querySelectorAll('input,select,textarea,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=partner();});
   syncPeriodControl();
   document.getElementById('goal-title').textContent=goal?'Edit goal':'New goal';dialog.showModal();if(!partner())form.elements.title.focus();return dialog;
  }
  const periodView = createPeriodGoals({
-  root,detail:document.getElementById('period-goal-detail'),getData,open,openTask,createTask,archiveGoal,escape,today,partner,pickDate,
-  periodOf:goalPeriodFromDate,labelOf:goalPeriodLabel,statusOf:goalStatus
+  root,detail:document.getElementById('period-goal-detail'),getData,open,openTask,createTask,archiveGoal,escape,today,partner,pickDate,pickPeriod,
+  periodOf:goalPeriodFromDate,dateOf:goalPeriodDate,labelOf:goalPeriodLabel,statusOf:goalStatus
  });
- form.elements.type.addEventListener('change',()=>{keyResults=readResults();options();const type=form.elements.type.value,period=form.elements.period.value;form.elements.period.value=goalPeriodFromDate(type,goalPeriodDate(lastFormType,period))||defaultPeriod(type);lastFormType=type;syncPeriodControl();renderResults();});
- form.elements.parentId.addEventListener('change',resultOptions);
- form.elements.status.addEventListener('change',()=>{form.elements.progressMode.value='manual';refreshSelects();});
- form.addEventListener('click',e=>{const add=e.target.closest('[data-add-result]'),remove=e.target.closest('[data-remove-result]');if(!add&&!remove||partner())return;keyResults=readResults();if(add&&keyResults.length<4)keyResults.push({id:crypto.randomUUID().replaceAll('-',''),title:'',baseline:null,current:null,target:null,unit:''});if(remove)keyResults.splice(Number(remove.dataset.removeResult),1);renderResults();if(add)resultRoot().lastElementChild?.querySelector('input')?.focus();});
- form.addEventListener('submit',async e=>{e.preventDefault();if(partner())return;const args={};for(const k of ['id','title','notes','type','period','category','parentId','keyResultId','status','progressMode'])args[k]=form.elements[k].value;args.completed=args.status==='done';args.keyResults=readResults();
-  const old=all().find(g=>g.id===args.id);if(args.type!=='quarter'){if(old?.type==='quarter'&&old.keyResults?.length){error('Remove measured results before changing this objective’s period type.');return;}args.keyResults=old?.type===args.type?old.keyResults||[]:[];}
-  if(args.keyResults.length>4&&args.keyResults.length>(old?.keyResults?.length||0)){error('Each objective can have up to 4 measured results.');return;}
-  const submit=form.querySelector('[type=submit]');submit.disabled=true;error('');try{await mutate('goal.save',args);dialog.close();}catch(err){error(err.message);}finally{submit.disabled=partner();}
+ form.elements.type.addEventListener('change',()=>{
+  const type=form.elements.type.value,period=form.elements.period.value;
+  form.elements.period.value=goalPeriodFromDate(type,goalPeriodDate(lastFormType,period))||defaultPeriod(type);
+  lastFormType=type;options();syncPeriodControl();
+ });
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();
+  if(partner())return;
+  const args=Object.fromEntries(['id','title','notes','type','period','category','parentId','status'].map(key=>[key,form.elements[key].value]));
+  args.completed=args.status==='done';
+  const old=all().find(goal=>goal.id===args.id);
+  if(old?.type==='quarter'&&args.type!=='quarter'&&old.keyResults?.length){error('This existing goal has saved results. Keep its period type as Quarter.');return;}
+  if(old?.keyResultId&&old.parentId!==args.parentId)args.keyResultId='';
+  if(old&&goalStatus(old)!==args.status)args.progressMode='manual';
+  const submit=form.querySelector('[type=submit]');
+  submit.disabled=true;error('');
+  try{await mutate('goal.save',args);dialog.close();}catch(err){error(err.message);}finally{submit.disabled=partner();}
  });
  return {...periodView,open};
 }

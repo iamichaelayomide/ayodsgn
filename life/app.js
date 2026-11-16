@@ -18,7 +18,7 @@ import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
-import {createGoals} from './goals.js?v=life-periods-2';
+import {createGoals} from './goals.js?v=life-periods-3';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=44';
