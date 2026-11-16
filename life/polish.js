@@ -12,7 +12,8 @@ export function installPolish(){
  const checklist=panel('Checklist','tick-square',[form.querySelector('.checklist-heading'),document.getElementById('checklist')]);
  const files=document.createElement('section');files.className='task-existing-files';files.hidden=true;files.innerHTML='<h3>Attachments</h3>';files.append(document.getElementById('attachment-list'));panels.after(files);
  const attachments=panel('Attachment','attach-circle',[document.getElementById('task-attachments')]);
- const more=panel('More','more',[field('priority'),field('goalId'),field('effortMinutes'),field('labels'),field('blocker'),field('dependencies'),document.getElementById('archive-task')]);
+ if(field('goalId'))form.querySelector('textarea[name=notes]').closest('label').after(field('goalId'));
+ const more=panel('More','more',[field('priority'),field('effortMinutes'),field('labels'),field('blocker'),field('dependencies'),document.getElementById('archive-task')]);
  const colors=document.createElement('label');colors.innerHTML='Card color<select name="color"><option value="pink">Pink</option><option value="blue">Blue</option><option value="mint">Mint</option><option value="peach">Peach</option><option value="lavender">Lavender</option><option value="neutral">Neutral</option></select>';more.prepend(colors);
  const completion=document.createElement('button');completion.type='button';completion.className='task-completion';completion.textContent='Mark done';field('listId').after(completion);completion.onclick=()=>document.dispatchEvent(new Event('life:complete-open-task'));
  const saveState=document.createElement('p');saveState.className='task-save-state';saveState.setAttribute('role','status');form.querySelector('.dialog-actions').before(saveState);

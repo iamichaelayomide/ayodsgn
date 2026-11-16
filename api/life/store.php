@@ -94,14 +94,13 @@ final class LifeStore {
                         $record['listId']=$listId;$record['blocker']='';$record['completedAt']=null;$record['reminderMinutes']=null;unset($record['approval'],$record['boardArchive']);
                     }else{
                         if($existing===null&&count($s['goals']??[])>=1000)throw new LifeError('Goal limit reached.');
-                        $original=LifeGoalModel::normalize($record);$record=$original;$record['archived']=false;
+                        $record=LifeGoalModel::normalize($record);$record['archived']=false;
                         $validationGoals=$s['goals']??[];
                         if($existing===null)$validationGoals[]=$record;else $validationGoals[$existing]=$record;
                         $record=LifeGoalModel::save($validationGoals,[
                             'id'=>$record['id'],'type'=>$args['type']??'adhoc','period'=>$args['period']??'',
                             'parentId'=>'','keyResultId'=>'','status'=>'todo','completed'=>false,
                         ],(bool)($s['accountabilityEnabled']??false),$role);
-                        LifeGoalModel::activeLimit($s['goals']??[],$record,$existing===null?null:$original);
                     }
                     $record['archived']=false;$record['updatedAt']=self::now();$s[$collection]??=[];if($existing===null)$s[$collection][]=$record;else $s[$collection][$existing]=$record;
                     $id=$record['id'];break;
@@ -178,7 +177,7 @@ final class LifeStore {
                     if($destination===null)throw new LifeError('No destination list is available.');
                     $s['tasks'][$i]['listId']=$destination;$s['tasks'][$i]['completedAt']=$args['done']?self::now():null;if($role==='partner'&&$args['done'])$s['tasks'][$i]['approval']=['by'=>$actor,'at'=>self::now()];else unset($s['tasks'][$i]['approval']);self::reorder($s['tasks'],$id,count($s['tasks']),$destination);break;
                 case 'goal.archive': case 'goal.restore':
-                    $i=self::index($s['goals']??[],$id);if($action==='goal.archive'){foreach($s['goals'] as $child)if(!$child['archived']&&$child['parentId']===$id)throw new LifeError('Archive linked goals first.');}if($action==='goal.restore'){ $restored=$s['goals'][$i];$restored['archived']=false;LifeGoalModel::activeLimit($s['goals'],$restored,$s['goals'][$i]);$validationGoals=$s['goals'];$validationGoals[$i]=$restored;LifeGoalModel::save($validationGoals,['id'=>$id],(bool)($s['accountabilityEnabled']??false),$role);}$s['goals'][$i]['archived']=$action==='goal.archive';$s['goals'][$i]['updatedAt']=self::now();break;
+                    $i=self::index($s['goals']??[],$id);if($action==='goal.archive'){foreach($s['goals'] as $child)if(!$child['archived']&&$child['parentId']===$id)throw new LifeError('Archive linked goals first.');}if($action==='goal.restore'){ $restored=$s['goals'][$i];$restored['archived']=false;$validationGoals=$s['goals'];$validationGoals[$i]=$restored;LifeGoalModel::save($validationGoals,['id'=>$id],(bool)($s['accountabilityEnabled']??false),$role);}$s['goals'][$i]['archived']=$action==='goal.archive';$s['goals'][$i]['updatedAt']=self::now();break;
                 case 'goal.save':
                     $goals=$s['goals']??[];$item=LifeGoalModel::save($goals,$args,(bool)($s['accountabilityEnabled']??false),$role);
                     if($id==='')$goals[]=$item;else $goals[self::index($goals,$id)]=$item;
