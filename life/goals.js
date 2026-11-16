@@ -1,4 +1,4 @@
-import {createPeriodGoals} from './period-goals.js?v=3';
+import {createPeriodGoals} from './period-goals.js?v=4';
 import {plannerTimezone} from './accounts.js?v=1';
 import {chooseDate} from './date-controls.js?v=1';
 const types={adhoc:'Independent',day:'Day',week:'Week',month:'Month',quarter:'Quarter'};

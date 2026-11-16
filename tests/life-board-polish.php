@@ -4,7 +4,19 @@ $db=new PDO('sqlite::memory:');$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_
 function ok($v){global $n;if(!$v)throw new Exception('Board polish check '.$n.' failed');$n++;}
 function bad($fn,$status=422){try{$fn();}catch(LifeError $e){ok($e->status===$status);return;}throw new Exception('Expected rejection');}
 $d=$store->read();$first=$d['state']['boards'][0]['id'];bad(fn()=>$store->mutate($d['version'],'board.archive',['id'=>$first]));
-$d=$store->mutate($d['version'],'board.save',['name'=>'Projects']);$second=$d['state']['boards'][1]['id'];$list=array_values(array_filter($d['state']['lists'],fn($l)=>($l['boardId']??$store->read()['state']['board']['id'])===$second))[0]['id'];
+bad(fn()=>$store->mutate($d['version'],'board.save',['name'=>'Projects']));
+ok(count($store->read()['state']['boards'])===1);
+// Existing boards and templates are still present in older accounts.
+$second=LifeStore::id();$list=LifeStore::id();$template=LifeStore::id();
+$legacy=$d['state'];
+$legacy['boards'][]=['id'=>$second,'name'=>'Projects','archived'=>false];
+$legacy['lists'][]=['id'=>$list,'boardId'=>$second,'name'=>'Idea Box','position'=>0,'archived'=>false,'isDone'=>false,'createdAt'=>LifeStore::now(),'updatedAt'=>LifeStore::now()];
+$legacy['templates'][]=['id'=>$template,'kind'=>'board','name'=>'Projects','text'=>'','lists'=>['Idea Box']];
+$db->prepare('UPDATE life_board SET state=? WHERE id=1')->execute([json_encode($legacy)]);
+$d=$store->read();
+bad(fn()=>$store->mutate($d['version'],'template.apply',['id'=>$template]));
+$d=$store->mutate($d['version'],'board.save',['id'=>$second,'name'=>'Renamed project board']);
+ok($d['state']['boards'][1]['name']==='Renamed project board');
 $d=$store->mutate($d['version'],'task.save',['title'=>'Blue card','listId'=>$list,'color'=>'blue']);$task=$d['state']['tasks'][0];ok($task['color']==='blue');
 $d=$store->mutate($d['version'],'task.save',array_merge($task,['notes'=>'Updated']));ok($d['state']['tasks'][0]['color']==='blue');bad(fn()=>$store->mutate($d['version'],'task.save',array_merge($task,['color'=>'javascript:bad'])));
 $d=$store->mutate($d['version'],'task.save',['title'=>'Already archived','listId'=>$list]);$old=$d['state']['tasks'][1]['id'];$d=$store->mutate($d['version'],'task.archive',['id'=>$old]);

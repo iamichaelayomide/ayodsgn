@@ -18,8 +18,8 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
   const active = () => (getData()?.state.goals || []).filter(goal => !goal.archived);
   const period = type => periodOf(type,date || today());
   const types = records => mode === 'overview' ? [...Object.keys(periods), ...(records.some(g => g.type === 'adhoc' && (!area || areaOf(g).toLocaleLowerCase() === area.toLocaleLowerCase())) ? ['adhoc'] : [])] : [mode];
-  const add = (type, category = '', label = '+ Add goal') => partner() ? '' :
-    `<button type="button" class="period-add" data-plan-add="${type}" data-area="${escape(category)}">${label}</button>`;
+  const add = (type, category, label) => partner() ? '' :
+    `<button type="button" class="period-add" data-plan-add="${type}" data-area="${escape(category)}" aria-label="${escape(label)}">+ Add goal</button>`;
   const goalRow = (goal, records) => {
     const parent = records.find(record => record.id === goal.parentId);
     return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>↳ ${escape(parent.title)}</small>` : ''}</span><span class="goal-row-arrow" aria-hidden="true">›</span></button></li>`;
@@ -36,11 +36,11 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       }));
       const matching = area ? group.filter(g => g.area.toLocaleLowerCase() === area.toLocaleLowerCase()) : group;
       return `<section class="period-section" data-period="${type}">
-        <header><div><h2>${headings[type]}</h2>${type === 'adhoc' ? '' : `<span>${escape(labelOf(type,current))}</span>`}</div>${add(type,area,type === 'adhoc' ? '+ Add goal' : `+ ${periods[type]} goal`)}</header>
+        <header><div><h2>${headings[type]}</h2>${type === 'adhoc' ? '' : `<span>${escape(labelOf(type,current))}</span>`}</div>${add(type,area,type === 'adhoc' ? 'Add goal without a set period' : `Add goal for ${labelOf(type,current)}`)}</header>
         ${matching.length ? matching.map(group => `<div class="period-area">
           <div class="period-area-header">${area ? `<h3>${escape(group.area)}</h3>` : `<h3><button type="button" data-plan-area="${escape(group.area)}">${escape(group.area)} <span aria-hidden="true">›</span></button></h3>`}</div>
           <ul>${group.goals.map(g => goalRow(g,records)).join('')}</ul>
-        </div>`).join('') : '<p class="period-empty">No goals planned for this period.</p>'}
+        </div>`).join('') : '<p class="period-empty">No goals yet.</p>'}
       </section>`;
     });
     root.innerHTML = `<div class="period-toolbar">
@@ -73,7 +73,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       <p class="period-detail-status"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span>${({todo:'To do',progress:'In progress',done:'Done'})[statusOf(goal)]}</p>
       ${parent ? `<p class="period-parent">Supports <button type="button" data-plan-goal="${escape(parent.id)}">${escape(parent.title)}</button></p>` : ''}
       ${goal.notes ? `<p class="period-notes">${escape(goal.notes)}</p>` : ''}
-      ${childType || children.length ? `<section><header><h3>${childType ? (childType === 'month' ? 'Monthly goals' : 'Weekly goals') : 'Linked goals'}</h3>${childType && !partner() ? `<button type="button" data-plan-child="${childType}">+ Add ${childType} goal</button>` : ''}</header>${children.length ? `<ul class="period-detail-list">${children.map(child => goalRow(child,records)).join('')}</ul>` : '<p class="period-empty">No linked goals yet.</p>'}</section>` : ''}
+      ${childType || children.length ? `<section><header><h3>${childType ? (childType === 'month' ? 'Monthly goals' : 'Weekly goals') : 'Linked goals'}</h3>${childType && !partner() ? `<button type="button" data-plan-child="${childType}" aria-label="Add goal for a linked ${childType}">+ Add goal</button>` : ''}</header>${children.length ? `<ul class="period-detail-list">${children.map(child => goalRow(child,records)).join('')}</ul>` : '<p class="period-empty">No linked goals yet.</p>'}</section>` : ''}
       <section><header><h3>Linked tasks</h3>${isDated && !partner() ? '<button type="button" data-plan-task-new>+ Add weekly task</button>' : ''}</header>
       ${tasks.length ? `<ul class="period-detail-list">${tasks.map(task => `<li><button type="button" data-plan-task="${escape(task.id)}">${escape(task.title)}</button><small>${state.lists.find(list => list.id === task.listId)?.isDone ? 'Done' : 'Open'}</small></li>`).join('')}</ul>` : '<p class="period-empty">No linked tasks yet.</p>'}</section>
       ${partner() ? '' : '<button type="button" class="period-archive" data-plan-archive>Archive goal</button>'}

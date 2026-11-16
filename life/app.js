@@ -6,19 +6,19 @@ import {installPWA,removeLifeSubscriptions} from './pwa.js?v=5';
 import {createTaskHistory} from './task-history.js?v=3';
 import {installCardDrag} from './card-drag.js?v=2';
 import {installEmailAuth} from './auth-entry.js?v=4';
-import {createAccountSettings,plannerTimezone} from './accounts.js?v=50';
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=connections-1';
 import {installUploadPolish} from './upload-polish.js?v=43';
 import {installDateControls,chooseDate} from './date-controls.js?v=2';
 import {createAnalytics} from './analytics.js?v=2';
 import {installReminders} from './reminders.js?v=1';
 import {installTaskEditor} from './task-editor.js?v=3';
-import {installPolish} from './polish.js?v=board-controls-1';
+import {installPolish} from './polish.js?v=board-controls-2';
 import {createCompanion} from './companion.js?v=58';
-import {createThinking} from './thinking.js?v=5';
+import {createThinking} from './thinking.js?v=6';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
-import {createGoals} from './goals.js?v=life-periods-3';
+import {createGoals} from './goals.js?v=life-periods-4';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=44';
@@ -147,7 +147,7 @@ function render() {
  document.querySelector('.week-picker-line').hidden=view!=='week';
  $('analytics').hidden=view!=='analytics';
  $('workspace').dataset.view=view;const newTask=$('new-task');newTask.hidden=['today','goals','analytics','companion','calendar','routines','week'].includes(view);(view==='board'?document.querySelector('.board-picker'):document.querySelector('.page-heading')).append(newTask);
- $('archive-board').hidden=data.state.boards.filter(b=>!b.archived).length<2;$('archive-board').disabled=$('archive-board').hidden;document.dispatchEvent(new Event('life:board-toolbar'));
+ $('archive-board').hidden=data.state.boards.filter(b=>!b.archived).length<2;$('archive-board').disabled=$('archive-board').hidden;
  $('workspace').classList.toggle('ramble-view',view==='companion');
  $('companion').hidden=view!=='companion';if(view==='companion'){for(const id of ['board','archive','routines','accountability','goals','planning','thinking','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent='Ramble';$('page-title').innerHTML='A little <em>clarity.</em>';$('page-description').textContent='Think it through. Find a direction. Choose your next step.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});companion.render();return;}
 
@@ -155,7 +155,14 @@ function render() {
  $('thinking').hidden=!['notes','mindmap','templates','history'].includes(view);
  if(!$('thinking').hidden){for(const id of ['board','archive','routines','accountability','goals','planning','sprint-panel','board-footnote'])$(id).hidden=true;document.querySelector('.toolbar').hidden=true;document.querySelector('.board-picker').hidden=true;$('breadcrumb').textContent={notes:'Thoughts',mindmap:'Mind map',templates:'Templates',history:'Activity'}[view];$('page-title').textContent={notes:'Room to think.',mindmap:'Connect your thinking.',templates:'Your rhythm, repeated.',history:'Every step counts.'}[view];$('page-description').textContent='Your ideas, plans and progress, all in one place.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});thinking.render(view);return;}
 
-  $('board-select').innerHTML=(data.state.boards||[data.state.board]).filter(b=>!b.archived).map(b=>`<option value="${b.id}">${escape(b.name)}</option>`).join('');$('board-select').value=selectedBoard;document.querySelector('.board-picker').hidden=!['board','week','archive'].includes(view);$('routines').hidden=view!=='routines';
+  const activeBoards=data.state.boards.filter(board=>!board.archived);
+  $('board-select').innerHTML=activeBoards.map(board=>`<option value="${board.id}">${escape(board.name)}</option>`).join('');
+  $('board-select').value=selectedBoard;
+  $('board-select-label').hidden=activeBoards.length<2;
+  $('board-current').hidden=activeBoards.length!==1;
+  $('board-current').textContent=activeBoards.length===1?activeBoards[0].name:'';
+  document.querySelector('.board-picker').hidden=!['board','week','archive'].includes(view);
+  $('routines').hidden=view!=='routines';
   if(view==='routines'){$('goals').hidden=true;$('accountability').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Routines';$('page-title').innerHTML='Build your <em>rhythm.</em>';$('page-description').textContent='Make the important things a little easier to repeat.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});routines.render();return;}
   $('accountability').hidden=view!=='accountability';
   if(view==='accountability'){$('goals').hidden=true;$('planning').hidden=true;document.querySelector('.toolbar').hidden=true;$('board').hidden=true;$('archive').hidden=true;$('sprint-panel').hidden=true;$('board-footnote').hidden=true;$('breadcrumb').textContent='Accountability';$('page-title').innerHTML='Better, <em>together.</em>';$('page-description').textContent='A trusted perspective. A little encouragement. Shared progress.';document.querySelectorAll('[data-view]').forEach(b=>{if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});accountability.render();return;}
@@ -184,7 +191,7 @@ function render() {
   const visibleCount=new Set(columns.flatMap(list=>list.tasks.map(task=>task.id))).size;
   $('task-count').textContent=`${visibleCount} task${visibleCount===1?'':'s'}`;
   $('clear-filters').hidden=!($('search').value || $('priority-filter').value || $('label-filter').value);
-  $('board').hidden=view==='archive'; $('archive').hidden=view!=='archive'; $('sprint-panel').hidden=view!=='week'; $('new-list').hidden=view!=='board'||isWeeklyBoard; $('board-footnote').hidden=view==='archive';
+  $('board').hidden=view==='archive'; $('archive').hidden=view!=='archive'; $('sprint-panel').hidden=view!=='week'; $('new-list').hidden=view!=='board'||isWeeklyBoard; document.dispatchEvent(new Event('life:board-toolbar')); $('board-footnote').hidden=view==='archive';
   $('page-title').textContent=isWeeklyBoard?(commitmentWeek()===data.week?'This week':'Weekly board'):['board','week'].includes(view)?data.state.boards.find(b=>b.id===selectedBoard)?.name||'My board':'Your archive';
   $('breadcrumb').textContent=view==='board'?'My board':view==='week'?'This week':'Archive';
   $('page-description').textContent=view==='board'?'Capture the thought. Take the next step. Keep the bigger picture close.':view==='week'?'A clear goal, a considered shortlist, and space to make progress.':'Lists, tasks and thoughts. Restore whenever you’re ready.';
@@ -296,10 +303,16 @@ $('sprint-form').addEventListener('submit',async(e)=>{e.preventDefault();const v
 document.querySelectorAll('#reload,[data-reload]').forEach(button=>button.addEventListener('click',async()=>{try{await loadBoard();const message='Latest board loaded. Review your preserved draft before saving.';pageError(message);document.querySelectorAll('dialog[open] .error').forEach(el=>el.textContent=message);}catch(e){pageError(e.message);}}));
 window.addEventListener('beforeunload',(e)=>{if(saving||$('sprint-goal').dataset.dirty||document.querySelector('dialog[open] form')){e.preventDefault();e.returnValue='';}});
 $('board-select').addEventListener('change',()=>{selectedBoard=$('board-select').value;try{localStorage.setItem('life.board',selectedBoard);}catch{}render();});
-function openBoard(id=''){const f=$('board-form');f.reset();f.elements.id.value=id;f.elements.name.value=(data.state.boards||[]).find(b=>b.id===id)?.name||'';$('board-dialog').showModal();f.elements.name.focus();}
+function openBoard(id){if(!id)return;const f=$('board-form');f.reset();f.elements.id.value=id;f.elements.name.value=(data.state.boards||[]).find(b=>b.id===id)?.name||'';$('board-dialog').showModal();f.elements.name.focus();}
 $('page-title').addEventListener('dblclick',()=>{if(['board','week'].includes(view))openBoard(selectedBoard);});$('page-title').tabIndex=0;$('page-title').addEventListener('keydown',e=>{if(['board','week'].includes(view)&&e.key==='Enter')openBoard(selectedBoard);});
 $('archive-board').onclick=async()=>{try{await confirmArchive('board.archive',selectedBoard);}catch(e){pageError(e.message);}};
-$('new-board').addEventListener('click',()=>openBoard());$('rename-board').addEventListener('click',()=>openBoard(selectedBoard));$('board-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;try{await mutate('board.save',Object.fromEntries(new FormData(f)));if(!f.elements.id.value){selectedBoard=data.state.boards.at(-1).id;try{localStorage.setItem('life.board',selectedBoard);}catch{}render();}$('board-dialog').close();}catch(err){f.querySelector('.error').textContent=err.message;}});
+$('rename-board').addEventListener('click',()=>openBoard(selectedBoard));
+$('board-form').addEventListener('submit',async event=>{
+  event.preventDefault();
+  const form=event.currentTarget;
+  try{await mutate('board.save',Object.fromEntries(new FormData(form)));$('board-dialog').close();}
+  catch(error){form.querySelector('.error').textContent=error.message;}
+});
 $('save-capacity').addEventListener('click',async()=>{try{await mutate('sprint.save',{week:selectedWeek,goal:sprint().goal,taskIds:sprint().taskIds,capacityMinutes:Math.round(Number($('week-capacity').value)*60)});}catch(err){pageError(err.message);}});
 
 start();
