@@ -132,10 +132,10 @@ final class LifeStore {
                     if(isset($args['lists'])&&!is_array($args['lists']))throw new LifeError('Choose valid board lists.');
                     $s['templates']??=[];if(count($s['templates'])>=100)throw new LifeError('Template limit reached.');$kind=$args['kind']??'';if(!in_array($kind,['board','week','review'],true))throw new LifeError('Choose a template type.');$template=['id'=>self::id(),'name'=>self::text($args['name']??'',100,true),'kind'=>$kind,'text'=>self::text($args['text']??'',2000),'lists'=>[]];if($kind==='board'){foreach($args['lists']??[] as $name)$template['lists'][]=self::text($name,80,true);if(count($template['lists'])<1||count($template['lists'])>20)throw new LifeError('Choose 1–20 lists.');}$s['templates'][]=$template;break;
                 case 'template.apply':
-                    $i=self::index($s['templates']??[],$id);$tpl=$s['templates'][$i];if($tpl['kind']==='board'){if(count($s['boards'])>=20)throw new LifeError('Board limit reached.');$bid=self::id();$s['boards'][]=['id'=>$bid,'name'=>$tpl['name'],'archived'=>false];foreach($tpl['lists'] as $pos=>$name)$s['lists'][]=['id'=>self::id(),'boardId'=>$bid,'name'=>$name,'position'=>$pos,'archived'=>false,'isDone'=>$name==='Done','createdAt'=>self::now(),'updatedAt'=>self::now()];}elseif($tpl['kind']==='week'){$week=self::validWeek($args['week']??'');$s['sprints'][$week]=array_merge(['id'=>self::id(),'week'=>$week,'taskIds'=>[],'capacityMinutes'=>0],$s['sprints'][$week]??[],['goal'=>$tpl['text'],'updatedAt'=>self::now()]);}else{$week=self::validWeek($args['week']??'');$s['reviews'][$week]=array_merge($s['reviews'][$week]??[],['week'=>$week,'wins'=>$tpl['text'],'updatedAt'=>self::now()]);}break;
+                    $i=self::index($s['templates']??[],$id);$tpl=$s['templates'][$i];if($tpl['kind']==='board')throw new LifeError('New boards are disabled.');if($tpl['kind']==='week'){$week=self::validWeek($args['week']??'');$s['sprints'][$week]=array_merge(['id'=>self::id(),'week'=>$week,'taskIds'=>[],'capacityMinutes'=>0],$s['sprints'][$week]??[],['goal'=>$tpl['text'],'updatedAt'=>self::now()]);}else{$week=self::validWeek($args['week']??'');$s['reviews'][$week]=array_merge($s['reviews'][$week]??[],['week'=>$week,'wins'=>$tpl['text'],'updatedAt'=>self::now()]);}break;
                 case 'board.archive':
                     $bi=self::index($s['boards'],$id);if($s['boards'][$bi]['archived'])break;
-                    if(count(array_filter($s['boards'],fn($b)=>!$b['archived']))<2)throw new LifeError('Create another board before archiving your last active board.');
+                    if(count(array_filter($s['boards'],fn($b)=>!$b['archived']))<2)throw new LifeError('Keep at least one active board.');
                     $s['boards'][$bi]['archived']=true;$owned=[];
                     foreach($s['lists'] as &$l){if(($l['boardId']??$s['board']['id'])===$id){$owned[]=$l['id'];if(!$l['archived']){$l['archived']=true;$l['boardArchive']=$id;}}}unset($l);
                     foreach($s['tasks'] as &$t){if(in_array($t['listId'],$owned,true)&&!$t['archived']){$t['archived']=true;$t['boardArchive']=$id;}}unset($t);break;
@@ -143,9 +143,10 @@ final class LifeStore {
                     $bi=self::index($s['boards'],$id);$s['boards'][$bi]['archived']=false;
                     foreach(['lists','tasks'] as $kind)foreach($s[$kind] as &$r){if(($r['boardArchive']??'')===$id){$r['archived']=false;unset($r['boardArchive']);}}unset($r);break;
                 case 'board.save':
-                    $name=self::text($args['name']??'',80,true);
-                    if($id===''){if(count($s['boards'])>=20)throw new LifeError('Board limit reached.');$bid=self::id();$s['boards'][]=['id'=>$bid,'name'=>$name,'archived'=>false];foreach(['Idea Box','In Progress','Review','Blocked','Done'] as $position=>$name)$s['lists'][]=['id'=>self::id(),'boardId'=>$bid,'name'=>$name,'position'=>$position,'archived'=>false,'isDone'=>$name==='Done','createdAt'=>self::now(),'updatedAt'=>self::now()];}
-                    else{$i=self::index($s['boards'],$id);$s['boards'][$i]['name']=$name;}break;
+                    if($id==='')throw new LifeError('New boards are disabled.');
+                    $i=self::index($s['boards'],$id);
+                    $s['boards'][$i]['name']=self::text($args['name']??'',80,true);
+                    break;
                 case 'routine.save':
                     $list=self::text($args['listId']??'',32,true);$li=self::listIndex($s,$list);if($s['lists'][$li]['isDone'])throw new LifeError('Choose an unfinished list.');
                     $frequency=$args['frequency']??'';if(!in_array($frequency,['daily','weekly','monthly'],true))throw new LifeError('Choose a recurrence.');$date=self::validDate($args['startDate']??'');

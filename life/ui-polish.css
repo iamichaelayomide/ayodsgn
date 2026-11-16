@@ -127,3 +127,79 @@ dialog.ayo-dialog .ayo-detail-tabs{gap:8px}
 }
 .board-picker>label,.board-picker .select-control,.board-picker .select-trigger{margin:0}
 body:has(.workspace[data-view=board]) #voice-preview{display:none}
+
+/* Connections uses a scrollable sheet with a persistent close button. */
+dialog.account-settings{
+  --connection-pad:24px;
+  width:min(520px,calc(100vw - 24px));max-width:none;max-height:min(90dvh,720px);
+  padding:0;overflow:auto;overscroll-behavior:contain;background:#fff;border-radius:18px;
+  scrollbar-width:thin;
+}
+.account-settings .connection-header{
+  position:sticky;top:0;z-index:1;align-items:flex-start;gap:12px;
+  margin:0;padding:16px var(--connection-pad);border-bottom:1px solid var(--line);background:#fff;
+}
+.account-settings .connection-header h2{font-size:21px;line-height:1.25}
+.account-settings .connection-header [data-identity]{margin:3px 0 0;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.account-settings .connection-header [data-close]{
+  display:grid;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;
+  padding:0;border:0;background:#f0f2f6;border-radius:9px;color:var(--body);font:500 22px/1 var(--sans);
+}
+.account-settings .connection-body{padding:0 var(--connection-pad) calc(18px + env(safe-area-inset-bottom,0px))}
+.account-settings .connection-section{
+  margin:0;padding:16px 0;border-bottom:1px solid var(--line);
+}
+.account-settings .connection-section:last-of-type{border-bottom:0;padding-bottom:0}
+.account-settings .connection-section h3{font:650 15px/1.4 var(--sans);margin:0 0 6px}
+.account-settings .connection-services{margin:0;padding:0;list-style:none}
+.account-settings .connection-services li{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;
+  min-height:46px;padding:3px 0;
+}
+.account-settings .connection-services li+li{border-top:1px solid #edf0f5}
+.account-settings .connection-services li>span:first-child{overflow-wrap:anywhere}
+.account-settings .connection-state{font-size:12px;color:#556176}
+.account-settings .connection-state[data-connected=true]{
+  background:#e8f4ed;border-radius:6px;padding:4px 8px;color:#245742;font-weight:600;
+}
+.account-settings .connection-services button,.account-settings [data-zone] button{
+  min-height:44px;white-space:nowrap;padding:7px 11px;font-size:13px;border-radius:8px;
+}
+.account-settings [data-link],.account-settings [data-disconnect]{
+  min-height:44px;margin:4px 0 0;padding:6px 0;border:0;background:transparent;
+  text-align:left;font-size:13px;color:var(--blue);
+}
+.account-settings [data-link]{margin:0}
+.account-settings [data-disconnect]{color:#96374d}
+.account-settings .connection-note,.account-settings [data-conflicts] p{
+  margin:7px 0 0;font-size:12px;line-height:1.5;color:#526071;overflow-wrap:anywhere;
+}
+.account-settings [data-conflicts]>section{margin:12px 0 0;padding:10px 0 0;border-top:1px solid var(--line)}
+.account-settings .connection-conflict-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.account-settings .connection-conflict-actions>button{min-height:44px}
+.account-settings [data-zone]{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.account-settings [data-zone]>label,.account-settings [data-zone] .select-control{margin:0;min-width:0}
+.account-settings [data-zone] .select-trigger{margin:0;min-height:44px}
+.account-settings .notification-switch{min-height:44px;gap:12px;margin:0;cursor:pointer}
+.account-settings [data-error]:empty{display:none}
+.account-settings button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-width:600px){
+ dialog.account-settings{--connection-pad:16px;width:calc(100vw - 20px);max-height:calc(100dvh - 24px);border-radius:15px}
+ .account-settings .connection-header{padding-block:12px}
+ .account-settings .connection-section{padding-block:13px}
+}
+@media(max-width:350px){
+ .account-settings [data-zone]{grid-template-columns:minmax(0,1fr)}
+ .account-settings [data-zone] button{width:100%}
+}
+@media(prefers-reduced-motion:no-preference){
+ .account-settings .connection-header [data-close],.account-settings .connection-services button,.account-settings [data-zone] button{
+  transition:transform 140ms cubic-bezier(.23,1,.32,1);touch-action:manipulation;
+ }
+ .account-settings .connection-header [data-close]:active:not(:focus-visible),
+ .account-settings .connection-services button:active:not(:focus-visible),
+ .account-settings [data-zone] button:active:not(:focus-visible){transform:scale(.97)}
+}
+.board-picker .board-current{font-size:14px;line-height:1.4;color:var(--muted);padding:0 2px;overflow-wrap:anywhere}
+@media(min-width:801px){.board-picker .board-current{margin-right:auto}}
+@media(max-width:800px){.workspace[data-view=board] .board-picker>.board-current{grid-column:1/-1}}
