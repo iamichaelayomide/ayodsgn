@@ -42,10 +42,10 @@
 }
 
 /* Consistent disclosure affordance, preserving native keyboard/expanded semantics. */
-:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)>summary{position:relative;list-style:none;padding-right:30px;cursor:pointer}
-:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)>summary::-webkit-details-marker{display:none}
-:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)>summary::after{content:'';position:absolute;right:4px;top:.75em;width:16px;height:16px;background:url('./icons/chevron-down.svg') center/contain no-repeat;opacity:.6;transform:translateY(-50%)}
-:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run)[open]>summary::after{transform:translateY(-50%) rotate(180deg)}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary{position:relative;list-style:none;padding-right:30px;cursor:pointer}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary::-webkit-details-marker{display:none}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary::after{content:'';position:absolute;right:4px;top:.75em;width:16px;height:16px;background:url('./icons/chevron-down.svg') center/contain no-repeat;opacity:.6;transform:translateY(-50%)}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)[open]>summary::after{transform:translateY(-50%) rotate(180deg)}
 :where(.workspace,dialog) summary:focus-visible{outline:2px solid #829be0;outline-offset:4px;border-radius:5px}
 .ayo-mail-row>summary::after{top:26px!important;right:8px!important}
 .ayo-mail-row>summary{padding:16px 32px 16px 0}
@@ -76,3 +76,54 @@ dialog.ayo-dialog .ayo-detail-tabs{gap:8px}
 @media(min-width:801px) and (max-width:1100px){.ramble-view #companion.show-ramble-history .ramble-chats{padding:20px;max-width:680px;margin:0 auto;width:100%;height:calc(100dvh - 150px);border:1px solid #e5e9f0;border-radius:16px;background:#fff}.ramble-view #companion .ramble-chat-rows{height:calc(100% - 110px)}}
 @media(max-width:650px){.ayo-research-compose{padding:16px}.ayo-research-compose .ayo-agent-query textarea{font-size:16px}.ayo-agent-form-footer>.ayo-muted{max-width:none;flex-basis:100%}.ayo-agent-form-footer button{margin-left:auto}.ayo-research-progress{padding:16px}.ayo-agent-status{max-width:130px}}
 @media(max-width:1100px){.ramble-view #companion.show-ramble-history .ramble-history-back{display:inline-flex!important;align-items:center;justify-content:center;width:32px;min-height:32px;padding:5px;border:0;background:transparent}.ramble-view #companion.show-ramble-history .ramble-list-heading{display:grid;grid-template-columns:32px minmax(0,1fr) 32px;align-items:center;gap:10px}.ramble-view #companion.show-ramble-history .ramble-list-heading h2{text-align:left}.ramble-history-back svg{width:20px;height:20px}}
+
+/* The board toolbar uses one icon per action and a shared 44px control row. */
+#new-task .board-control-icon,.board-picker .board-control-icon,.toolbar .board-control-icon{display:block;width:18px;height:18px;flex:0 0 18px}
+.board-picker .board-options>summary,.toolbar .board-filter-options>summary{
+  min-height:44px;height:44px;border-radius:10px;color:var(--body);gap:8px;padding:0 12px;
+}
+.board-picker .board-options>summary{width:44px;padding:0}
+.board-picker .board-options>summary::marker,.toolbar .board-filter-options>summary::marker{content:''}
+.board-picker .board-options[open]>summary,.toolbar .board-filter-options[open]>summary,
+.toolbar .board-filter-options:has(#active-filter-count:not([hidden]))>summary{
+  color:var(--blue);background:#edf2ff;border-color:#c4d1fa;
+}
+.board-picker .select-trigger{min-height:44px;height:44px}
+.workspace #new-task{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;
+  border-radius:10px;white-space:nowrap;
+}
+.toolbar .search{height:44px;min-height:44px;border-radius:10px}
+.toolbar .search:focus-within{border-color:var(--blue);outline:2px solid #c4d1fa;outline-offset:1px}
+.toolbar .search input{height:42px;min-height:0}
+.toolbar .search-icon{color:#53617a}
+.toolbar #task-count{white-space:nowrap;font-variant-numeric:tabular-nums}
+.toolbar .board-filter-options #active-filter-count{
+  display:inline-grid;place-items:center;min-width:18px;min-height:18px;padding:0 4px;
+  border-radius:6px;background:#dce6ff;color:#2143b9;line-height:1;font-weight:650;
+}
+.board-picker .board-options-items,.toolbar .board-filter-options>div{
+  padding:8px;border-radius:12px;box-shadow:0 8px 24px #18234516;
+  max-width:calc(100vw - 40px);
+}
+.board-picker .board-options-items button:focus-visible,
+.toolbar .board-filter-options>summary:focus-visible,
+.board-picker .board-options>summary:focus-visible{
+  outline:2px solid var(--blue);outline-offset:2px;border-radius:10px;
+}
+@media(hover:hover) and (pointer:fine){
+ .board-picker .board-options:not([open])>summary:hover,.toolbar .board-filter-options:not([open])>summary:hover{
+   background:#f7f9fd;border-color:#bdc9df;
+ }
+ .board-picker .board-options-items button:hover{background:#f1f4fa}
+}
+@media(prefers-reduced-motion:no-preference){
+ .board-picker .board-options>summary,.toolbar .board-filter-options>summary,.board-picker #new-task{
+   transition:transform 140ms cubic-bezier(.23,1,.32,1);touch-action:manipulation;
+ }
+ .board-picker .board-options>summary:active:not(:focus-visible),
+ .toolbar .board-filter-options>summary:active:not(:focus-visible),
+ .board-picker #new-task:active:not(:focus-visible){transform:scale(.97)}
+}
+.board-picker>label,.board-picker .select-control,.board-picker .select-trigger{margin:0}
+body:has(.workspace[data-view=board]) #voice-preview{display:none}

@@ -25,17 +25,30 @@ export function installPolish(){
  document.addEventListener('life:task-open',e=>{form.elements.color.value=e.detail.task?.color||'neutral';saveState.textContent='';extras.open=false;completion.hidden=!e.detail.existing;completion.textContent=e.detail.done?'Reopen task':'Mark done';description.hidden=!e.detail.existing&&!form.elements.notes.value;descriptionToggle.hidden=!description.hidden;files.hidden=!document.getElementById('attachment-list').querySelector('a');panels.querySelectorAll(':scope>section').forEach(p=>p.hidden=true);actions.querySelectorAll('button').forEach(b=>b.setAttribute('aria-expanded','false'));document.getElementById('task-attachments').hidden=!e.detail.existing;attachments.querySelector('.new-attachment-note')?.remove();if(!e.detail.existing){const note=document.createElement('p');note.className='new-attachment-note';note.textContent='Save the task first, then attach a file.';attachments.append(note);}if(document.getElementById('checklist').children.length){checklist.hidden=false;actions.querySelector('[aria-controls="task-panel-checklist"]').setAttribute('aria-expanded','true');}});
  form.addEventListener('invalid',e=>{const area=e.target.closest('.task-detail-panels>section');if(area){area.hidden=false;actions.querySelector(`[aria-controls="${area.id}"]`)?.setAttribute('aria-expanded','true');}},true);
  const picker=document.querySelector('.board-picker'),toolbar=document.querySelector('.toolbar');
- const options=document.createElement('details');options.className='board-options';options.innerHTML='<summary aria-label="Board options"><img class="action-icon" src="./icons/more.svg" alt=""></summary><div class="board-options-items"></div>';
+ const options=document.createElement('details');options.className='board-options';options.innerHTML='<summary aria-label="Board options"><svg class="board-control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></summary><div class="board-options-items"></div>';
  ['new-board','new-list','archive-board'].forEach(id=>options.querySelector('div').append(document.getElementById(id)));picker.append(document.getElementById('new-task'),options);
- const filters=document.createElement('details');filters.className='board-filter-options';filters.innerHTML='<summary><img class="action-icon" src="./icons/filter.svg" alt=""><span>Filters</span><span id="active-filter-count" hidden></span></summary><div></div>';
+ const filters=document.createElement('details');filters.className='board-filter-options';filters.innerHTML='<summary><svg class="board-control-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6.5 7.5V19l-3-1.5v-5L4 5Z"/></svg><span>Filters</span><span id="active-filter-count" hidden></span></summary><div></div>';
  ['priority-filter','label-filter'].forEach(id=>filters.querySelector('div').append(document.getElementById(id).closest('label')));toolbar.querySelector('.search').after(filters);
- const search=document.querySelector('.search-icon');const img=document.createElement('img');img.src='./icons/search-normal.svg';img.alt='';img.className='search-icon';search.replaceWith(img);
  document.querySelectorAll('.sidebar [title]').forEach(el=>{if(el.querySelector('.nav-label'))el.removeAttribute('title');});
- function filterCount(){const n=['priority-filter','label-filter'].filter(id=>document.getElementById(id).value).length+(document.getElementById('task-period')&&document.getElementById('task-period').value!=='all'?1:0);const b=document.getElementById('active-filter-count');b.hidden=!n;b.textContent=n;}
+ function filterCount(){const n=['priority-filter','label-filter'].filter(id=>document.getElementById(id).value).length;const b=document.getElementById('active-filter-count');b.hidden=!n;b.textContent=n;}
  toolbar.addEventListener('change',filterCount);toolbar.addEventListener('click',()=>queueMicrotask(filterCount));
  document.addEventListener('life:board-toolbar',()=>{filterCount();options.open=false;});
  options.querySelector('div').addEventListener('click',()=>options.open=false);
- document.addEventListener('keydown',e=>{if(e.key==='Escape'){options.open=false;filters.open=false;}});
+ const disclosures=[options,filters];
+ for(const disclosure of disclosures){
+  disclosure.addEventListener('toggle',()=>{
+   if(disclosure.open)for(const other of disclosures)if(other!==disclosure)other.open=false;
+  });
+ }
+ document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape'||document.querySelector('dialog[open]'))return;
+  for(const disclosure of disclosures){
+   if(!disclosure.open)continue;
+   const restore=disclosure.contains(document.activeElement);
+   disclosure.open=false;
+   if(restore){e.preventDefault();disclosure.querySelector('summary').focus();}
+  }
+ });
  document.addEventListener('click',e=>{if(!options.contains(e.target))options.open=false;if(!filters.contains(e.target))filters.open=false;});
  const button=document.createElement('button');button.id='voice-preview';button.className='voice-fab';button.type='button';button.setAttribute('aria-label','Voice conversation preview');button.title='Voice conversation';button.innerHTML='<img src="./icons/microphone.svg" alt=""><span class="visually-hidden">Voice conversation</span>';
  document.getElementById('workspace').append(button);button.setAttribute('aria-label','Talk to Ramble');button.onclick=()=>{document.dispatchEvent(new Event('life:voice-open'));};
