@@ -1,4 +1,5 @@
 const periods = {quarter:'Quarter', month:'Month', week:'Week'};
+const headings = {quarter:'Quarterly goals', month:'Monthly goals', week:'Weekly goals', adhoc:'Other goals'};
 const areaOf = goal => goal.category?.trim() || 'Personal';
 
 export function goalsByArea(goals) {
@@ -12,11 +13,11 @@ export function goalsByArea(goals) {
   return [...areas.values()].sort((a,b) => a.area.localeCompare(b.area));
 }
 
-export function createPeriodGoals({root, detail, getData, open, openTask, createTask, escape, today, partner, pickDate, periodOf, labelOf, statusOf}) {
+export function createPeriodGoals({root, detail, getData, open, openTask, createTask, archiveGoal, escape, today, partner, pickDate, periodOf, labelOf, statusOf}) {
   let date = '', mode = 'overview', area = '', goalId = '';
   const active = () => (getData()?.state.goals || []).filter(goal => !goal.archived);
   const period = type => periodOf(type,date || today());
-  const types = () => mode === 'overview' ? ['quarter','month','week'] : [mode];
+  const types = records => mode === 'overview' ? [...Object.keys(periods), ...(records.some(g => g.type === 'adhoc' && (!area || areaOf(g).toLocaleLowerCase() === area.toLocaleLowerCase())) ? ['adhoc'] : [])] : [mode];
   const add = (type, category = '', label = '+ Add goal') => partner() ? '' :
     `<button type="button" class="period-add" data-plan-add="${type}" data-area="${escape(category)}">${label}</button>`;
   const goalRow = (goal, records) => {
@@ -26,13 +27,16 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
 
   function render() {
     const records = active();
-    const heading = {quarter:'Quarterly goals',month:'Monthly goals',week:'Weekly goals'};
     const dateType = mode === 'overview' ? 'month' : mode;
-    const sections = types().map(type => {
-      const group = goalsByArea(records.filter(g => g.type === type && g.period === period(type)));
+    const sections = types(records).map(type => {
+      const current = period(type);
+      const group = goalsByArea(records.filter(g => {
+        if (g.type === type) return type === 'adhoc' || g.period === current;
+        return type === 'week' && g.type === 'day' && periodOf('week',g.period) === current;
+      }));
       const matching = area ? group.filter(g => g.area.toLocaleLowerCase() === area.toLocaleLowerCase()) : group;
       return `<section class="period-section" data-period="${type}">
-        <header><div><h2>${heading[type]}</h2><span>${escape(labelOf(type,period(type)))}</span></div>${add(type,area,`+ ${periods[type]} goal`)}</header>
+        <header><div><h2>${headings[type]}</h2>${type === 'adhoc' ? '' : `<span>${escape(labelOf(type,current))}</span>`}</div>${add(type,area,type === 'adhoc' ? '+ Add goal' : `+ ${periods[type]} goal`)}</header>
         ${matching.length ? matching.map(group => `<div class="period-area">
           <div class="period-area-header">${area ? `<h3>${escape(group.area)}</h3>` : `<h3><button type="button" data-plan-area="${escape(group.area)}">${escape(group.area)} <span aria-hidden="true">›</span></button></h3>`}</div>
           <ul>${group.goals.map(g => goalRow(g,records)).join('')}</ul>
@@ -44,8 +48,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       <div class="period-date"><button type="button" data-plan-shift="-1" aria-label="Previous period">‹</button><button type="button" data-plan-date>${escape(labelOf(dateType,period(dateType)))}</button><button type="button" data-plan-shift="1" aria-label="Next period">›</button></div>
     </div>
     ${area ? `<header class="period-area-title"><button type="button" data-plan-area="">← All areas</button><h2>${escape(area)}</h2></header>` : ''}
-    <div class="period-sections">${sections.join('')}</div>
-    ${area ? '' : '<button type="button" class="period-library" data-plan-library>Browse all goals</button>'}`;
+    <div class="period-sections">${sections.join('')}</div>`;
     if (detail.open) {
       const focused = detail.contains(document.activeElement);
       renderDetail();
@@ -74,6 +77,8 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       ${childType || children.length ? `<section><header><h3>${childType ? (childType === 'month' ? 'Monthly goals' : 'Weekly goals') : 'Linked goals'}</h3>${childType && !partner() ? `<button type="button" data-plan-child="${childType}">+ Add ${childType} goal</button>` : ''}</header>${children.length ? `<ul class="period-detail-list">${children.map(child => goalRow(child,records)).join('')}</ul>` : '<p class="period-empty">No linked goals yet.</p>'}</section>` : ''}
       <section><header><h3>Linked tasks</h3>${isDated && !partner() ? '<button type="button" data-plan-task-new>+ Add weekly task</button>' : ''}</header>
       ${tasks.length ? `<ul class="period-detail-list">${tasks.map(task => `<li><button type="button" data-plan-task="${escape(task.id)}">${escape(task.title)}</button><small>${state.lists.find(list => list.id === task.listId)?.isDone ? 'Done' : 'Open'}</small></li>`).join('')}</ul>` : '<p class="period-empty">No linked tasks yet.</p>'}</section>
+      ${partner() ? '' : '<button type="button" class="period-archive" data-plan-archive>Archive goal</button>'}
+      <p class="error" data-plan-error role="alert"></p>
     </div>`;
   }
 
@@ -130,7 +135,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     },{once:true});
   }
 
-  detail.addEventListener('click',event => {
+  detail.addEventListener('click',async event => {
     const button = event.target.closest('button');
     if (!button) return;
     const goal = active().find(g => g.id === goalId);
@@ -140,7 +145,10 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     else if (planGoal) showGoal(planGoal);
     else if (planTask) afterClosingDetail(() => openTask(planTask));
     else if (!partner() && button.hasAttribute('data-plan-edit')) afterClosingDetail(() => open(goal.id));
-    else if (!partner() && planChild) {
+    else if (!partner() && button.hasAttribute('data-plan-archive')) {
+      try { if (await archiveGoal(goal.id) && detail.open) detail.close(); }
+      catch (error) { detail.querySelector('[data-plan-error]').textContent = error.message; }
+    } else if (!partner() && planChild) {
       let childPeriod = period(planChild);
       if (planChild === 'month' && periodOf('quarter',childPeriod+'-01') !== goal.period) {
         childPeriod = goal.period.slice(0,4)+'-'+String((Number(goal.period.at(-1))-1)*3+1).padStart(2,'0');

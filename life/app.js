@@ -18,7 +18,7 @@ import {createThinking} from './thinking.js?v=5';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
-import {createGoals} from './goals.js?v=life-periods-1';
+import {createGoals} from './goals.js?v=life-periods-2';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=44';
@@ -109,7 +109,7 @@ function taskCard(task,weeklyReference=false) {
 const planning = createCalendar({getData:()=>data,today,mutate,openTask,createTask:date=>openTask('','',{dueDate:date}),refreshSelects,escape});
 const routines=createRoutines({getData:()=>data,mutate,escape,refreshSelects,today});
 const accountability=createAccountability({getData:()=>data,request,mutate,escape,role:()=>role});
-const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,openTask,createTask:(goalId,sprintWeek)=>openTask('','',{goalId,sprintWeek,inSprint:true}),week:()=>selectedWeek,periodPlanning:true});
+const goals=createGoals({getData:()=>data,mutate,escape,refreshSelects,openTask,createTask:(goalId,sprintWeek)=>openTask('','',{goalId,sprintWeek,inSprint:true}),archiveGoal:id=>confirmArchive('goal.archive',id),week:()=>selectedWeek});
 const thinking=createThinking({getData:()=>data,mutate,escape,refreshSelects,role:()=>role,openTask,week:()=>selectedWeek});
 installPolish();installDateControls({refreshSelects});installTaskEditor({request,refreshSelects});installUploadPolish();installReminders({request,openTask,isOwner:()=>role==='owner'&&!!data});
 const analytics=createAnalytics({getData:()=>data,escape,week:()=>data.week,openGoal:id=>goals.showGoal(id)});

@@ -120,11 +120,10 @@
 .period-goal{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:10px 0;min-height:44px}
 .period-goal strong{font-size:14px;line-height:1.5;font-weight:650;color:#192133;overflow-wrap:anywhere}
 .period-goal small,.period-detail-list li>small{display:block;font-size:12px;font-weight:400;color:#526071;line-height:1.45;overflow-wrap:anywhere}
-.period-goal:hover strong,.period-area-header button:hover,.period-library:hover{color:var(--goal-blue)}
+.period-goal:hover strong,.period-area-header button:hover{color:var(--goal-blue)}
 .goal-dot{display:block;width:7px;height:7px;border-radius:50%;background:#aab2c0}
 .goal-dot[data-status=progress]{background:#3159df}.goal-dot[data-status=done]{background:#29816a}
 .goal-row-arrow{padding:0 4px;color:#626d82;font-size:19px}
-.period-library{margin:13px 0;background:transparent;border:0;color:var(--goal-blue);padding-inline:0;min-height:44px}
 .period-area-title{display:flex;gap:15px;align-items:center;margin-bottom:16px}
 .period-area-title h2{margin:0;overflow-wrap:anywhere}
 .task-goal-context{display:block;color:#4d5b72;font-size:12px;line-height:1.35;margin-top:4px;overflow-wrap:anywhere}
@@ -166,3 +165,6 @@
 .period-section h2,.period-area-title h2,.period-detail-inner h2,.period-detail-inner h3{font-family:var(--sans);font-weight:650}
 .period-area-header button{min-height:40px}
 body:has(.workspace[data-view=goals]) #voice-preview{display:none}
+
+.period-archive{margin-top:18px;background:transparent;border:0;color:#96374d;padding-inline:0;min-height:44px}
+.period-detail-inner [data-plan-error]:empty{display:none}
