@@ -90,3 +90,79 @@
 .goal-period-clear{align-self:flex-start;min-height:32px!important;padding:4px 0;border:0;background:transparent;color:var(--blue,#284bd2);font-size:12px;text-align:left}
 #goal-form .goal-period-picker{margin-top:7px}
 #goal-form .goal-period-clear{margin-top:4px}
+
+.period-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.period-tabs{display:flex;align-items:center;gap:3px;padding:4px;border-radius:11px;background:#e9ecf2}
+.period-tabs button{background:transparent;border:0;border-radius:8px;min-height:38px;padding:7px 14px;color:#4c576c}
+.period-tabs [aria-pressed=true]{background:#fff;color:var(--goal-blue);box-shadow:0 1px 3px #19233c13;font-weight:650}
+.period-date{display:flex;align-items:center;gap:3px;max-width:100%}
+.period-date[hidden]{display:none}
+.period-date button{min-height:42px;white-space:nowrap}
+.period-date button[data-plan-shift],.period-date button[data-board-shift]{padding:0;width:42px;font-size:22px}
+.period-sections{display:grid;gap:18px}
+.period-section{overflow:hidden;border:1px solid #e1e3eb;border-radius:14px;background:#fff}
+.period-section>header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;background:#f5edf5}
+.period-section[data-period=month]>header{background:#eef2fb}
+.period-section[data-period=week]>header{background:#edf3f0}
+.period-section>header>div{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.period-section h2,.period-area h3{margin:0}
+.period-section h2{font-size:18px;letter-spacing:-.01em}
+.period-section>header span,.period-empty{color:#526071;font-size:13px}
+.period-section .period-add,.period-detail-inner section header button{background:#fff;border:1px solid #dce2ed;color:var(--blue,#2444d7);white-space:nowrap;min-height:40px;font-size:13px}
+.period-empty{margin:0;padding:17px 18px}
+.period-area{padding:12px 18px 4px}
+.period-area+.period-area{border-top:1px solid #ebedf2}
+.period-area-header h3{font-size:13px;font-weight:650;color:#48465e}
+.period-area-header button{align-items:center;border:0;background:#f1eef6;color:#48465e;border-radius:7px;padding:7px 10px;font-size:13px;font-weight:650}
+.period-area ul,.period-detail-list{padding:0;margin:2px 0;list-style:none}
+.period-area li+li,.period-detail-list li+li{border-top:1px solid #ebedf2}
+.period-area li,.period-detail-list li{min-width:0}
+.period-goal{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;text-align:left;border:0;background:transparent;padding:10px 0;min-height:44px}
+.period-goal strong{font-size:14px;line-height:1.5;font-weight:650;color:#192133;overflow-wrap:anywhere}
+.period-goal small,.period-detail-list li>small{display:block;font-size:12px;font-weight:400;color:#526071;line-height:1.45;overflow-wrap:anywhere}
+.period-goal:hover strong,.period-area-header button:hover,.period-library:hover{color:var(--goal-blue)}
+.goal-dot{display:block;width:7px;height:7px;border-radius:50%;background:#aab2c0}
+.goal-dot[data-status=progress]{background:#3159df}.goal-dot[data-status=done]{background:#29816a}
+.goal-row-arrow{padding:0 4px;color:#626d82;font-size:19px}
+.period-library{margin:13px 0;background:transparent;border:0;color:var(--goal-blue);padding-inline:0;min-height:44px}
+.period-area-title{display:flex;gap:15px;align-items:center;margin-bottom:16px}
+.period-area-title h2{margin:0;overflow-wrap:anywhere}
+.task-goal-context{display:block;color:#4d5b72;font-size:12px;line-height:1.35;margin-top:4px;overflow-wrap:anywhere}
+#board-mode-controls .period-date{margin-right:auto}
+#period-goal-detail{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;background:#f4f5f8;color:#192133;overflow:auto;overscroll-behavior:contain}
+.period-detail-inner{max-width:880px;margin:auto;padding:26px 30px 55px}
+.period-detail-top,.period-detail-inner section header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.period-detail-top>button:first-child,.period-parent button{background:transparent;border:0;color:var(--blue,#2444d7);padding-inline:0}
+.period-detail-meta{color:#526071;font-size:13px;margin:35px 0 8px}
+.period-detail-inner h2{font-size:clamp(29px,4vw,47px);line-height:1.12;letter-spacing:-.025em;margin:0 0 12px;overflow-wrap:anywhere}
+.period-detail-inner h3{font-size:16px;margin:0}
+.period-parent{color:#526071;line-height:1.5}
+.period-notes{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;max-width:64ch}
+.period-detail-inner section{background:#fff;border:1px solid #e1e3eb;border-radius:14px;margin-top:16px;padding:15px 18px}
+.period-detail-inner section .period-empty{padding:12px 0 2px}
+.period-detail-list li:has(>small){display:flex;justify-content:space-between;gap:12px;align-items:center;padding:8px 0}
+.period-detail-list li>button[data-plan-task]{min-height:42px;padding-inline:0;background:transparent;border:0;text-align:left;color:#192133}
+.period-detail-inner button:focus-visible,.period-toolbar button:focus-visible,.period-section button:focus-visible{outline:2px solid var(--blue,#2444d7);outline-offset:2px}
+.period-toolbar button:active,.period-section button:active,.period-detail-inner button:active{transform:translateY(1px)}
+@media(max-width:700px){
+ .period-toolbar{gap:10px;margin-bottom:15px}
+ .period-tabs{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+ .period-tabs button{padding-inline:4px;min-height:44px;font-size:13px}
+ .period-section>header{padding:10px 12px}
+ .period-section>header>div{display:grid;gap:3px}
+ .period-section h2{font-size:16px}
+ .period-section .period-add{padding-inline:8px}
+ .period-area{padding-inline:12px}
+ .period-detail-inner{padding:16px 16px 40px}
+ .period-detail-inner section{padding:12px}
+ #board-mode-controls:has(#board-week-controls){display:flex;flex-wrap:wrap}
+ #board-mode-controls #board-week-controls{order:2;width:100%}
+}
+@media(prefers-reduced-motion:reduce){.period-toolbar button:active,.period-section button:active,.period-detail-inner button:active{transform:none}}
+.period-detail-status{display:flex;align-items:center;gap:8px;color:#526071;font-size:13px}
+@media(min-width:1000px){
+ .workspace .board.is-weekly:not(.is-list) .column{flex:1 0 min(28%,285px);min-width:220px;max-width:400px}
+}
+.period-section h2,.period-area-title h2,.period-detail-inner h2,.period-detail-inner h3{font-family:var(--sans);font-weight:650}
+.period-area-header button{min-height:40px}
+body:has(.workspace[data-view=goals]) #voice-preview{display:none}

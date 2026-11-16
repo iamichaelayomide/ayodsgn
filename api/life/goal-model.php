@@ -22,13 +22,6 @@ final class LifeGoalModel {
         }
         return $period;
     }
-    public static function activeLimit(array $goals,array $goal,?array $old=null): void {
-        if($goal['type']!=='quarter'||($goal['archived']??false))return;
-        // Grandfather existing plans, including over-limit records, when editing in place.
-        if($old!==null&&!($old['archived']??false)&&$old['type']==='quarter'&&$old['period']===$goal['period'])return;
-        $count=0;foreach($goals as $other)if(($other['id']??'')!==($goal['id']??'')&&($other['type']??'')==='quarter'&&($other['period']??'')===$goal['period']&&!($other['archived']??false))$count++;
-        if($count>=3)throw new LifeError('Plan up to three active objectives per quarter. Archive an objective before adding another.');
-    }
     private static function results(mixed $rows,array $old): array {
         if(!is_array($rows)||!array_is_list($rows))throw new LifeError('Provide a list of key results.');
         if(count($rows)>4){
@@ -127,7 +120,7 @@ final class LifeGoalModel {
             if(!($child['archived']??false)&&($goal['type']!==$old['type']||$goal['period']!==$old['period']))throw new LifeError('Keep the period type while this goal has linked goals.');
             if(($child['keyResultId']??'')!==''&&!in_array($child['keyResultId'],array_column($goal['keyResults'],'id'),true))throw new LifeError('Unlink dependent goals before removing a referenced key result.');
         }
-        $goal['id']=$id?:LifeStore::id();$goal['createdAt']??=LifeStore::now();$goal['updatedAt']=LifeStore::now();self::activeLimit($goals,$goal,$old);
+        $goal['id']=$id?:LifeStore::id();$goal['createdAt']??=LifeStore::now();$goal['updatedAt']=LifeStore::now();
         return $goal;
     }
 }
