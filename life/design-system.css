@@ -563,3 +563,14 @@ dialog.ayo-editor button.ayo-form-close{position:absolute!important;top:20px!imp
  .ramble-view #companion .ramble-welcome{padding:12px}
  .ramble-view #companion .ramble-welcome h2{font-size:22px}
 }
+/* Keep starter prompts on the same centered column as the writing surface. */
+.ramble-view #companion .ramble-suggestions{width:100%;max-width:760px;margin:8px auto;align-self:center;box-sizing:border-box;padding-inline:4px}
+.ramble-view #companion .ramble-suggestions>button{box-sizing:border-box;padding-inline:12px}
+@media(min-width:801px) and (max-width:1100px){
+ .ramble-view #companion .ramble-layout{height:calc(100dvh - 112px);min-height:0;grid-template-rows:minmax(0,1fr)}
+ .ramble-view #companion .ramble-thread{height:100%;min-height:0;overflow:hidden}
+ .ramble-view #companion .chat-history{min-height:0;overflow-y:auto}
+ .ramble-view #companion #ai-composer{flex:none}
+ .ramble-view #companion .ramble-suggestions{flex:none}
+}
+@media(max-width:800px){.ramble-view #companion .ramble-suggestions{margin:4px auto 8px;padding-inline:0}}
