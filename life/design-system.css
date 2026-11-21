@@ -394,3 +394,12 @@ button:has(>.ui-icon:only-child){display:grid;place-items:center;padding:10px}
 #ayo-os .inline-status .select-trigger{position:relative}
 #ayo-os .pipeline-bars{grid-template-columns:1fr}
 @media(max-width:600px){#ayo-os .ayo-table-head{display:none}}
+#applications .application-document-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+#applications .application-document{padding:20px;min-width:0;display:flex;flex-direction:column;gap:20px}
+#applications .application-document header{display:grid;grid-template-columns:32px minmax(0,1fr) 28px;gap:12px;align-items:start}
+#applications .application-document header>div{min-width:0}
+#applications .application-document header strong{font-size:13px;font-weight:600;line-height:1.6;overflow-wrap:anywhere;display:block}
+#applications .application-document header small{display:block;margin-top:7px;font-size:10px;line-height:1.7;color:#92929a}
+#applications .application-document-icon{width:32px;height:36px;border-radius:8px;background:#f1f4fa;display:grid;place-items:center}
+#applications .application-document-actions{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+#applications .application-document-actions :is(button,a){font-size:11px;min-height:34px;padding:8px 11px}
