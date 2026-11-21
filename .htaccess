@@ -1,5 +1,11 @@
 RewriteEngine On
 Options -Indexes
+# Tab is a separate application, with a separate host-only session and team API.
+RewriteCond %{HTTP_HOST} ^tab\.ayodsgn\.com$ [NC]
+RewriteRule ^(?:life|api/life)(?:/|$) - [F,L]
+RewriteCond %{HTTP_HOST} ^tab\.ayodsgn\.com$ [NC]
+RewriteRule ^$ tab/index.php [L]
+
 # Development fixtures, maintenance commands and deployment metadata are never public routes.
 RewriteRule ^(?:tests|scripts|docs)(?:/|$) - [F,L,NC]
 RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
