@@ -14,7 +14,7 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-sr
   <meta name="theme-color" content="#1f46d2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Life"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="apple-touch-icon" href="/life/pwa-icons/apple-touch-icon.png"><link rel="manifest" href="/life/manifest.webmanifest"><link rel="stylesheet" href="./vendor/quill/quill.core.css"><script defer src="./vendor/quill/quill.js"></script>
   <link rel="stylesheet" href="./life.css?v=63"><link rel="stylesheet" href="./ayo-os.css?v=agents-2"><link rel="stylesheet" href="./applications.css?v=6"><link rel="stylesheet" href="./chat-mobile.css?v=7"><link rel="stylesheet" href="./goals.css?v=periods-4"><link rel="stylesheet" href="./planner-interactions.css?v=1"><link rel="stylesheet" href="./simple-ui.css?v=2"><script type="module" src="./app.js?v=goal-actions-1"></script>
 <link rel="stylesheet" href="./opportunity-agents.css?v=3"><link rel="stylesheet" href="./ui-polish.css?v=connections-1">
-<link rel="stylesheet" href="./design-system.css?v=chat-fit-1">
+<link rel="stylesheet" href="./design-system.css?v=chat-align-2">
 </head>
 <body>
   <div id="announcement" role="status" aria-live="polite"></div>
