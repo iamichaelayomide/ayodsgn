@@ -31,3 +31,5 @@ assert.equal(stageView.stageForPipeline('accepted','career',custom),'won','Movin
 assert.equal(stageView.stageForPipeline('not-accepted','career',custom),'closed','Moving declined work out preserves closure');
 assert.equal(stageView.stageForPipeline('submitted','ai-testing',custom),'pending');
 assert.equal(stageView.stageForPipeline('pending','career',custom),'researched');
+
+assert.equal(stageView.opportunityStatus({title:'SENT — Original email title',stage:'researched',stageExplicit:true}),'researched','Manual status wins over imported title evidence');

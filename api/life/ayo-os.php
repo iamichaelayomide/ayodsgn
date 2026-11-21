@@ -71,7 +71,7 @@ final class LifeAyoOS {
     }
     if($type==='opportunities'){
      if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create an opportunity at the other company instead.');
-     $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',array_merge(self::PIPELINES,array_column($s['pipelines'],'id')));$r['stage']=self::choice($args['stage']??$r['stage']??'researched',array_merge(self::STAGES,array_column($s['statuses'],'id')));$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
+     $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',array_merge(self::PIPELINES,array_column($s['pipelines'],'id')));$r['stage']=self::choice($args['stage']??$r['stage']??'researched',array_merge(self::STAGES,array_column($s['statuses'],'id')));if(array_key_exists('stageExplicit',$args))$r['stageExplicit']=$args['stageExplicit']===true;$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
 
 
     }

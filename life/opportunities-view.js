@@ -4,7 +4,7 @@ export const stages={researched:'Researched',ready:'Ready',drafted:'Drafted',sch
 export function safeLink(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';}catch{return '';}}
 export function pipelineFor(o,c){return o.pipeline==='career'&&/^(Mercor|Taste(?: \/ TasteMakers)?|micro1)$/i.test(c?.name||'')?'ai-testing':o.pipeline;}
 export function opportunityStatus(o,ai=false){
- const title=o.title||'';let stage=o.stage||'researched';
+ const title=o.title||'';let stage=o.stage||'researched';if(o.stageExplicit)return stage;
  const prefixes=[['DELIVERY FAILED','bounced'],['SENT','sent'],['SUBMITTED','submitted'],['FORM SUBMITTED','submitted'],['SCHEDULED','scheduled'],['REPLIED','replied'],['DECLINED','not-accepted'],['INCOMPLETE','incomplete'],['PROJECT PAUSED','paused']];
  for(const [prefix,value]of prefixes)if((stage==='researched'||!o.stage)&&title.startsWith(prefix+' — ')){stage=value;break;}
  if(ai)return stage==='accepted'||stage==='won'?'accepted':stage==='not-accepted'||stage==='closed'?'not-accepted':'pending';
