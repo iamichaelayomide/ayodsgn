@@ -19,7 +19,7 @@ export function installSelects() {
   function open(control, direction = 0) {
     close(); sync(control);
     const {select, button} = control;
-    const menu = document.createElement('div'); menu.className = 'select-menu';
+    const menu = document.createElement('div'); menu.className = 'select-menu';if(select.matches('[data-inline-stage]'))menu.classList.add('status-select-menu');
     menu.id = button.getAttribute('aria-controls'); menu.setAttribute('role', 'listbox');
     menu.setAttribute('aria-label', button.getAttribute('aria-label'));
     if(select.multiple)menu.setAttribute('aria-multiselectable','true');
@@ -43,7 +43,7 @@ export function installSelects() {
     const left = Math.max(12,bounds?bounds.left+12:12), right = Math.min(innerWidth-12,bounds?bounds.right-12:innerWidth-12);
     const heading = dialog?.querySelector('.dialog-heading')?.getBoundingClientRect(), actions = dialog?.querySelector('.dialog-actions')?.getBoundingClientRect();
     const top = Math.max(12,heading?heading.bottom+8:bounds?bounds.top+12:12), bottom = Math.min(innerHeight-12,actions?actions.top-8:bounds?bounds.bottom-12:innerHeight-12);
-    const width = Math.min(rect.width,right-left);
+    const width = Math.min(select.matches('[data-inline-stage]')?Math.max(148,rect.width):rect.width,right-left);
     menu.style.width = `${width}px`; menu.style.left = `${Math.max(left,Math.min(rect.left,right-width))}px`;
     const below = Math.max(0,bottom-rect.bottom-6), above = Math.max(0,rect.top-top-6);
     const desired = Math.min(280,menu.scrollHeight);
