@@ -19,3 +19,4 @@ input:focus,textarea:focus,select:focus{outline-color:#262b3555}
 .roadmap-intro{flex-wrap:wrap}.roadmap-intro>.text-action{margin-left:auto;order:3;font-size:10px}
 .fine,.task-date,.empty,.event summary{color:#788391}.task-reference{color:#8591a3}.milestone-main h2.placeholder{color:#838e9f}.milestone-main p.placeholder{color:#8a95a6}
 @media(max-width:700px){.roadmap-intro>.text-action{margin:6px 0 0}.goal-toolbar>.text-action{order:3;margin-left:auto}}
+.mobile-account{display:none}@media(max-width:700px){.mobile-account{display:inline-flex;font-size:10px}.topbar .sync-label{display:none}}
