@@ -70,4 +70,5 @@ finishCreate();await sendingNew;createWait=null;assert.equal(sent.text,'New draf
 await click({ai:'new'});listeners.input[0]({target:{id:'ai-message',value:'Save me later',hasAttribute:()=>false}});failCreate=true;await submit();assert.equal(companion.navigationState().title,'New chat');assert.match(content,/Save me later/);assert.match(content,/Could not start chat/);failCreate=false;
 // Late upload responses must not restore a signed-out session.
 const next=change({id:'ai-files',files:[new File(['later'],'later.txt',{type:'text/plain'})]});await new Promise(resolve=>setTimeout(resolve,0));companion.reset();uploadResolve();await next;assert.equal(content,'');
+await companion.render();companion.showHistory();companion.home();await companion.render();assert.equal(companion.navigationState().title,'New chat');assert.equal(companion.navigationState().view,'thread');assert.match(content,/What’s on your mind/);
 console.log('Actual companion creates scoped chat, blocks upload sends, preserves failed drafts/files, renders saved attachments and ignores stale upload responses');
