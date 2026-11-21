@@ -13,7 +13,7 @@ export function createApplications({root,request:sendRequest,escape:e,getData,op
  function navigate(target){navigation.remember(capture());selected='';if(target==='home'){tab='groups';tracker='';category='';stage='';query='';filter='all';kind='';}else if(target==='group'){tab='group';category='';stage='';query='';filter='all';}else if(target==='list'){tab='opportunities';}else{tab=target==='trackers'?'groups':target;}draw();}
  function breadcrumbs(){const items=[{label:'Opportunities',action:'home'}];if(tracker)items.push({label:current()?.name||'Group',action:'group'});if(category)items.push({label:data?.state.categories.find(c=>c.id===category)?.name||'Folder',action:'list'});else if(tab==='opportunities')items.push({label:tracker?'All opportunities':opportunityTitle(),action:'list'});if(tab==='documents')items.push({label:'Documents'});if(selected)items.push({label:data?.state.opportunities.find(o=>o.id===selected)?.title||'Opportunity'});return items;}
  const key=()=>crypto.randomUUID().replaceAll('-','');
- const image=name=>`<img class="action-icon" src="./icons/${name}.svg" alt="">`;
+ const image=name=>`<img class="action-icon" src="./icons/${name}.svg?v=ios1" alt="">`;
  const button=(label,action,id='',extra='')=>`<button type="button" data-app-action="${action}" data-id="${e(id)}" ${extra}>${label}</button>`;
  const dateLabel=value=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z'));
  const option=(value,name,current)=>`<option value="${e(value)}" ${value===current?'selected':''}>${e(name)}</option>`;

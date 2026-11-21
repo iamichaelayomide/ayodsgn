@@ -22,7 +22,7 @@ export function createOpportunityAgents({request,getData,saveOperation,onChanged
  const clearToken=()=>{connectionToken='';tokenExpires='';if(tokenTimer)clearTimeout(tokenTimer);tokenTimer=null;};
  const rememberOpen=()=>{if(container?.querySelector('[data-agent-expansion]'))expanded=new Set([...container.querySelectorAll('[data-agent-expansion][open]')].map(el=>el.dataset.agentExpansion));};
  const current=()=>getData();const workspace=()=>current()?.workspaceId;
- const icon=name=>`<img class="ayo-icon" src="./icons/${name}.svg" alt="" aria-hidden="true">`;
+ const icon=name=>`<img class="ayo-icon" src="./icons/${name}.svg?v=ios1" alt="" aria-hidden="true">`;
  const action=(label,type,job='',index='')=>`<button type="button" data-agent-action="${type}" data-job="${e(job)}" data-index="${e(String(index))}">${e(label)}</button>`;
  const link=(url,label)=>https(url)?`<a href="${e(https(url))}" target="_blank" rel="noopener noreferrer">${e(label)}</a>`:'';
  const jobBy=id=>status?.jobs?.find(j=>j.id===id);

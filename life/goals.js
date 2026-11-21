@@ -1,4 +1,5 @@
-import {createPeriodGoals} from './period-goals.js?v=4';
+import {uiIcon} from './ui-icons.js?v=1';
+import {createPeriodGoals} from './period-goals.js?v=5';
 import {plannerTimezone} from './accounts.js?v=1';
 import {chooseDate} from './date-controls.js?v=1';
 const types={adhoc:'Independent',day:'Day',week:'Week',month:'Month',quarter:'Quarter'};
@@ -46,8 +47,8 @@ export function chooseGoalPeriod({type,value,onSelect}){
  const picker=document.createElement('dialog');
  picker.className='goal-choice-dialog';
  picker.setAttribute('aria-label',`Choose a ${label}`);
- picker.innerHTML=`<div class="dialog-heading"><h2>Choose a ${label}</h2><button type="button" aria-label="Close period picker">×</button></div>
- <div class="goal-choice-year"><button type="button" data-year-step="-1" aria-label="Previous year">‹</button><strong aria-live="polite"></strong><button type="button" data-year-step="1" aria-label="Next year">›</button></div>
+ picker.innerHTML=`<div class="dialog-heading"><h2>Choose a ${label}</h2><button type="button" aria-label="Close period picker">${uiIcon('close')}</button></div>
+ <div class="goal-choice-year"><button type="button" data-year-step="-1" aria-label="Previous year">${uiIcon('chevron-back')}</button><strong aria-live="polite"></strong><button type="button" data-year-step="1" aria-label="Next year">${uiIcon('chevron-forward')}</button></div>
  <div class="goal-choice-grid" data-kind="${type}"></div>`;
  const grid=picker.querySelector('.goal-choice-grid');
  const yearLabel=picker.querySelector('.goal-choice-year strong');
@@ -117,7 +118,13 @@ export function createGoals({getData,mutate,escape,refreshSelects,openTask,creat
   const areaOptions=document.getElementById('life-areas');
   if(areaOptions){
    const names=new Set(['Personal','Master’s','Research','NYSC','Full-time work','Business','Health','Family',...all().filter(g=>!g.archived).map(g=>g.category).filter(Boolean)]);
-   areaOptions.innerHTML=[...names].map(name=>`<option value="${escape(name)}"></option>`).join('');
+   form.elements.category.removeAttribute('list');
+   let suggestions=form.querySelector('.goal-area-suggestions');
+   if(!suggestions){suggestions=document.createElement('div');suggestions.className='goal-area-suggestions';suggestions.setAttribute('role','group');suggestions.setAttribute('aria-label','Suggested areas');form.elements.category.after(suggestions);}
+   suggestions.innerHTML=[...names].map(name=>`<button type="button" aria-pressed="${name===form.elements.category.value}">${escape(name)}</button>`).join('');
+   suggestions.onclick=event=>{const button=event.target.closest('button');if(!button)return;form.elements.category.value=button.textContent;suggestions.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));};
+   form.elements.category.oninput=()=>suggestions.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===form.elements.category.value)));
+   form.elements.category.placeholder='Choose below or type an area';
   }
   refreshSelects();error('');
   form.querySelectorAll('input,select,textarea,button').forEach(el=>{if(!el.hasAttribute('data-close'))el.disabled=partner();});

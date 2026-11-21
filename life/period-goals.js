@@ -1,3 +1,4 @@
+import {uiIcon} from './ui-icons.js?v=1';
 const periods = {quarter:'Quarter', month:'Month', week:'Week'};
 const headings = {quarter:'Quarterly goals', month:'Monthly goals', week:'Weekly goals', adhoc:'Other goals'};
 const areaOf = goal => goal.category?.trim() || 'Personal';
@@ -22,7 +23,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     `<button type="button" class="period-add" data-plan-add="${type}" data-area="${escape(category)}" aria-label="${escape(label)}">+ Add goal</button>`;
   const goalRow = (goal, records) => {
     const parent = records.find(record => record.id === goal.parentId);
-    return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>↳ ${escape(parent.title)}</small>` : ''}</span><span class="goal-row-arrow" aria-hidden="true">›</span></button></li>`;
+    return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>↳ ${escape(parent.title)}</small>` : ''}</span></button></li>`;
   };
 
   function render() {
@@ -38,14 +39,14 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       return `<section class="period-section" data-period="${type}">
         <header><div><h2>${headings[type]}</h2>${type === 'adhoc' ? '' : `<span>${escape(labelOf(type,current))}</span>`}</div>${add(type,area,type === 'adhoc' ? 'Add goal without a set period' : `Add goal for ${labelOf(type,current)}`)}</header>
         ${matching.length ? matching.map(group => `<div class="period-area">
-          <div class="period-area-header">${area ? `<h3>${escape(group.area)}</h3>` : `<h3><button type="button" data-plan-area="${escape(group.area)}">${escape(group.area)} <span aria-hidden="true">›</span></button></h3>`}</div>
+          <div class="period-area-header">${area ? `<h3>${escape(group.area)}</h3>` : `<h3><button type="button" data-plan-area="${escape(group.area)}">${escape(group.area)} ${uiIcon('chevron-forward')}</button></h3>`}</div>
           <ul>${group.goals.map(g => goalRow(g,records)).join('')}</ul>
         </div>`).join('') : '<p class="period-empty">No goals yet.</p>'}
       </section>`;
     });
     root.innerHTML = `<div class="period-toolbar">
       <div class="period-tabs" role="group" aria-label="Goal timeframe">${[['overview','Overview'],...Object.entries(periods)].map(([key,label]) => `<button type="button" data-plan-mode="${key}" aria-pressed="${mode === key}">${label}</button>`).join('')}</div>
-      <div class="period-date"><button type="button" data-plan-shift="-1" aria-label="Previous period">‹</button><button type="button" data-plan-date>${escape(labelOf(dateType,period(dateType)))}</button><button type="button" data-plan-shift="1" aria-label="Next period">›</button></div>
+      <div class="period-date"><button type="button" data-plan-shift="-1" aria-label="Previous period">${uiIcon('chevron-back')}</button><button type="button" data-plan-date>${escape(labelOf(dateType,period(dateType)))}</button><button type="button" data-plan-shift="1" aria-label="Next period">${uiIcon('chevron-forward')}</button></div>
     </div>
     ${area ? `<header class="period-area-title"><button type="button" data-plan-area="">← All areas</button><h2>${escape(area)}</h2></header>` : ''}
     <div class="period-sections">${sections.join('')}</div>`;

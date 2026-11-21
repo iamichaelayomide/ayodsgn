@@ -33,7 +33,7 @@ console.log('Goal views, measured results, and unique delivery checks passed');
 const makeElement=()=>({events:{},addEventListener(name,fn){this.events[name]=fn;}});
 const root={...makeElement(),dataset:{},classList:{toggle(){}},innerHTML:'',querySelector(){return null;}};
 const inserted=[];
-const field=()=>({...makeElement(),value:'',closest:()=>({hidden:false}),focus(){},after(element){inserted.push(element);}});
+const field=()=>({...makeElement(),value:'',removeAttribute(name){delete this[name];},closest:()=>({hidden:false}),focus(){},after(element){inserted.push(element);}});
 const controls=Object.fromEntries(['id','title','notes','type','period','category','status','parentId'].map(name=>[name,field()]));
 const form={...makeElement(),elements:controls,reset(){},querySelector:()=>({hidden:false,disabled:false,innerHTML:'',querySelectorAll:()=>[]}),querySelectorAll:()=>[]};
 const dialog={showModal(){},close(){}};
