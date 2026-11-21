@@ -23,7 +23,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     `<button type="button" class="period-add" data-plan-add="${type}" data-area="${escape(category)}" aria-label="${escape(label)}">+ Add goal</button>`;
   const goalRow = (goal, records) => {
     const parent = records.find(record => record.id === goal.parentId);
-    return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>${uiIcon('chevron-forward')} ${escape(parent.title)}</small>` : ''}</span></button></li>`;
+    return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}" aria-pressed="${detail.open&&goal.id===goalId}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>${uiIcon('chevron-forward')} ${escape(parent.title)}</small>` : ''}</span></button></li>`;
   };
 
   function render() {
@@ -68,7 +68,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     const childType = {quarter:'month',month:'week'}[goal.type];
     const isDated = Boolean(periods[goal.type]);
     detail.innerHTML = `<div class="period-detail-inner">
-      <header class="period-detail-top"><button type="button" data-plan-close aria-label="Close goal details">${uiIcon('close')}</button>${partner() ? '' : '<button type="button" class="primary" data-plan-edit>Edit goal</button>'}</header>
+      <header class="period-detail-top"><button type="button" data-plan-close aria-label="Close goal details">${uiIcon('close')}</button>${partner() ? '' : '<button type="button" class="goal-text-action" data-plan-edit>Edit goal</button>'}</header>
       <p class="period-detail-meta">${escape(areaOf(goal))}${goal.period ? ' · '+escape(labelOf(goal.type,goal.period)) : ''}</p>
       <h2 id="period-detail-title">${escape(goal.title)}</h2>
       <p class="period-detail-status"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span>${({todo:'To do',progress:'In progress',done:'Done'})[statusOf(goal)]}</p>
