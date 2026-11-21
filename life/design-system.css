@@ -519,3 +519,17 @@ dialog.ayo-editor button.ayo-form-close{position:absolute!important;top:20px!imp
 @media(max-width:1000px){#goals.has-goal-inspector{padding-right:0}#period-goal-detail{width:min(460px,90vw);box-shadow:-10px 0 40px #24243b20}}
 @media(max-width:600px){#period-goal-detail{inset:100px 10px 10px;width:calc(100vw - 20px);height:calc(100dvh - 110px);max-height:calc(100dvh - 110px);border:1px solid #e4e4ea;border-radius:16px}#period-goal-detail .period-detail-inner{padding:16px 18px}#period-goal-detail h2{font-size:21px}.goal-area-navigation{gap:3px}.goal-area-navigation button{font-size:11px;padding:7px 8px}}
 #ayo-os .opportunity-period-controls .period-date>button svg{display:block;width:15px;height:15px}
+/* Repeated contextual actions are quiet text controls; submit actions retain depth. */
+#goals .period-section .period-add,#period-goal-detail [data-plan-edit],#period-goal-detail [data-plan-child],#period-goal-detail [data-plan-task-new]{display:inline-flex;align-items:center;justify-content:center;gap:5px;background:transparent!important;background-image:none!important;border:0!important;border-radius:6px;color:#296ff0!important;box-shadow:none!important;font:600 12px/1.4 var(--sans);letter-spacing:0;padding:6px 4px;min-height:34px;white-space:nowrap;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+#goals .period-section>header{padding-block:10px;background:#fdfdfd!important}
+#goals .period-section .period-add:active,#period-goal-detail [data-plan-edit]:active,#period-goal-detail [data-plan-child]:active,#period-goal-detail [data-plan-task-new]:active{background:#edf3ff!important;transform:none}
+#period-goal-detail section{background:transparent;border:0;border-top:1px solid #ececf0;border-radius:0;padding:18px 0 0;margin-top:22px}
+#period-goal-detail section header{gap:8px;align-items:center}
+#period-goal-detail .period-detail-top{padding-bottom:10px;align-items:center}
+#period-goal-detail .period-detail-meta{margin-top:10px}
+#period-goal-detail .period-empty{padding:7px 0 0;font-size:12px}
+#period-goal-detail .period-archive{min-height:36px;padding:5px 0;color:#b65f6a;background:transparent;border:0;box-shadow:none}
+#goals .period-goal[aria-pressed=true]{background:#edf3ff}
+@media(hover:hover) and (pointer:fine){#goals .period-section .period-add:hover,#period-goal-detail [data-plan-edit]:hover,#period-goal-detail [data-plan-child]:hover,#period-goal-detail [data-plan-task-new]:hover{background:#edf3ff!important}}
+@media(pointer:coarse){#goals .period-section .period-add,#period-goal-detail [data-plan-edit],#period-goal-detail [data-plan-child],#period-goal-detail [data-plan-task-new],#period-goal-detail [data-plan-close]{min-height:44px!important}#period-goal-detail [data-plan-close]{width:44px!important;height:44px!important;flex-basis:44px!important}}
+@media(max-width:600px){#period-goal-detail{inset:72px 0 0;width:100%;height:calc(100dvh - 72px);max-height:calc(100dvh - 72px);border-width:1px 0 0;border-radius:16px 16px 0 0;box-shadow:0 -6px 30px #24243b15}#period-goal-detail .period-detail-inner{padding:14px 20px max(28px,env(safe-area-inset-bottom))}#period-goal-detail .period-detail-top{padding-top:2px;background:#fff}#period-goal-detail .period-detail-top [data-plan-edit]{font-size:13px}#goals .period-section>header{gap:10px}#goals .period-section .period-add{font-size:12px}#period-goal-detail section header{flex-wrap:nowrap}#period-goal-detail section header h3{min-width:0;font-size:13px}#period-goal-detail section header button{flex-shrink:0}}

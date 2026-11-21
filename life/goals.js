@@ -1,5 +1,5 @@
 import {uiIcon} from './ui-icons.js?v=1';
-import {createPeriodGoals} from './period-goals.js?v=nav-1-5';
+import {createPeriodGoals} from './period-goals.js?v=goal-actions-1';
 import {plannerTimezone} from './accounts.js?v=1';
 import {chooseDate} from './date-controls.js?v=1';
 const types={adhoc:'Independent',day:'Day',week:'Week',month:'Month',quarter:'Quarter'};
