@@ -33,6 +33,7 @@ export function installSelects() {
     const items = options.map((option,index) => {
       const item = document.createElement('button'); item.type = 'button'; item.className = 'select-option';
       item.setAttribute('role','option'); item.setAttribute('aria-selected',String(option.selected));
+      if(/^\s*\+\s*Add\b/i.test(option.textContent||''))item.classList.add('select-option-create');
       item.disabled = option.disabled; item.tabIndex = -1; item.textContent = option.textContent;
       item.addEventListener('click', () => choose(index)); menu.append(item); return item;
     });
