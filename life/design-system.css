@@ -533,3 +533,8 @@ dialog.ayo-editor button.ayo-form-close{position:absolute!important;top:20px!imp
 @media(hover:hover) and (pointer:fine){#goals .period-section .period-add:hover,#period-goal-detail [data-plan-edit]:hover,#period-goal-detail [data-plan-child]:hover,#period-goal-detail [data-plan-task-new]:hover{background:#edf3ff!important}}
 @media(pointer:coarse){#goals .period-section .period-add,#period-goal-detail [data-plan-edit],#period-goal-detail [data-plan-child],#period-goal-detail [data-plan-task-new],#period-goal-detail [data-plan-close]{min-height:44px!important}#period-goal-detail [data-plan-close]{width:44px!important;height:44px!important;flex-basis:44px!important}}
 @media(max-width:600px){#period-goal-detail{inset:72px 0 0;width:100%;height:calc(100dvh - 72px);max-height:calc(100dvh - 72px);border-width:1px 0 0;border-radius:16px 16px 0 0;box-shadow:0 -6px 30px #24243b15}#period-goal-detail .period-detail-inner{padding:14px 20px max(28px,env(safe-area-inset-bottom))}#period-goal-detail .period-detail-top{padding-top:2px;background:#fff}#period-goal-detail .period-detail-top [data-plan-edit]{font-size:13px}#goals .period-section>header{gap:10px}#goals .period-section .period-add{font-size:12px}#period-goal-detail section header{flex-wrap:nowrap}#period-goal-detail section header h3{min-width:0;font-size:13px}#period-goal-detail section header button{flex-shrink:0}}
+/* Keep counts visible: the legend grows with its rows instead of scrolling internally. */
+#ayo-os .status-legend{max-height:none;overflow:visible;padding-right:2px;scrollbar-gutter:auto}
+#ayo-os .status-legend li{min-width:0}
+#ayo-os .status-legend strong{white-space:nowrap;text-align:right}
+#ayo-os .status-composition{align-items:center}
