@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {opportunityOverview} from '../life/dashboard.js';
+import {opportunityOverview,renderOpportunityOverview} from '../life/dashboard.js';
 const rows=[{id:'a',pipeline:'career',stage:'sent'},{id:'b',pipeline:'nysc',stage:'researched'}];
 const messages=[{id:'1',messageId:'same',opportunityId:'a',direction:'sent',occurredAt:'2026-11-21T10:00:00Z'},{id:'2',messageId:'same',opportunityId:'a',direction:'sent',occurredAt:'2026-11-21T10:00:00Z'},{id:'3',opportunityId:'b',direction:'received',occurredAt:'2026-11-20T10:00:00Z'},{id:'4',opportunityId:'a',direction:'scheduled',occurredAt:'2026-11-21T10:00:00Z'},{id:'5',opportunityId:'a',direction:'sent',occurredAt:'invalid'},{id:'6',opportunityId:'a',direction:'sent',occurredAt:'2026-10-01T10:00:00Z'},{id:'7',opportunityId:'unknown',direction:'sent',occurredAt:'2026-11-21T10:00:00Z'}];
 const model=opportunityOverview(rows,messages,'2026-11-21',o=>o.pipeline,{career:'Career',nysc:'NYSC'});
@@ -11,3 +11,10 @@ const filtered=opportunityOverview(rows.slice(0,1),messages,'2026-11-21',o=>o.pi
 assert.equal(filtered.weeks.reduce((n,w)=>n+w.received,0),0,'Respect pipeline scope');
 assert.deepEqual(opportunityOverview([],[],'2026-11-21',o=>o.pipeline,{}).pipelines,[]);
 console.log('Dashboard activity, deduplication, dates and pipeline totals passed');
+
+const rendered=renderOpportunityOverview(model,v=>String(v));
+assert.ok(rendered.includes('Application status')&&!rendered.includes('Email activity'));
+assert.equal((rendered.match(/class="status-arc"/g)||[]).length,2);
+assert.ok(!renderOpportunityOverview(opportunityOverview([],[],'2026-11-21',o=>o.pipeline,{}),String).includes('NaN'));
+const ai=opportunityOverview([{id:'x',pipeline:'ai-testing',stage:'submitted'}],[],'2026-11-21',o=>o.pipeline,{'ai-testing':'AI testing'});
+assert.deepEqual(ai.statuses,[['pending',1]],'Chart and record labels agree for AI testing');

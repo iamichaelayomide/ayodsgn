@@ -403,3 +403,71 @@ button:has(>.ui-icon:only-child){display:grid;place-items:center;padding:10px}
 #applications .application-document-icon{width:32px;height:36px;border-radius:8px;background:#f1f4fa;display:grid;place-items:center}
 #applications .application-document-actions{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
 #applications .application-document-actions :is(button,a){font-size:11px;min-height:34px;padding:8px 11px}
+/* Compact reference layout: stable chart geometry, quiet rows, five-pixel chips. */
+#ayo-os .opportunity-spaces{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:0 0 10px;gap:5px;flex-wrap:wrap;overflow:visible}
+#ayo-os .opportunity-spaces button{flex:0 0 auto;padding:8px 11px;min-height:34px;gap:8px;border-radius:7px}
+#ayo-os .opportunity-spaces small{border-radius:5px;padding:1px 5px}
+#ayo-os .ayo-summary>button>span{flex-direction:row-reverse;justify-content:flex-end;gap:10px;font-weight:550;color:#43434a;padding:14px 16px;background:#fafafa}
+#ayo-os .ayo-summary .ayo-icon{width:16px;height:16px;padding:7px;filter:none;border:0;border-radius:8px;background:linear-gradient(145deg,#64a1ff,#256bf0);box-shadow:inset 0 1px 1px #ffffff66,0 2px 3px #1e4e991f}
+#ayo-os .ayo-summary>button:nth-child(2) .ayo-icon{background:linear-gradient(145deg,#ffc54f,#f6a10f)}
+#ayo-os .ayo-summary>button:nth-child(3) .ayo-icon{background:linear-gradient(145deg,#ef80b2,#dc4c8b)}
+#ayo-os .ayo-summary>button:nth-child(4) .ayo-icon{background:linear-gradient(145deg,#76ce92,#39a85e)}
+#ayo-os .ayo-summary>button>strong{font-size:30px;padding:16px 17px 18px}
+#ayo-os .opportunity-insights{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:stretch;margin:20px 0}
+#ayo-os .insight-card{padding:20px;min-height:0}
+#ayo-os .insight-card header{margin:0 0 20px;gap:12px}
+#ayo-os .insight-card h2{margin:0;font-size:14px}
+#ayo-os .chart-period{white-space:nowrap;flex-shrink:0;border-radius:5px}
+#ayo-os .status-composition{display:grid;grid-template-columns:minmax(130px,190px) minmax(0,1fr);align-items:center;gap:22px}
+#ayo-os .status-donut{position:relative;aspect-ratio:1;min-width:0;max-width:190px;width:100%;margin:auto}
+#ayo-os .status-donut svg{width:100%;height:100%;display:block;overflow:visible}
+#ayo-os .donut-total{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;gap:3px}
+#ayo-os .donut-total strong{font-size:30px;letter-spacing:-1px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+#ayo-os .donut-total span{font-size:10px;color:#92929a}
+#ayo-os .status-legend{padding:0;margin:0;list-style:none;display:grid;gap:10px;max-height:190px;overflow:auto;scrollbar-width:thin}
+#ayo-os .status-legend li{display:grid;grid-template-columns:7px minmax(0,1fr) auto;align-items:center;gap:8px;font-size:11px;color:#767680;line-height:1.5}
+#ayo-os .status-legend i{width:6px;height:6px;border-radius:2px}
+#ayo-os .status-legend strong{font-size:11px;color:#4d4d55;font-weight:550;font-variant-numeric:tabular-nums}
+#ayo-os .pipeline-bars{max-height:190px;gap:15px;padding-right:3px}
+#ayo-os .pipeline-track{height:4px}
+#ayo-os .ayo-table-shell{border:0;border-radius:0;background:transparent;overflow:visible;scroll-margin-top:85px;outline:none}
+#ayo-os .ayo-table-head{border-top:1px solid #e8e8eb;border-bottom:1px solid #e8e8eb;background:transparent;padding:12px 8px;font-size:11px}
+#ayo-os .ayo-row{padding:16px 8px;background:transparent;min-height:75px;border-bottom:1px solid #e9e9ec;gap:20px}
+#ayo-os .ayo-row,#ayo-os .ayo-table-head{grid-template-columns:minmax(160px,2.5fr) minmax(70px,.8fr) minmax(110px,1fr) minmax(65px,.6fr)}
+#ayo-os .ayo-row-company>strong{font-size:13px;font-weight:550}
+#ayo-os .ayo-row-company>span{font-size:11px;color:#909099;white-space:normal;line-height:1.5}
+#ayo-os .ayo-company-avatar{width:30px;height:30px;font-size:9px;border-radius:8px;border:1px solid #e9e9ef;background:#f3f4f8;box-shadow:inset 0 1px 0 #fff}
+#ayo-os .inline-status{width:max-content;max-width:100%}
+#ayo-os .inline-status .select-control{width:max-content;max-width:100%}
+#ayo-os .inline-status .select-trigger{width:auto;min-width:0;max-width:none;border-radius:5px;min-height:26px;padding:5px 22px 5px 19px;font-size:10px;white-space:nowrap;line-height:1.4}
+#ayo-os .ayo-detail-status .inline-status{width:max-content}
+#ayo-os .ayo-badge{border-radius:5px}
+#ayo-os .ayo-list-summary>a{display:none}
+#goals .period-section{border-radius:14px;background:white;box-shadow:0 1px 2px #00000003;overflow:hidden}
+#goals .period-section>header{background:#fafafa!important;border-bottom:1px solid #ededf0;padding:14px 18px}
+#goals .period-section>header>div{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px}
+#goals .period-section h2{font-size:15px;font-weight:600}
+#goals .period-section>header span{font-size:11px;color:#94949c;white-space:nowrap}
+#goals .period-area{padding:12px 18px 6px}
+#goals .period-area-header button{display:inline-flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;min-height:28px;padding:4px 7px;background:transparent;border-radius:5px;color:#888892;font-size:11px;font-weight:500}
+#goals .period-area-header button svg{width:12px;height:12px;flex:none;display:block}
+#goals .period-goal{padding:11px 0;min-height:43px;gap:10px;border-radius:5px}
+#goals .period-goal strong{font-size:13px;font-weight:550;color:#40404a}
+#goals .goal-dot{width:5px;height:5px}
+@media(hover:hover) and (pointer:fine){#ayo-os .ayo-company-open:hover .ayo-row-company>strong{color:#296ff0}#ayo-os .status-arc:hover{opacity:.75}#ayo-os .ayo-row:hover{background:#f5f7fa}}
+#ayo-os .ayo-summary>button:active{transform:scale(.99)}
+@media(prefers-reduced-motion:no-preference){#ayo-os .ayo-summary>button{transition:transform 120ms cubic-bezier(.23,1,.32,1)}}
+@media(max-width:1100px){#ayo-os .status-composition{grid-template-columns:140px minmax(0,1fr);gap:14px}}
+@media(max-width:900px){#ayo-os .opportunity-insights{grid-template-columns:1fr 1fr}#ayo-os .status-composition{grid-template-columns:1fr}#ayo-os .status-donut{max-width:150px}#ayo-os .status-legend{max-height:140px}#ayo-os .pipeline-bars{max-height:310px}}
+@media(max-width:650px){#ayo-os .opportunity-insights{grid-template-columns:1fr}#ayo-os .status-composition{grid-template-columns:140px minmax(0,1fr)}#ayo-os .status-legend{max-height:180px}#ayo-os .pipeline-bars{max-height:200px}#ayo-os .ayo-row{grid-template-columns:minmax(0,1fr) max-content;gap:7px 12px;padding:14px 2px}#ayo-os .ayo-company-open{grid-row:1/3}#ayo-os .ayo-row>.ayo-pipeline{grid-column:2;grid-row:1}#ayo-os .ayo-row .inline-status{grid-column:2;grid-row:2;justify-self:end}#ayo-os .ayo-table-head,#ayo-os .ayo-row-date{display:none}#ayo-os .ayo-summary>button>span{padding:11px;font-size:11px;gap:7px}#ayo-os .ayo-summary .ayo-icon{padding:5px;width:14px;height:14px}#ayo-os .insight-card{padding:16px}#goals .period-section>header{padding:12px}#goals .period-area{padding:8px 12px}}
+@media(max-width:350px){#ayo-os .status-composition{grid-template-columns:115px minmax(0,1fr);gap:9px}#ayo-os .status-legend li{font-size:10px;gap:5px}#ayo-os .donut-total strong{font-size:25px}}
+#ayo-os .metric-icon{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:8px;background:linear-gradient(145deg,#64a1ff,#256bf0);box-shadow:inset 0 1px 1px #ffffff66,0 2px 3px #1e4e991f}
+#ayo-os .ayo-summary>button:nth-child(2) .metric-icon{background:linear-gradient(145deg,#ffc54f,#f6a10f)}
+#ayo-os .ayo-summary>button:nth-child(3) .metric-icon{background:linear-gradient(145deg,#ef80b2,#dc4c8b)}
+#ayo-os .ayo-summary>button:nth-child(4) .metric-icon{background:linear-gradient(145deg,#76ce92,#39a85e)}
+#ayo-os .ayo-summary .metric-icon .ayo-icon{background:none!important;box-shadow:none;filter:brightness(0) invert(1);padding:0;width:17px;height:17px;border-radius:0}
+#ayo-os .inline-status .select-control{margin-top:0}
+#ayo-os .inline-status .select-trigger{gap:0}
+#ayo-os .inline-status .select-trigger:after{position:absolute;top:calc(50% - 4px);margin:0}
+@media(prefers-reduced-motion:reduce){#ayo-os .ayo-summary>button:active{transform:none}}
+#ayo-os .ayo-summary>button:active:focus-visible{transform:none}
