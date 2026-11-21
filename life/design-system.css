@@ -471,3 +471,6 @@ button:has(>.ui-icon:only-child){display:grid;place-items:center;padding:10px}
 #ayo-os .inline-status .select-trigger:after{position:absolute;top:calc(50% - 4px);margin:0}
 @media(prefers-reduced-motion:reduce){#ayo-os .ayo-summary>button:active{transform:none}}
 #ayo-os .ayo-summary>button:active:focus-visible{transform:none}
+/* Status options fit on one line without inheriting full-size form typography. */
+.status-select-menu .select-option{font-size:12px!important;line-height:1.4;min-height:32px;padding:7px 10px;white-space:nowrap;border-radius:5px}
+@media(pointer:coarse){.status-select-menu .select-option{min-height:38px}}

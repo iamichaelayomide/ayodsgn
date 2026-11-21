@@ -23,7 +23,7 @@ import {createGoals} from './goals.js?v=craft-1';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=craft-1';
-import {installSelects} from './selects.js?v=6';
+import {installSelects} from './selects.js?v=status-size-1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = ['#ayo-os','#applications'].includes(location.hash)?'ayo-os':location.hash==='#application-library'?'applications':'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
