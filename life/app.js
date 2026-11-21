@@ -1,5 +1,5 @@
 import {uiIcon,installUIIcons} from './ui-icons.js?v=1';
-import {createAyoOS} from './ayo-os.js?v=clarity-1';
+import {createAyoOS} from './ayo-os.js?v=period-controls-1';
 import {taskColumns,periodRange,syncTaskReadiness,creationActions,laneTone} from './planner-interactions.js?v=life-periods-1';
 import {createNavigationHistory} from './navigation-history.js?v=1';
 import {createApplications} from './applications.js?v=clarity-1';
@@ -19,11 +19,11 @@ import {createThinking} from './thinking.js?v=craft-1';
 import {createRoutines} from './routines.js?v=3';
 import {createAccountability} from './accountability.js?v=4';
 import {emptyState} from './empty-states.js?v=2';
-import {createGoals} from './goals.js?v=craft-1';
+import {createGoals} from './goals.js?v=goal-nav-1';
 import {installNavigation} from './navigation.js?v=3';
 installNavigation();
 import {createCalendar} from './calendar.js?v=craft-1';
-import {installSelects} from './selects.js?v=status-size-1';
+import {installSelects} from './selects.js?v=period-controls-1';
 const refreshSelects = installSelects();
 const $ = (id) => document.getElementById(id);
 let csrf = '', setup = false, data = null, view = ['#ayo-os','#applications'].includes(location.hash)?'ayo-os':location.hash==='#application-library'?'applications':'board', selectedWeek = '', mobileList = '', saving = false, dragging = null, conflict = false;
@@ -124,7 +124,7 @@ $('ayo-os').addEventListener('click',event=>{if(event.target.closest('[data-ayo-
 const viewNavigation=createNavigationHistory();
 const viewNames={'ayo-os':'Opportunities',board:'My board',goals:'Goals',today:'Today',companion:'Ramble',applications:'CVs & saved applications','task-history':'History',analytics:'Analytics',week:'This week',calendar:'Calendar',routines:'Routines',accountability:'Accountability',notes:'Notes',mindmap:'Mind map',archive:'Archive'};
 function updateBreadcrumbs(){const parts=view==='applications'?applications.breadcrumbs():[{label:viewNames[view]||'My board'}];$('breadcrumb').innerHTML=parts.map((part,index)=>`<span class="breadcrumb-separator" aria-hidden="true">/</span>${part.action?`<button type="button" data-app-breadcrumb="${part.action}">${escape(part.label)}</button>`:`<span ${index===parts.length-1?'aria-current="page"':''}>${escape(part.label)}</span>`}`).join('');$('view-back').hidden=!viewNavigation.canBack&&!(view==='applications'&&applications.canBack())&&!(view==='companion'&&companion.canBack());}
-function goToView(next){if(next!=='ayo-os'&&next!=='applications'&&$('voice-preview')){$('voice-preview').setAttribute('aria-label','Add');$('voice-preview').title='Add';$('voice-preview').innerHTML='<span aria-hidden="true">+</span>';}if(next==='today')next='board';if(next==='applications')next='ayo-os';else if(next==='application-library')next='applications';if(next!==view){viewNavigation.remember({view,scroll:window.scrollY,board:selectedBoard,applications:view==='applications'?applications.captureNavigation():null});if(next==='applications'){applications.clearNavigation();applications.openDocumentBank();}view=next;if(next==='ayo-os')ayoOS.reload();}render();window.scrollTo(0,0);}
+function goToView(next){if(next!=='goals'&&$('period-goal-detail')?.open)$('period-goal-detail').close();$('voice-preview')?.classList.remove('opportunity-add-button');if(next!=='ayo-os'&&next!=='applications'&&$('voice-preview')){$('voice-preview').setAttribute('aria-label','Add');$('voice-preview').title='Add';$('voice-preview').innerHTML='<span aria-hidden="true">+</span>';}if(next==='today')next='board';if(next==='applications')next='ayo-os';else if(next==='application-library')next='applications';if(next!==view){viewNavigation.remember({view,scroll:window.scrollY,board:selectedBoard,applications:view==='applications'?applications.captureNavigation():null});if(next==='applications'){applications.clearNavigation();applications.openDocumentBank();}view=next;if(next==='ayo-os')ayoOS.reload();}render();window.scrollTo(0,0);}
 document.addEventListener('life:chat-navigation',updateBreadcrumbs);
 $('view-back').onclick=()=>{if(view==='companion'&&companion.back()){updateBreadcrumbs();return;}if(view==='applications'&&applications.back())return;const previous=viewNavigation.back();if(!previous)return;view=previous.view;selectedBoard=previous.board;if(previous.applications)applications.restoreNavigation(previous.applications);render();window.scrollTo(0,previous.scroll);};
 $('breadcrumb-home').onclick=()=>goToView('board');
@@ -134,8 +134,8 @@ function render() {
  queueMicrotask(updateBreadcrumbs);
  if($('board-mode-controls'))$('board-mode-controls').hidden=view!=='board';
  if(view==='board'){
-   $('board-week-date').textContent=boardWeekLabel();
-   $('board-week-controls').hidden=taskPeriod!=='week';
+   $('board-week-date').textContent=boardWeekLabel();$('board-week-date').setAttribute('aria-label',`Choose board ${taskPeriod}`);boardModeControls.querySelectorAll('[data-board-shift]').forEach(button=>button.setAttribute('aria-label',`${Number(button.dataset.boardShift)<0?'Previous':'Next'} board ${taskPeriod}`));
+   $('board-week-controls').hidden=taskPeriod==='all';
  }
  $('mobile-chat-list').hidden=view!=='companion';
  $('ayo-os').hidden=view!=='ayo-os';
@@ -339,14 +339,14 @@ document.addEventListener('life:voice-navigate',event=>{const next=event.detail;
 
 // The weekly board uses existing task statuses and sprint commitments.
 function boardWeekLabel() {
-  const [from,to]=periodRange('week',taskPeriodDate||today());
+  const anchor=taskPeriodDate||today();if(taskPeriod==='quarter')return `Q${Math.ceil(Number(anchor.slice(5,7))/3)} ${anchor.slice(0,4)}`;if(taskPeriod==='month')return new Intl.DateTimeFormat('en-GB',{month:'long',year:'numeric'}).format(new Date(anchor+'T12:00:00'));const [from,to]=periodRange('week',anchor);
   return `${dayLabel(from)} – ${dayLabel(to)} ${to.slice(0,4)}`;
 }
 const boardModeControls=document.createElement('div');
 boardModeControls.id='board-mode-controls';
 boardModeControls.className='planner-mode-controls';
 boardModeControls.hidden=true;
-boardModeControls.innerHTML=`<div class="planner-segment" role="group" aria-label="Board scope"><button type="button" data-board-scope="week" aria-pressed="true">This week</button><button type="button" data-board-scope="all" aria-pressed="false">All tasks</button></div><div id="board-week-controls" class="period-date"><button type="button" data-board-shift="-7" aria-label="Previous board week">${uiIcon('chevron-back')}</button><button type="button" id="board-week-date" aria-label="Choose board week"></button><button type="button" data-board-shift="7" aria-label="Next board week">${uiIcon('chevron-forward')}</button></div><div id="task-layout-controls" class="planner-segment" role="group" aria-label="Task view"><button type="button" data-task-layout="board" aria-pressed="true">Board</button><button type="button" data-task-layout="list" aria-pressed="false">List</button></div>`;
+boardModeControls.innerHTML=`<div class="planner-segment" role="group" aria-label="Board scope"><button type="button" data-board-scope="week" aria-pressed="true">This week</button><button type="button" data-board-scope="month" aria-pressed="false">Month</button><button type="button" data-board-scope="quarter" aria-pressed="false">Quarter</button><button type="button" data-board-scope="all" aria-pressed="false">All tasks</button></div><div id="board-week-controls" class="period-date"><button type="button" data-board-shift="-7" aria-label="Previous board week">${uiIcon('chevron-back')}</button><button type="button" id="board-week-date" aria-label="Choose board week"></button><button type="button" data-board-shift="7" aria-label="Next board week">${uiIcon('chevron-forward')}</button></div><div id="task-layout-controls" class="planner-segment" role="group" aria-label="Task view"><button type="button" data-task-layout="board" aria-pressed="true">Board</button><button type="button" data-task-layout="list" aria-pressed="false">List</button></div>`;
 document.querySelector('.page-heading').after(boardModeControls);
 boardModeControls.addEventListener('click',event=>{
   const button=event.target.closest('button');
@@ -359,17 +359,16 @@ boardModeControls.addEventListener('click',event=>{
     if(taskPeriod==='week')taskPeriodDate='';
     boardModeControls.querySelectorAll('[data-board-scope]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.boardScope===taskPeriod)));
   }else if(button.dataset.boardShift){
-    const date=new Date(commitmentWeek()+'T12:00:00Z');
-    date.setUTCDate(date.getUTCDate()+Number(button.dataset.boardShift));
+    const date=new Date((taskPeriodDate||today())+'T12:00:00Z');if(taskPeriod==='week')date.setUTCDate(date.getUTCDate()+Number(button.dataset.boardShift));else{date.setUTCDate(1);date.setUTCMonth(date.getUTCMonth()+Math.sign(Number(button.dataset.boardShift))*(taskPeriod==='quarter'?3:1));}
     taskPeriodDate=date.toISOString().slice(0,10);
   }else if(button.id==='board-week-date'){
-    chooseDate({value:commitmentWeek(),title:'Choose a board week',onSelect:value=>{taskPeriodDate=value;render();}});
+    chooseDate({value:taskPeriodDate||today(),title:taskPeriod==='week'?'Choose a board week':`Choose a board ${taskPeriod}`,onSelect:value=>{taskPeriodDate=value;render();}});
     return;
   }
   render();
 });
 document.addEventListener('input',event=>{const form=event.target.closest('.quick-add,#task-form');if(form&&event.target.name==='title')syncTaskReadiness(form,saving,role==='owner');});
 const quickSheet=document.createElement('dialog');quickSheet.id='quick-create-sheet';quickSheet.setAttribute('aria-labelledby','quick-create-title');quickSheet.innerHTML='<header><h2 id="quick-create-title" class="sr-only">Add</h2><button type="button" data-sheet-close aria-label="Close add menu">×</button></header><div class="quick-create-actions"></div>';document.body.append(quickSheet);
-$('ayo-os').addEventListener('ayo:context',event=>{const tab=event.detail.tab,control=$('voice-preview'),labels={opportunities:'Add opportunity',review:'Review next draft',agents:'Find opportunities',settings:'Find opportunities'},icons={opportunities:'opportunity',review:'tick-square',agents:'search-normal',settings:'search-normal'};control.setAttribute('aria-label',labels[tab]||'Add opportunity');control.title=labels[tab]||'Add opportunity';control.innerHTML=`<img src="./icons/${icons[tab]||'opportunity'}.svg" alt="" aria-hidden="true">`;});
+$('ayo-os').addEventListener('ayo:context',event=>{const tab=event.detail.tab,control=$('voice-preview'),labels={opportunities:'Add opportunity',review:'Review next draft',agents:'Find opportunities',settings:'Find opportunities'},icons={opportunities:'opportunity',review:'tick-square',agents:'search-normal',settings:'search-normal'};control.setAttribute('aria-label',labels[tab]||'Add opportunity');control.title=labels[tab]||'Add opportunity';control.classList.toggle('opportunity-add-button',tab==='opportunities');control.innerHTML=tab==='opportunities'?'<span aria-hidden="true">+</span><span>Add opportunity</span>':`<img src="./icons/${icons[tab]||'opportunity'}.svg" alt="" aria-hidden="true">`;});
 const quickTrigger=$('voice-preview');quickTrigger.setAttribute('aria-label','Add');quickTrigger.title='Add';quickTrigger.innerHTML='<span aria-hidden="true">+</span>';quickTrigger.setAttribute('aria-haspopup','dialog');quickTrigger.onclick=()=>{if(role!=='owner')return;if(view==='ayo-os'){ayoOS.primaryAction();return;}if(view==='goals'){goals.newGoal();return;}if(view==='board'){openTask();return;}const choices=creationActions(view),labels={task:'New task',goal:'New goal',opportunity:'New opportunity',group:'New group',note:'New note',map:'New map'},icons={task:'tick-square',goal:'chart',opportunity:'archive',group:'organize',note:'edit',map:'link'};quickSheet.querySelector('.quick-create-actions').innerHTML=choices.map(a=>`<button type="button" data-create="${a}"><img class="action-icon" src="./icons/${icons[a]}.svg?v=ios1" alt=""><span>${labels[a]}</span></button>`).join('');quickSheet.showModal();};
 quickSheet.querySelector('[data-sheet-close]').onclick=()=>quickSheet.close();quickSheet.addEventListener('click',async event=>{const button=event.target.closest('[data-create]');if(!button)return;quickSheet.close();const action=button.dataset.create;if(action==='task')openTask('','',{dueDate:view==='calendar'||view==='today'?today():''});else if(action==='goal')goals.open('','week');else if(action==='opportunity'){goToView('applications');ayoOS.createOpportunity();}else if(action==='group'){goToView('application-library');await applications.render();applications.createGroup();}else if(action==='note'){goToView('notes');$('thinking').querySelector('[data-thinking=new-note]')?.click();}else if(action==='map'){goToView('mindmap');$('thinking').querySelector('[data-thinking=new-map]')?.click();}});quickSheet.addEventListener('close',()=>quickTrigger.focus({preventScroll:true}));

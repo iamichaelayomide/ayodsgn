@@ -23,7 +23,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     `<button type="button" class="period-add" data-plan-add="${type}" data-area="${escape(category)}" aria-label="${escape(label)}">+ Add goal</button>`;
   const goalRow = (goal, records) => {
     const parent = records.find(record => record.id === goal.parentId);
-    return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>↳ ${escape(parent.title)}</small>` : ''}</span></button></li>`;
+    return `<li><button type="button" class="period-goal" data-plan-goal="${escape(goal.id)}"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span><span><strong>${escape(goal.title)}</strong>${parent ? `<small>${uiIcon('chevron-forward')} ${escape(parent.title)}</small>` : ''}</span></button></li>`;
   };
 
   function render() {
@@ -48,7 +48,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
       <div class="period-tabs" role="group" aria-label="Goal timeframe">${[['overview','Overview'],...Object.entries(periods)].map(([key,label]) => `<button type="button" data-plan-mode="${key}" aria-pressed="${mode === key}">${label}</button>`).join('')}</div>
       <div class="period-date"><button type="button" data-plan-shift="-1" aria-label="Previous period">${uiIcon('chevron-back')}</button><button type="button" data-plan-date>${escape(labelOf(dateType,period(dateType)))}</button><button type="button" data-plan-shift="1" aria-label="Next period">${uiIcon('chevron-forward')}</button></div>
     </div>
-    ${area ? `<header class="period-area-title"><button type="button" data-plan-area="">← All areas</button><h2>${escape(area)}</h2></header>` : ''}
+    <nav class="goal-area-navigation" aria-label="Goal areas"><button type="button" data-plan-area="" aria-pressed="${!area}">All areas</button>${goalsByArea(records).map(group=>`<button type="button" data-plan-area="${escape(group.area)}" aria-pressed="${area.toLocaleLowerCase()===group.area.toLocaleLowerCase()}">${escape(group.area)}<span>${group.goals.length}</span></button>`).join('')}</nav>
     <div class="period-sections">${sections.join('')}</div>`;
     if (detail.open) {
       const focused = detail.contains(document.activeElement);
@@ -68,7 +68,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     const childType = {quarter:'month',month:'week'}[goal.type];
     const isDated = Boolean(periods[goal.type]);
     detail.innerHTML = `<div class="period-detail-inner">
-      <header class="period-detail-top"><button type="button" data-plan-close>← Goals</button>${partner() ? '' : '<button type="button" class="primary" data-plan-edit>Edit goal</button>'}</header>
+      <header class="period-detail-top"><button type="button" data-plan-close aria-label="Close goal details">${uiIcon('close')}</button>${partner() ? '' : '<button type="button" class="primary" data-plan-edit>Edit goal</button>'}</header>
       <p class="period-detail-meta">${escape(areaOf(goal))}${goal.period ? ' · '+escape(labelOf(goal.type,goal.period)) : ''}</p>
       <h2 id="period-detail-title">${escape(goal.title)}</h2>
       <p class="period-detail-status"><span class="goal-dot" data-status="${statusOf(goal)}" aria-hidden="true"></span>${({todo:'To do',progress:'In progress',done:'Done'})[statusOf(goal)]}</p>
@@ -86,7 +86,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     if (!active().some(g => g.id === id)) return;
     goalId = id;
     renderDetail();
-    if (!detail.open) detail.showModal();
+    if (!detail.open) detail.show();root.classList.add('has-goal-inspector');root.querySelectorAll('[data-plan-goal]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.planGoal===id)));
     detail.querySelector('[data-plan-close]')?.focus();
   }
 
@@ -127,8 +127,7 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     } else if (planArea !== undefined) {
       area = planArea;
       render();
-      window.scrollTo(0,0);
-      root.querySelector(area ? '[data-plan-area=""]' : '[data-plan-mode][aria-pressed=true]')?.focus();
+      [...root.querySelectorAll('[data-plan-area]')].find(button=>button.dataset.planArea===area)?.focus({preventScroll:true});
     } else if (planGoal) showGoal(planGoal);
     else if (planAdd && !partner()) open('',planAdd,{period:period(planAdd),category:button.dataset.area || ''});
   });
@@ -142,6 +141,8 @@ export function createPeriodGoals({root, detail, getData, open, openTask, create
     },{once:true});
   }
 
+  detail.addEventListener('close',()=>{root.classList.remove('has-goal-inspector');root.querySelectorAll('[data-plan-goal]').forEach(button=>button.setAttribute('aria-pressed','false'));(root.querySelector(`[data-plan-goal="${goalId}"]`)||root.querySelector('.goal-area-navigation [aria-pressed=true]'))?.focus({preventScroll:true});});
+  detail.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();detail.close();}});
   detail.addEventListener('click',async event => {
     const button = event.target.closest('button');
     if (!button) return;
