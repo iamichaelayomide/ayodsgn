@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {opportunityOverview} from '../life/dashboard.js';
+const rows=[{id:'a',pipeline:'career',stage:'sent'},{id:'b',pipeline:'nysc',stage:'researched'}];
+const messages=[{id:'1',messageId:'same',opportunityId:'a',direction:'sent',occurredAt:'2026-11-21T10:00:00Z'},{id:'2',messageId:'same',opportunityId:'a',direction:'sent',occurredAt:'2026-11-21T10:00:00Z'},{id:'3',opportunityId:'b',direction:'received',occurredAt:'2026-11-20T10:00:00Z'},{id:'4',opportunityId:'a',direction:'scheduled',occurredAt:'2026-11-21T10:00:00Z'},{id:'5',opportunityId:'a',direction:'sent',occurredAt:'invalid'},{id:'6',opportunityId:'a',direction:'sent',occurredAt:'2026-10-01T10:00:00Z'},{id:'7',opportunityId:'unknown',direction:'sent',occurredAt:'2026-11-21T10:00:00Z'}];
+const model=opportunityOverview(rows,messages,'2026-11-21',o=>o.pipeline,{career:'Career',nysc:'NYSC'});
+assert.equal(model.weeks.reduce((n,w)=>n+w.sent,0),1,'Deduplicate sent emails and ignore scheduled/out-of-range/invalid records');
+assert.equal(model.weeks.reduce((n,w)=>n+w.received,0),1);
+assert.equal(model.pipelines.reduce((n,p)=>n+p.count,0),2);
+assert.equal(model.weeks[0].start,'2026-10-25');assert.equal(model.weeks.at(-1).end,'2026-11-21');
+const filtered=opportunityOverview(rows.slice(0,1),messages,'2026-11-21',o=>o.pipeline,{career:'Career',nysc:'NYSC'});
+assert.equal(filtered.weeks.reduce((n,w)=>n+w.received,0),0,'Respect pipeline scope');
+assert.deepEqual(opportunityOverview([],[],'2026-11-21',o=>o.pipeline,{}).pipelines,[]);
+console.log('Dashboard activity, deduplication, dates and pipeline totals passed');

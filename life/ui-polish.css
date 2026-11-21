@@ -44,7 +44,7 @@
 /* Consistent disclosure affordance, preserving native keyboard/expanded semantics. */
 :where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary{position:relative;list-style:none;padding-right:30px;cursor:pointer}
 :where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary::-webkit-details-marker{display:none}
-:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary::after{content:'';position:absolute;right:4px;top:.75em;width:16px;height:16px;background:url('./icons/chevron-down.svg') center/contain no-repeat;opacity:.6;transform:translateY(-50%)}
+:where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)>summary::after{content:'';position:absolute;right:4px;top:.75em;width:16px;height:16px;background:url('./icons/chevron-down.svg?v=ios1') center/contain no-repeat;opacity:.6;transform:translateY(-50%)}
 :where(.workspace,dialog) details:not(.nav-group):not(.sidebar-tools):not(.ayo-agent-run):not(.board-options):not(.board-filter-options)[open]>summary::after{transform:translateY(-50%) rotate(180deg)}
 :where(.workspace,dialog) summary:focus-visible{outline:2px solid #829be0;outline-offset:4px;border-radius:5px}
 .ayo-mail-row>summary::after{top:26px!important;right:8px!important}

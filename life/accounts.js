@@ -5,7 +5,7 @@ export function createAccountSettings({request}) {
  const syncGoogle=()=>{googleButton.disabled=loginButton.disabled=googleBusy||!session?.googleReady||!policyAccepted();};
  const googleActions=document.querySelector('#google-auth-actions'),googleButton=document.querySelector('#google-signup'),loginButton=document.querySelector('#google-login'),authForm=document.querySelector('#auth-form');
  const ownerRecovery=new URLSearchParams(location.search).get('owner-access')==='1';authForm.hidden=!ownerRecovery;document.querySelector('#partner-login').hidden=true;
- const settingsButton=document.createElement('button');settingsButton.type='button';settingsButton.className='account-settings-trigger';settingsButton.setAttribute('aria-label','Connections');settingsButton.title='Connections';settingsButton.innerHTML='<img class="nav-icon" src="./icons/link.svg" alt=""><span class="nav-label">Connections</span>';settingsButton.hidden=true;document.querySelector('#logout').before(settingsButton);
+ const settingsButton=document.createElement('button');settingsButton.type='button';settingsButton.className='account-settings-trigger';settingsButton.setAttribute('aria-label','Connections');settingsButton.title='Connections';settingsButton.innerHTML='<img class="nav-icon" src="./icons/link.svg?v=ios1" alt=""><span class="nav-label">Connections</span>';settingsButton.hidden=true;document.querySelector('#logout').before(settingsButton);
  const dialog=document.createElement('dialog');
  dialog.className='account-settings';
  dialog.setAttribute('aria-labelledby','account-settings-title');

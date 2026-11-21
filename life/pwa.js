@@ -27,7 +27,7 @@ export function installationInstructions(userAgent=navigator.userAgent){
 export function installPWA({isBusy=()=>false}={}){
  let installEvent,waiting,updating=false,reloadRequested=false;
  const installed=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
- const icon='<img class="nav-icon" src="/life/icons/install.svg" alt="">';
+ const icon='<img class="nav-icon" src="/life/icons/install.svg?v=ios1" alt="">';
  const buttons=[];
  const sidebar=document.createElement('button');sidebar.type='button';sidebar.className='pwa-install-trigger';sidebar.innerHTML=icon+'<span class="nav-label">Install Life</span>';document.querySelector('#logout')?.before(sidebar);buttons.push(sidebar);
  const dialog=document.createElement('dialog');dialog.id='life-install-dialog';dialog.setAttribute('aria-labelledby','life-install-title');dialog.innerHTML='<div class="dialog-heading"><h2 id="life-install-title">Life on your phone</h2><button type="button" aria-label="Close install instructions">×</button></div><p>Open Life from your Home Screen, in its own app window.</p><ol></ol><p class="fine-print">An internet connection is needed for your planner and AI.</p>';document.body.append(dialog);dialog.querySelector('[aria-label]').onclick=()=>dialog.close();

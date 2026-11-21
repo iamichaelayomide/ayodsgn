@@ -2,7 +2,7 @@ import {plannerTimezone} from './accounts.js?v=1';
 // Quill 2.0.3 is vendored locally; only a small, safe Delta format is persisted.
 export function installTaskEditor({request,refreshSelects}) {
  const form=document.getElementById('task-form'),notes=form.elements.notes,description=notes.closest('label');
- const icon=(name)=>`<img class="action-icon" src="./icons/${name}.svg" alt="">`;
+ const icon=(name)=>`<img class="action-icon" src="./icons/${name}.svg?v=ios1" alt="">`;
  const box=document.createElement('div');box.className='description-editor';
  box.innerHTML='<div class="description-format" role="toolbar" aria-label="Description formatting"></div><div class="description-content"></div>';
  description.append(box);notes.hidden=true;

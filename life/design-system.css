@@ -165,3 +165,155 @@ dialog .dialog-actions button{min-height:44px;border-radius:10px;margin:0}
  .workspace .topbar{background:#fff;backdrop-filter:none}
  .workspace button.primary,dialog button.primary,#goals .period-add{border-color:#174ca8}
 }
+
+/* Dashboard craft: grouped metrics, evidence-based charts, and a quiet list. */
+.ui-icon{display:block;width:20px;height:20px;flex:none;stroke-width:32px}
+button:has(>.ui-icon:only-child){display:grid;place-items:center;padding:10px}
+.select-trigger::after{width:16px;height:16px;flex-basis:16px;border:0;background:url('./icons/chevron-down.svg?v=ios1') center/16px no-repeat;transform:none;margin:0;opacity:.65}
+.select-trigger[aria-expanded=true]::after{transform:rotate(180deg)}
+.select-option[aria-selected=true]{background:#edf3ff;color:#205bc1}
+.select-menu{padding:5px;border-radius:12px}
+#ayo-os{--chart-blue:#296ff0;--chart-grey:#a9bad8;--chart-track:#eef0f5;--chart-ink:#303038}
+#ayo-os .ayo-toolbar{margin-bottom:20px}
+#ayo-os .ayo-main-tabs{display:flex;background:#e9e9ef;padding:3px;border-radius:11px;gap:2px}
+#ayo-os .ayo-main-tabs button{border:0;background:transparent;min-height:36px;padding:8px 14px;border-radius:8px;font-size:13px;white-space:nowrap}
+#ayo-os .ayo-main-tabs button[aria-pressed=true]{background:#fff;color:var(--text);box-shadow:0 1px 3px #00000012}
+#ayo-os .ayo-summary{gap:0;padding:6px;background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:16px}
+#ayo-os .ayo-summary button{border:0;border-right:1px solid #ededf2;border-radius:0;box-shadow:none;background:transparent;padding:14px 18px;gap:10px}
+#ayo-os .ayo-summary button:last-child{border-right:0}
+#ayo-os .ayo-summary button[aria-pressed=true]{background:#f0f5ff;border-radius:10px;box-shadow:inset 0 0 0 1px #dce7fc}
+#ayo-os .ayo-summary button>span{display:flex;align-items:center;justify-content:space-between;width:100%;font-size:13px;color:#60606b}
+#ayo-os .ayo-summary .ayo-icon{width:18px;height:18px;opacity:.6}
+#ayo-os .ayo-summary strong{font:600 30px/1.15 var(--sans);letter-spacing:-.025em;font-variant-numeric:tabular-nums;color:var(--text)}
+.opportunity-insights{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;margin-bottom:24px}
+.insight-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px;min-width:0}
+.insight-card>header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
+.insight-card h2{font:600 15px/1.4 var(--sans);letter-spacing:-.01em;margin:0;color:var(--text)}
+.insight-card header>span{font-size:11px;color:var(--muted)}
+.activity-chart{height:142px;display:grid;grid-template-columns:22px repeat(4,minmax(0,1fr));gap:16px;padding-top:8px}
+.chart-scale{display:flex;flex-direction:column;justify-content:space-between;font-size:10px;color:var(--muted);padding-bottom:24px}
+.activity-week{position:relative;min-width:0;outline-offset:4px;border-radius:4px}
+.activity-columns{height:116px;display:flex;align-items:flex-end;justify-content:center;gap:6px;border-bottom:1px solid var(--line);background:repeating-linear-gradient(to top,transparent 0,transparent 37px,#f1f2f6 38px,transparent 39px)}
+.activity-bar{width:26px;max-width:36%;height:max(2px,var(--bar));background:var(--chart-blue);border-radius:5px 5px 0 0;position:relative}
+.activity-bar.received{background:var(--chart-grey)}
+.activity-bar>span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font:500 10px var(--sans);color:var(--chart-ink);padding-bottom:3px}
+.activity-week-label{display:block;text-align:center;font-size:10px;color:var(--muted);margin-top:8px;white-space:nowrap}
+.chart-legend{display:flex;justify-content:flex-end;gap:16px;font-size:11px;color:var(--muted);margin-top:12px}
+.chart-legend>span{display:flex;gap:6px;align-items:center}
+.chart-legend i{width:7px;height:7px;border-radius:2px;background:var(--chart-blue)}
+.chart-legend i.received{background:var(--chart-grey)}
+.pipeline-bars{display:grid;gap:10px;max-height:174px;overflow:auto;overscroll-behavior:contain}
+#ayo-os .pipeline-bars button{display:grid;grid-template-columns:1fr auto;gap:7px;padding:0 0 5px;border:0;background:transparent;text-align:left;min-height:33px;font-size:12px;border-radius:4px}
+.pipeline-bars strong{font-weight:550;font-variant-numeric:tabular-nums}
+.pipeline-track{grid-column:1/-1;height:5px;border-radius:4px;background:var(--chart-track);overflow:hidden}
+.pipeline-track i{height:100%;display:block;border-radius:4px;background:#8caeea;min-width:2px}
+.chart-no-data{min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:13px;text-align:center;margin:0}
+.chart-no-data img{width:28px;height:28px;opacity:.4}.chart-no-data p{margin:0}
+#ayo-os .ayo-list-tools{gap:16px;margin-bottom:14px;align-items:center}
+#ayo-os .ayo-filters{gap:3px;flex-wrap:wrap;overflow:visible}
+#ayo-os .ayo-filters button{min-height:34px;font-size:12px;padding:6px 11px;border-radius:8px}
+#ayo-os .ayo-filters button[aria-pressed=true]{background:#e6edfb;color:#235ebf}
+#ayo-os .ayo-search{border:1px solid var(--line);border-radius:10px;background:#fff;min-height:40px;padding:0 11px;flex:0 1 260px;gap:8px}
+#ayo-os .ayo-search input{border:0!important;box-shadow:none!important;background:transparent!important;min-height:38px;padding:8px 0;border-radius:0;font-size:12px}
+#ayo-os .ayo-search .ayo-icon{width:17px;height:17px}
+#ayo-os .ayo-list-summary{font-size:12px;margin:16px 0 10px;color:var(--muted)}
+#ayo-os .ayo-table-shell{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+#ayo-os .ayo-table-head{padding:11px 18px;background:#fafafc;border-bottom:1px solid var(--line);font-size:11px;color:#6b6b75}
+#ayo-os .ayo-row,#ayo-os .ayo-table-head{grid-template-columns:34px minmax(160px,2.4fr) minmax(75px,.8fr) minmax(95px,.9fr) minmax(65px,.6fr);gap:12px;align-items:center}
+#ayo-os .ayo-table-head>span:first-child{grid-column:1/3}
+#ayo-os .ayo-table-head>span:last-child{display:none}
+#ayo-os .ayo-opportunity-list{border:0;border-radius:0}
+#ayo-os .ayo-row{padding:14px 18px;min-height:74px;border-radius:0;border-bottom-color:#eeeeF3;position:relative}
+#ayo-os .ayo-row-company>strong{font-size:13px;font-weight:600;color:var(--text);line-height:1.4}
+#ayo-os .ayo-row-company>span{font-size:12px;color:var(--muted);line-height:1.5;overflow-wrap:anywhere}
+#ayo-os .ayo-company-avatar{display:grid;place-items:center;width:32px;height:32px;background:#f0f2f7;border:1px solid #e7e9f1;border-radius:9px;font-size:10px;font-weight:600;letter-spacing:.02em;color:#606a80}
+#ayo-os .ayo-pipeline,#ayo-os .ayo-row-date{font-size:12px;color:var(--muted)}
+#ayo-os .ayo-row-date{display:block;font-variant-numeric:tabular-nums}
+#ayo-os .ayo-badge{font-size:10px;font-weight:500;padding:4px 7px;border-radius:6px;white-space:normal}
+#ayo-os .ayo-row:focus-visible{outline:2px solid var(--blue);outline-offset:-3px;z-index:1}
+/* Forms have one clear path, with optional information disclosed in place. */
+#goal-dialog{width:min(520px,calc(100vw - 24px));padding:0;max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain}
+#goal-form{padding:22px 24px 0;display:grid;gap:18px}
+#goal-form .dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0}
+#goal-form .dialog-heading h2{margin:0}
+#goal-form label{margin:0;font-size:13px;font-weight:550}
+#goal-form label>input,#goal-form label>textarea,#goal-form label>.select-control{margin-top:7px}
+#goal-form .field-row{margin:0;gap:14px}
+#goal-form .goal-form-details{margin:0;border-top:1px solid var(--line);padding-top:12px}
+#goal-form .goal-form-details summary{font-size:13px;margin:0 0 10px;color:var(--muted)}
+#goal-form .goal-form-details label{margin:14px 0}
+#goal-form .dialog-actions{position:sticky;bottom:0;margin:0 -24px;padding:14px 24px;background:#fffffff5;border-top:1px solid var(--line);z-index:2}
+#goal-form #goal-error:empty{display:none}
+.goal-area-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+#goal-form .goal-area-suggestions button{min-height:30px;padding:5px 9px;border:1px solid #e7e8ed;background:#f7f7fa;border-radius:7px;font-size:11px;font-weight:400}
+#goal-form .goal-area-suggestions button[aria-pressed=true]{border-color:#c6d7f9;background:#edf3ff;color:#205bc1}
+.goal-choice-dialog{width:min(360px,calc(100vw - 24px));padding:20px;border-radius:18px}
+.goal-choice-dialog .dialog-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.goal-choice-dialog .dialog-heading h2{font-size:18px;margin:0}
+.goal-choice-dialog .goal-choice-year{margin:0 0 14px;gap:12px}
+.goal-choice-dialog .goal-choice-year button{width:36px;height:36px;min-height:36px;border:0;background:#f4f4f7;border-radius:50%}
+.goal-choice-dialog .goal-choice-year strong{font-size:15px;font-weight:600}
+.goal-choice-dialog .goal-choice-grid{gap:7px}
+.goal-choice-dialog .goal-choice-grid button{min-height:44px;padding:10px 7px;border:1px solid #e6e7ec;background:#fafafc;border-radius:9px;font-size:13px}
+.goal-choice-dialog .goal-choice-grid button[aria-pressed=true]{background:#eaf1ff;border-color:#bed1fb;color:#205bc1;box-shadow:inset 0 0 0 1px #d4e1fc}
+.ayo-editor .ayo-form-close{position:absolute;right:20px;top:18px;width:34px;height:34px;min-height:34px;background:#f1f1f5;border:0;border-radius:50%;padding:0;font-size:22px;color:#65656e}
+.ayo-editor form>h2{padding-right:40px;font:600 20px/1.35 var(--sans);letter-spacing:-.02em}
+.ayo-editor .ayo-form-fields{gap:16px}
+.ayo-editor .ayo-form-fields label{font-size:13px;font-weight:550;line-height:1.4}
+.ayo-editor .ayo-form-fields :is(input,textarea,select){margin-top:7px;border-color:var(--line);border-radius:9px;font-weight:400}
+.ayo-editor .ayo-form-fields select,dialog select:not([hidden]){appearance:none;background-image:url('./icons/chevron-down.svg?v=ios1');background-size:16px;background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.ayo-editor form>footer.ayo-actions{background:#fffffff5;border-top:1px solid var(--line);gap:8px}
+.ayo-editor .ayo-form-pair{gap:14px}
+@media(hover:hover) and (pointer:fine){#ayo-os .ayo-row:hover{background:#f7f9fd}#ayo-os .pipeline-bars button:hover{color:#205bc1}.goal-area-suggestions button:hover{background:#eaf1ff}}
+@media(max-width:1050px){
+ #ayo-os .ayo-row,#ayo-os .ayo-table-head{grid-template-columns:32px minmax(120px,2fr) 90px 90px}
+ #ayo-os .ayo-row-date,#ayo-os .ayo-table-head>span:nth-child(4){display:none}
+ .opportunity-insights{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+}
+@media(max-width:650px){
+ #ayo-os .ayo-summary{grid-template-columns:repeat(2,minmax(0,1fr));border-radius:14px;padding:4px;margin-bottom:12px}
+ #ayo-os .ayo-summary button{padding:12px;border-bottom:1px solid #ededf2}
+ #ayo-os .ayo-summary button:nth-child(2){border-right:0}#ayo-os .ayo-summary button:nth-child(n+3){border-bottom:0}
+ #ayo-os .ayo-summary strong{font-size:27px}#ayo-os .ayo-summary button>span{font-size:12px}
+ .opportunity-insights{grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:18px}
+ .insight-card{padding:16px}.insight-card>header{margin-bottom:16px}.insight-card h2{font-size:14px}
+ .activity-chart{gap:10px}.pipeline-bars{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px;max-height:none}
+ #ayo-os .ayo-main-tabs{width:calc(100% - 44px);min-width:0}#ayo-os .ayo-main-tabs button{padding:8px 7px;font-size:11px;flex:1}
+ #ayo-os .ayo-list-tools{gap:10px}#ayo-os .ayo-filters{width:100%;gap:3px}#ayo-os .ayo-filters button{font-size:11px;padding:7px 9px;min-height:36px}
+ #ayo-os .ayo-search{flex:1 1 100%;min-height:44px}#ayo-os .ayo-search input{font-size:16px}
+ #ayo-os .ayo-table-head{display:none}
+ #ayo-os .ayo-row{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;padding:14px;min-height:80px}
+ #ayo-os .ayo-company-avatar{display:none}#ayo-os .ayo-row-company{grid-column:1;grid-row:1/3}
+ #ayo-os .ayo-row>.ayo-pipeline{display:block;grid-column:2;grid-row:1;font-size:10px;text-align:right}
+ #ayo-os .ayo-row>span:nth-child(4){grid-column:2;grid-row:2;text-align:right;max-width:100px}
+ #ayo-os .ayo-row .ayo-badge{font-size:10px}#ayo-os .ayo-row-company>span{font-size:12px}
+ #goal-form{padding:18px 16px 0;gap:16px}#goal-form .dialog-actions{margin-inline:-16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:1fr 1fr}
+ #goal-form .field-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+ #goal-form input,#goal-form textarea,#goal-form .select-trigger{font-size:16px}
+ #goal-form .goal-area-suggestions button{min-height:36px;font-size:12px}
+ .ayo-editor .ayo-form-fields :is(input,textarea,select){font-size:16px}
+}
+@media(forced-colors:active){.activity-bar,.pipeline-track i{background:Highlight}.activity-bar.received{background:GrayText}}
+.analytics-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;background:#fff;padding:6px;margin:20px 0 16px}
+.analytics-metrics>div{display:grid;gap:10px;padding:14px 18px;border-right:1px solid var(--line)}.analytics-metrics>div:last-child{border:0}
+.analytics-metrics span{font-size:12px;color:var(--muted)}.analytics-metrics strong{font-size:28px;line-height:1.2;letter-spacing:-.025em;font-weight:600;font-variant-numeric:tabular-nums}
+.analytics-bars{display:grid;gap:16px;min-height:140px;align-content:start}.analytics-bars>div{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:12px}
+.analytics-bars strong{font-weight:500;font-variant-numeric:tabular-nums}.analytics-bar-track,.analytics-bars meter{grid-column:1/-1;width:100%;height:8px;background:#eef0f5;border-radius:5px;overflow:hidden;border:0}
+.analytics-bar-track i{display:block;height:100%;background:#8caeea;border-radius:5px}.analytics-bar-track i.complete{background:#558a76}
+.analytics-bars meter::-webkit-meter-bar{background:#eef0f5;border:0;height:8px}.analytics-bars meter::-webkit-meter-optimum-value{background:#558a76;border-radius:5px}
+.analytics-section-title{font-size:16px;font-weight:600;margin:24px 0 14px}
+#analytics .analytics-goals{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#analytics .analytics-goals article{border-color:var(--line);border-radius:14px;padding:18px}#analytics .analytics-goals p{font-size:12px;line-height:1.5}
+#analytics .analytics-period{background:#eaeaf0;padding:3px;border-radius:10px;width:fit-content;gap:2px}#analytics .analytics-period button{border:0;background:transparent;min-height:36px;font-size:12px}#analytics .analytics-period button[aria-pressed=true]{background:#fff;box-shadow:0 1px 3px #00000012;color:var(--text)}
+@media(max-width:650px){.analytics-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.analytics-metrics>div{padding:12px}.analytics-metrics>div:nth-child(2){border-right:0}.analytics-metrics>div:nth-child(-n+2){border-bottom:1px solid var(--line)}#analytics .analytics-goals{grid-template-columns:1fr}}
+#analytics .analytics-section-title{font:600 16px/1.4 var(--sans)}
+.activity-bar{height:var(--bar)}
+.period-area-header h3 button{display:inline-flex;align-items:center;gap:6px}.period-area-header h3 button .ui-icon{width:14px;height:14px}
+@media(prefers-reduced-motion:reduce){.workspace,.sidebar{transition:none!important}}
+@media(max-width:650px){
+ #ayo-os .ayo-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 32px;gap:8px;align-items:center}
+ #ayo-os .ayo-main-tabs{width:100%;min-width:0;flex-wrap:nowrap}
+ #ayo-os .ayo-main-tabs button{min-width:0;padding:8px 5px;letter-spacing:-.015em}
+ #ayo-os .ayo-settings{width:32px;min-width:32px;padding:6px;border:0}
+ #ayo-os .ayo-row-company>span{white-space:normal;overflow:visible;text-overflow:clip}
+}
+@media(max-width:360px){#ayo-os .ayo-main-tabs button{font-size:10px}}
