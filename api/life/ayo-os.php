@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/applications.php';
 /** Private outreach workspace. This model never performs external actions. */
 final class LifeAyoOS {
- public const PIPELINES=['nysc','freelance','career','ai-testing'];
+ public const PIPELINES=['nysc','freelance','career','ai-testing','fellowships','grants','education'];
  public const STAGES=['researched','ready','drafted','replied','conversation','offer','won','closed','sent','submitted','scheduled','bounced','pending','accepted','not-accepted','paused','incomplete'];
  public function __construct(public LifeStore $store){$store->db->exec(file_get_contents(__DIR__.'/migrations/ayo-os.sql'));new LifeApplications($store);}
  public static function requireWorkspace(array $input,int $tenantId):void{if(($input['workspaceId']??null)!==$tenantId)throw new LifeError('Your account changed. Reload Ayo OS before saving.',409);}
@@ -71,7 +71,7 @@ final class LifeAyoOS {
     }
     if($type==='opportunities'){
      if($old&&$r['companyId']!==$old['companyId'])throw new LifeError('Create an opportunity at the other company instead.');
-     $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',array_merge(self::PIPELINES,array_column($s['pipelines'],'id')));$r['stage']=self::choice($args['stage']??$r['stage']??'researched',array_merge(self::STAGES,array_column($s['statuses'],'id')));$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
+     $r['pipeline']=self::choice($args['pipeline']??$r['pipeline']??'',array_merge(self::PIPELINES,array_column($s['pipelines'],'id')));$r['stage']=self::choice($args['stage']??$r['stage']??'researched',array_merge(self::STAGES,array_column($s['statuses'],'id')));if(array_key_exists('stageExplicit',$args))$r['stageExplicit']=$args['stageExplicit']===true;$r['followUpDate']=LifeApplications::date($args['followUpDate']??$r['followUpDate']??'');
 
 
     }
