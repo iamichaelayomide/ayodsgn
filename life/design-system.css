@@ -317,3 +317,80 @@ button:has(>.ui-icon:only-child){display:grid;place-items:center;padding:10px}
  #ayo-os .ayo-row-company>span{white-space:normal;overflow:visible;text-overflow:clip}
 }
 @media(max-width:360px){#ayo-os .ayo-main-tabs button{font-size:10px}}
+/* Reference study: layered utility surfaces and compact, directly editable records. */
+:root{--paper:#fafafa;--line:#e8e8e9;--surface-radius:18px}
+.workspace .sidebar{border-radius:0;background:#f7f7f7;border-width:0 1px 0 0;box-shadow:none}
+.workspace .workspace-badge{background:#fff;border-radius:12px;box-shadow:0 2px 3px #00000003}
+.workspace .topbar{background:#ffffffed}
+#ayo-os .ayo-toolbar{justify-content:flex-end;margin:0 0 20px;gap:12px}
+#ayo-os .document-bank-link{display:flex;align-items:center;gap:9px;text-decoration:none;color:#36363b;background:#fff;border:1px solid var(--line);padding:9px 12px;border-radius:11px;box-shadow:0 2px 2px #00000003;font-size:12px}
+#ayo-os .document-bank-link small{color:#89898e;border-left:1px solid var(--line);padding-left:10px;font-size:11px}
+#ayo-os .opportunity-spaces{display:flex;gap:5px;overflow-x:auto;padding:5px;background:#f1f1f2;border:1px solid #e9e9eb;border-radius:14px;margin-bottom:25px;scrollbar-width:thin}
+#ayo-os .opportunity-spaces button{border:1px solid transparent;background:transparent;display:flex;align-items:center;gap:7px;padding:10px 12px;flex:1;white-space:nowrap;font-size:12px;color:#727277;border-radius:10px;min-height:42px}
+#ayo-os .opportunity-spaces button[aria-pressed=true]{background:#fff;color:#202024;border-color:#e5e5e7;box-shadow:0 2px 3px #00000008}
+#ayo-os .opportunity-spaces .ayo-icon{width:17px;height:17px;opacity:.65}
+#ayo-os .opportunity-spaces small{font-size:10px;color:#85858b;background:#e8e8eb;border-radius:5px;padding:2px 5px;margin-left:auto;font-variant-numeric:tabular-nums}
+#ayo-os .opportunity-scope-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 22px}
+#ayo-os .opportunity-scope-heading h2{font-size:23px;letter-spacing:-.6px;margin:0 0 5px;font-weight:600}
+#ayo-os .opportunity-scope-heading p{font-size:12px;color:#85858b;margin:0}
+#ayo-os .opportunity-scope-heading button{font-size:12px;min-height:38px;padding:9px 14px}
+#ayo-os .ayo-summary{gap:14px;background:none;padding:0;border:0;box-shadow:none;border-radius:0}
+#ayo-os .ayo-summary>button{border:1px solid #e4e4e6;background:#fff;border-radius:16px;padding:0;overflow:hidden;text-align:left;box-shadow:0 2px 3px #00000004}
+#ayo-os .ayo-summary>button>span{display:flex;align-items:center;padding:13px 16px;border-bottom:1px solid #e9e9eb;background:#fafafa;font-size:12px;color:#5e5e65}
+#ayo-os .ayo-summary>button>strong{display:block;padding:14px 17px 18px;font-size:32px;font-weight:600;letter-spacing:-1px}
+#ayo-os .ayo-summary .ayo-icon{background:#eaf1ff;border:1px solid #dce7fd;padding:5px;box-sizing:content-box;border-radius:8px;width:17px;height:17px;opacity:.85}
+#ayo-os .ayo-summary>button[aria-pressed=true]{border-color:#b9cdef;background:white;box-shadow:0 0 0 2px #eaf1ff}
+#ayo-os .opportunity-insights{gap:16px;margin:20px 0 24px;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+#ayo-os .insight-card{background:#fff;border:1px solid #e4e4e6;box-shadow:0 2px 3px #00000004;border-radius:18px;padding:20px;min-width:0}
+#ayo-os .insight-card header{align-items:center;margin-bottom:15px}
+#ayo-os .insight-card h2{font-size:15px;font-weight:600;margin:5px 0 0;letter-spacing:-.25px}
+#ayo-os .chart-eyebrow{font:9px ui-monospace,SFMono-Regular,monospace;letter-spacing:1px;color:#98989f}
+#ayo-os .chart-period{font-size:10px;background:#fafafa;border:1px solid #ececee;padding:6px 8px;border-radius:7px;color:#808087}
+#ayo-os .chart-headline{display:flex;align-items:center;gap:12px;margin:5px 0 20px}
+#ayo-os .chart-headline>strong{font-size:34px;letter-spacing:-1px;font-weight:600}
+#ayo-os .chart-headline>span{color:#85858d;font-size:11px}
+#ayo-os .chart-legend{justify-content:flex-start;font-size:10px;gap:13px;margin:5px 0 0}
+#ayo-os .chart-legend i.sent{background:#2d78f5}#ayo-os .chart-legend i.received{background:#ff9c33}
+#ayo-os .activity-chart{height:165px;margin:0;padding-top:0;background:repeating-linear-gradient(to top,transparent 0,transparent 44px,#f0f0f2 44px,#f0f0f2 45px);gap:13px}
+#ayo-os .activity-columns{display:flex;justify-content:center;height:130px;gap:7px;border:0;background:none;padding:0 4px}
+#ayo-os .activity-track{position:relative;width:27px;height:100%;border-radius:8px;background:linear-gradient(#fafafa,#f4f4f5);border:1px solid #eeeef0}
+#ayo-os .activity-bar{position:absolute;bottom:0;left:-1px;right:-1px;width:auto;height:var(--bar);min-height:0;border-radius:8px;background:linear-gradient(100deg,#438bff,#246aea);box-shadow:inset 1px 1px 2px #ffffff55,0 1px 2px #1d6ce91a}
+#ayo-os .activity-bar.received{background:linear-gradient(100deg,#ffb45b,#fa921e)}
+#ayo-os .activity-bar>span{top:-20px;font:10px ui-monospace,SFMono-Regular,monospace;color:#64646d}
+#ayo-os .activity-week-label{font:10px ui-monospace,SFMono-Regular,monospace;color:#8e8e94;margin-top:10px}
+#ayo-os .activity-week{position:relative;outline-offset:4px;border-radius:8px}
+#ayo-os .chart-tooltip{display:none;position:absolute;bottom:35px;left:50%;transform:translateX(-50%);background:#252529;color:white;border:1px solid #404047;box-shadow:0 4px 12px #0002;padding:8px;border-radius:8px;white-space:nowrap;font-size:10px;z-index:2;pointer-events:none}
+#ayo-os .activity-week:is(:hover,:focus-visible) .chart-tooltip{display:block}
+#ayo-os .chart-empty-caption{font-size:11px;color:#8c8c94;margin-bottom:0}
+#ayo-os .segmented-overview{height:12px;display:flex;gap:4px;margin:26px 0 20px}
+#ayo-os .segmented-overview i{background:var(--segment);border-radius:5px;min-width:3px;box-shadow:inset 0 1px 2px #fff5}
+#ayo-os .pipeline-bars{display:grid;gap:13px;max-height:260px;overflow:auto}
+#ayo-os .pipeline-breakdown{display:grid;grid-template-columns:1fr auto;gap:7px;text-align:left;background:none;border:0;padding:0;color:#6e6e76;font-size:11px}
+#ayo-os .pipeline-breakdown strong{font:12px ui-monospace,SFMono-Regular,monospace;color:#3f3f46}
+#ayo-os .pipeline-breakdown small{font-size:10px;color:#a1a1a7;margin-left:12px}
+#ayo-os .pipeline-track{grid-column:1/-1;background:#f1f1f3;height:5px;border-radius:5px}
+#ayo-os .pipeline-track i{background:var(--segment);border-radius:5px}
+#ayo-os .ayo-list-tools{justify-content:flex-end;margin:0}
+#ayo-os .ayo-row,#ayo-os .ayo-table-head{display:grid;grid-template-columns:minmax(140px,2.5fr) minmax(70px,.7fr) minmax(115px,1fr) minmax(65px,.6fr);gap:15px}
+#ayo-os .ayo-table-head>span:first-child{grid-column:auto}
+#ayo-os .ayo-row{background:#fff;border:0;border-bottom:1px solid #efeff0;min-height:73px;padding:12px 17px}
+#ayo-os .ayo-company-open{display:flex;align-items:center;gap:12px;min-width:0;padding:0;border:0;background:none;text-align:left;color:inherit;box-shadow:none}
+#ayo-os .ayo-row-company{display:flex;flex-direction:column;gap:4px;min-width:0;grid-column:auto;grid-row:auto}
+#ayo-os .ayo-company-avatar{flex-shrink:0;background:linear-gradient(#f7f7fa,#efeff4);box-shadow:inset 0 1px 0 white;color:#858594}
+#ayo-os .inline-status{display:block;min-width:0;--status-color:#697485;--status-bg:#f1f3f6}
+#ayo-os .inline-status[data-status=sent],#ayo-os .inline-status[data-status=submitted]{--status-color:#4873c9;--status-bg:#edf2ff}
+#ayo-os .inline-status[data-status=won],#ayo-os .inline-status[data-status=accepted]{--status-color:#299b6d;--status-bg:#eaf8f0}
+#ayo-os .inline-status[data-status=bounced]{--status-color:#bc6462;--status-bg:#fceeee}
+#ayo-os .inline-status .select-trigger{background:var(--status-bg);color:var(--status-color);border:1px solid transparent;border-radius:7px;min-height:29px;padding:5px 22px 5px 20px;font-size:10px;box-shadow:none;max-width:155px}
+#ayo-os .inline-status .select-trigger:before{content:'';position:absolute;left:9px;top:calc(50% - 2px);width:4px;height:4px;border-radius:50%;background:var(--status-color)}
+#ayo-os .inline-status .select-trigger:after{width:5px;height:5px;right:9px}
+#ayo-os .ayo-detail-status .inline-status{width:150px}
+#applications .application-document-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}
+#applications .application-document{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 3px #00000004}
+#applications .applications-view-heading h2{font-size:20px;letter-spacing:-.5px}
+@media(max-width:900px){#ayo-os .opportunity-insights{grid-template-columns:1fr}#ayo-os .opportunity-spaces button{flex:0 0 auto}#ayo-os .ayo-row-date,#ayo-os .ayo-table-head>span:nth-child(4){display:block}}
+@media(max-width:600px){#ayo-os .ayo-summary{gap:10px}#ayo-os .ayo-summary>button>span{padding:10px;font-size:11px}#ayo-os .ayo-summary>button>strong{padding:12px;font-size:27px}#ayo-os .ayo-toolbar{margin-bottom:15px}#ayo-os .document-bank-link small{display:none}#ayo-os .opportunity-scope-heading{align-items:flex-start}#ayo-os .opportunity-scope-heading p{max-width:210px;line-height:1.6}#ayo-os .opportunity-scope-heading button{font-size:0;min-width:36px}#ayo-os .opportunity-scope-heading button:after{content:'+';font-size:22px}#ayo-os .insight-card{padding:16px}#ayo-os .ayo-row{grid-template-columns:minmax(0,1fr) 110px;gap:10px;padding:13px}#ayo-os .ayo-company-open{grid-column:1;grid-row:1/3}#ayo-os .ayo-row>.ayo-pipeline{grid-column:2;grid-row:1;text-align:right;font-size:10px}#ayo-os .ayo-row .inline-status{grid-column:2;grid-row:2}#ayo-os .ayo-row-date{display:none}#ayo-os .ayo-row-company>strong{font-size:12px}#ayo-os .ayo-row-company>span{font-size:11px}#ayo-os .chart-tooltip{white-space:normal;min-width:110px}#ayo-os .activity-track{width:20px}#ayo-os .activity-columns{gap:4px}#ayo-os .ayo-search{flex:1}#ayo-os .ayo-list-summary>a{display:none}}
+#ayo-os h2,#ayo-os h3,#applications h2,#applications h3{font-family:var(--sans);font-style:normal}
+#ayo-os .inline-status .select-trigger{position:relative}
+#ayo-os .pipeline-bars{grid-template-columns:1fr}
+@media(max-width:600px){#ayo-os .ayo-table-head{display:none}}

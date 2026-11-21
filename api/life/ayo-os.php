@@ -3,7 +3,7 @@ declare(strict_types=1);
 require_once __DIR__.'/applications.php';
 /** Private outreach workspace. This model never performs external actions. */
 final class LifeAyoOS {
- public const PIPELINES=['nysc','freelance','career','ai-testing'];
+ public const PIPELINES=['nysc','freelance','career','ai-testing','fellowships','grants','education'];
  public const STAGES=['researched','ready','drafted','replied','conversation','offer','won','closed','sent','submitted','scheduled','bounced','pending','accepted','not-accepted','paused','incomplete'];
  public function __construct(public LifeStore $store){$store->db->exec(file_get_contents(__DIR__.'/migrations/ayo-os.sql'));new LifeApplications($store);}
  public static function requireWorkspace(array $input,int $tenantId):void{if(($input['workspaceId']??null)!==$tenantId)throw new LifeError('Your account changed. Reload Ayo OS before saving.',409);}

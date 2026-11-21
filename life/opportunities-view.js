@@ -1,5 +1,5 @@
 /** Presentation only: keep imported source titles and evidence unchanged. */
-export const pipelines={nysc:'NYSC',freelance:'Freelance',career:'Career','ai-testing':'AI testing'};
+export const pipelines={nysc:'NYSC',freelance:'Freelance',career:'Jobs',fellowships:'Fellowships',grants:'Grants',education:'Education','ai-testing':'AI testing'};
 export const stages={researched:'Researched',ready:'Ready',drafted:'Drafted',scheduled:'Scheduled',sent:'Sent',submitted:'Submitted',replied:'Replied',conversation:'In discussion',offer:'Offer',won:'Accepted',closed:'Closed',bounced:'Delivery failed',pending:'Pending',accepted:'Accepted','not-accepted':'Not accepted',paused:'Paused',incomplete:'Incomplete'};
 export function safeLink(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';}catch{return '';}}
 export function pipelineFor(o,c){return o.pipeline==='career'&&/^(Mercor|Taste(?: \/ TasteMakers)?|micro1)$/i.test(c?.name||'')?'ai-testing':o.pipeline;}
