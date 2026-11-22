@@ -5,6 +5,7 @@ require_once __DIR__.'/../life/accounts.php';
 /** Tab records never use personal LifeStore rows. Every write is versioned and audited. */
 final class TabTeam {
     const ICONS=['flag','research','people','design','build','launch','growth','check'];
+    const DEFAULT_ROADMAP_SECTION='roadmap-default';
     const STAGES=['backlog','ready','progress','review','done'];
     const ADMINS=['femo.arek@gmail.com','iamichaelayomide@gmail.com'];
     const SEED=['femo.arek@gmail.com','iamichaelayomide@gmail.com','arekeayomide@gmail.com','obayemibankole@gmail.com','akinloluwabanks2@gmail.com','adeoyegideon1@gmail.com'];
@@ -19,14 +20,21 @@ final class TabTeam {
         if($this->workspace!=='tab')throw new LifeError('Workspace unavailable.',404);
         $q=$this->db->prepare('SELECT id FROM tab_workspace WHERE id=?');$q->execute([$this->workspace]);if($q->fetchColumn())return;
         $this->db->beginTransaction();try {
-            $state=['name'=>'Tab','timezone'=>'Africa/Lagos','tasks'=>[],'goals'=>[],'milestones'=>[],'comments'=>[]];
-            for($i=0;$i<5;$i++)$state['milestones'][]=['id'=>LifeStore::id(),'title'=>'','description'=>'','icon'=>self::ICONS[$i],'owner'=>'','targetDate'=>'','position'=>$i,'archived'=>false];
+            $state=['name'=>'Tab','timezone'=>'Africa/Lagos','tasks'=>[],'goals'=>[],'milestones'=>[],'roadmapSections'=>[['id'=>self::DEFAULT_ROADMAP_SECTION,'title'=>'Milestones']],'comments'=>[]];
+            for($i=0;$i<5;$i++)$state['milestones'][]=['id'=>LifeStore::id(),'title'=>'','description'=>'','icon'=>self::ICONS[$i],'owner'=>'','targetDate'=>'','sectionId'=>self::DEFAULT_ROADMAP_SECTION,'position'=>$i,'archived'=>false];
             $this->db->prepare('INSERT INTO tab_workspace VALUES (?,1,?)')->execute([$this->workspace,json_encode($state,JSON_THROW_ON_ERROR)]);
             foreach(self::SEED as $email)$this->db->prepare('INSERT INTO tab_member VALUES (?,?,NULL,?,?,?, ?,0)')->execute([$this->workspace,$email,'',in_array($email,self::ADMINS,true)?'admin':'member','pending','']);
             $this->db->commit();
         }catch(Throwable $e){if($this->db->inTransaction())$this->db->rollBack();$q->execute([$this->workspace]);if(!$q->fetchColumn())throw $e;}
     }
-    private function row():array {$q=$this->db->prepare('SELECT * FROM tab_workspace WHERE id=?');$q->execute([$this->workspace]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new LifeError('Team unavailable.',404);return ['version'=>(int)$r['version'],'state'=>json_decode($r['state'],true,64,JSON_THROW_ON_ERROR)];}
+    private function row():array {$q=$this->db->prepare('SELECT * FROM tab_workspace WHERE id=?');$q->execute([$this->workspace]);$r=$q->fetch(PDO::FETCH_ASSOC);if(!$r)throw new LifeError('Team unavailable.',404);$state=json_decode($r['state'],true,64,JSON_THROW_ON_ERROR);
+        if (!isset($state['roadmapSections'])) {
+            $state['roadmapSections']=[['id'=>self::DEFAULT_ROADMAP_SECTION,'title'=>'Milestones']];
+            foreach ($state['milestones'] as &$milestone) $milestone['sectionId']=self::DEFAULT_ROADMAP_SECTION;
+            unset($milestone);
+        }
+        return ['version'=>(int)$r['version'],'state'=>$state];
+    }
     public function member(int $account):array {$q=$this->db->prepare("SELECT * FROM tab_member WHERE workspace=? AND account_id=? AND status='active'");$q->execute([$this->workspace,$account]);$m=$q->fetch(PDO::FETCH_ASSOC);if(!$m)throw new LifeError('You do not have access to Tab. Ask an admin for an invitation.',403);return $m;}
     private function members():array {$q=$this->db->prepare('SELECT email,name,role,status,account_id AS accountId,expires FROM tab_member WHERE workspace=? ORDER BY role,email');$q->execute([$this->workspace]);return $q->fetchAll(PDO::FETCH_ASSOC);}
     public function read(int $account):array {$me=$this->member($account);return $this->row()+['me'=>array_intersect_key($me,array_flip(['email','name','role'])),'members'=>$this->members()];}
@@ -69,8 +77,42 @@ final class TabTeam {
                 }else throw new LifeError('Unknown membership action.',404);
             }elseif($action==='comment.add'){
                 $kind=$a['kind']??'';if(!in_array($kind,['tasks','goals','milestones'],true))throw new LifeError('Choose an item to discuss.');$i=$this->index($s[$kind],$id);$title=$s[$kind][$i]['title']?:'Untitled milestone';if(count($s['comments'])>=10000)throw new LifeError('Comment limit reached.');$text=LifeStore::text($a['text']??'',6000,true);$s['comments'][]=['id'=>LifeStore::id(),'kind'=>$kind,'itemId'=>$id,'text'=>$text,'actor'=>$me['email'],'name'=>$me['name'],'createdAt'=>LifeStore::now()];$changes=['comment'=>$text];
+            }elseif($action==='section.save'){
+                $title=LifeStore::text($a['title']??'',200,true);
+                if ($id==='') {
+                    if (count($s['roadmapSections'])>=2000) throw new LifeError('Roadmap section limit reached.');
+                    $id=LifeStore::id();
+                    $s['roadmapSections'][]=['id'=>$id,'title'=>$title];
+                    $changes=['title'=>[null,$title]];
+                } else {
+                    $i=$this->index($s['roadmapSections'],$id);
+                    $oldTitle=$s['roadmapSections'][$i]['title'];
+                    $s['roadmapSections'][$i]['title']=$title;
+                    if ($oldTitle!==$title) $changes=['title'=>[$oldTitle,$title]];
+                }
             }elseif($action==='milestone.reorder'){
-                $ids=$a['ids']??[];$active=array_values(array_filter($s['milestones'],fn($r)=>!$r['archived']));$expected=array_column($active,'id');$sorted=$ids;sort($sorted);sort($expected);if($sorted!==$expected)throw new LifeError('Refresh the roadmap before reordering.',409);foreach($s['milestones'] as &$r)if(!$r['archived'])$r['position']=array_search($r['id'],$ids,true);unset($r);$title='Roadmap order';$id='roadmap';$changes=['order'=>$ids];
+                $sectionId=LifeStore::text($a['sectionId']??self::DEFAULT_ROADMAP_SECTION,32,true);
+                $section=$s['roadmapSections'][$this->index($s['roadmapSections'],$sectionId)];
+                $ids=$a['ids']??[];
+                if (!is_array($ids) || !array_is_list($ids) || $ids!==array_filter($ids,'is_string')) throw new LifeError('Choose valid roadmap steps.');
+                $steps=array_filter($s['milestones'],fn($step)=>$step['sectionId']===$sectionId);
+                uasort($steps,fn($a,$b)=>$a['position']<=>$b['position']);
+                $expected=array_column(array_filter($steps,fn($step)=>!$step['archived']),'id');
+                $sorted=$ids;
+                sort($sorted,SORT_STRING);
+                sort($expected,SORT_STRING);
+                if ($sorted!==$expected) throw new LifeError('Refresh this section before reordering.',409);
+
+                $indices=array_flip(array_column($s['milestones'],'id'));
+                $position=0;
+                $next=0;
+                foreach ($steps as $step) {
+                    $stepId=$step['archived']?$step['id']:$ids[$next++];
+                    $s['milestones'][$indices[$stepId]]['position']=$position++;
+                }
+                $title=$section['title'];
+                $id=$sectionId;
+                $changes=['order'=>$ids];
             }else {
                 $parts=explode('.',$action);$kind=['task'=>'tasks','goal'=>'goals','milestone'=>'milestones'][$parts[0]]??null;if(!$kind||!in_array($parts[1]??'',['save','archive','restore'],true))throw new LifeError('Unknown action.',404);
                 $existing=$id!=='';$i=$existing?$this->index($s[$kind],$id):count($s[$kind]);$old=$existing?$s[$kind][$i]:[];
@@ -101,7 +143,14 @@ final class TabTeam {
                         foreach($s['goals'] as $child)if(!$child['archived']&&($child['parentId']??'')===$id&&$existing&&(($old['type']??'')!==$type||($old['period']??'')!==$period))throw new LifeError('Move linked goals before changing this period.');
                         $status=$a['status']??'todo';if(!in_array($status,['todo','progress','done'],true))throw new LifeError('Choose a goal status.');$new+=['type'=>$type,'period'=>$period,'parentId'=>$parentId,'status'=>$status];
                     }else{
-                        $icon=$a['icon']??'flag';if(!in_array($icon,self::ICONS,true))throw new LifeError('Choose an available icon.');$new+=['goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'icon'=>$icon,'owner'=>$this->owner(LifeStore::text($a['owner']??'',254)),'targetDate'=>$this->date($a['targetDate']??''),'position'=>$old['position']??count($s['milestones'])];
+                        $icon=$a['icon']??'flag';if(!in_array($icon,self::ICONS,true))throw new LifeError('Choose an available icon.');$sectionId=LifeStore::text($a['sectionId']??($old['sectionId']??self::DEFAULT_ROADMAP_SECTION),32,true);
+                        $this->index($s['roadmapSections'],$sectionId);
+                        $position=$old['position']??0;
+                        if ($sectionId!==($old['sectionId']??null)) {
+                            $steps=array_filter($s['milestones'],fn($step)=>$step['sectionId']===$sectionId);
+                            $position=max([-1,...array_column($steps,'position')])+1;
+                        }
+                        $new+=['goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'icon'=>$icon,'owner'=>$this->owner(LifeStore::text($a['owner']??'',254)),'targetDate'=>$this->date($a['targetDate']??''),'sectionId'=>$sectionId,'position'=>$position];
                     }
                 }
                 $s[$kind][$i]=$new;$id=$new['id'];$title=$new['title']?:'Untitled milestone';foreach($new as $field=>$value)if(!in_array($field,['updatedAt','createdAt'],true)&&($old[$field]??null)!==$value)$changes[$field]=[$old[$field]??null,$value];

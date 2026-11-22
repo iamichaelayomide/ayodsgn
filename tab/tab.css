@@ -157,3 +157,50 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .inline-actions > div { display: flex; align-items: center; gap: 12px; }
 .inline-actions [data-cancel] { color: #647080; }
 .milestone-description-editor .ql-editor ol { padding-inline-start: 0; }
+
+/* Roadmap sections */
+.roadmap-toolbar { display: flex; justify-content: flex-end; margin: -4px 0 12px; }
+.roadmap-sections { display: grid; gap: 18px; }
+.roadmap-section { min-width: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+.roadmap-section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 18px;
+    min-height: 60px;
+}
+.roadmap-section-header h2 { margin: 0; min-width: 0; font-size: 15px; line-height: 1.35; }
+.roadmap-section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    text-align: left;
+    font: inherit;
+    font-weight: 650;
+    padding: 5px 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+}
+.roadmap-section-toggle span { overflow-wrap: anywhere; }
+.roadmap-section-toggle .icon { flex: 0 0 16px; width: 16px; height: 16px; color: var(--muted); }
+.roadmap-section-toggle[aria-expanded="true"] .icon { transform: rotate(90deg); }
+.roadmap-count { color: #697483; font-size: 12px; white-space: nowrap; }
+.roadmap-section-actions { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.roadmap-section-actions .text-action { min-height: 44px; white-space: nowrap; }
+.roadmap-section-actions [data-rename-section] { color: #697483; }
+.roadmap-section-body { border-top: 1px solid var(--line); padding: 20px 18px; }
+.roadmap-empty { margin: 0; font-size: 13px; color: #697483; }
+.roadmap-track { position: relative; isolation: isolate; }
+.roadmap-track > .roadmap { margin: 0; }
+.roadmap-track .roadmap > li:last-child { padding-bottom: 0; }
+@media (max-width: 550px) {
+    .roadmap-section-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 8px; padding: 4px 12px; }
+    .roadmap-section-actions { grid-column: 1 / -1; justify-content: space-between; width: 100%; }
+    .roadmap-section-body { padding: 14px 10px; }
+    .roadmap-track .roadmap > li { grid-template-columns: 36px minmax(0, 1fr); gap: 10px; }
+    .roadmap-track .path-marker > button { width: 36px; height: 36px; }
+    .roadmap-track .path-marker .icon { width: 17px; height: 17px; }
+    .roadmap-track .milestone-card:before { left: -11px; width: 10px; }
+}
