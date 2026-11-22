@@ -10,6 +10,8 @@ export function createInlineEditing({record, version, save, refresh, redraw, say
         const field = target.dataset.inlineField;
         const item = record(id);
         if (!item || item.archived) return;
+        const kind = milestone.dataset.roadmapKind;
+        const label = kind === 'milestone' ? 'Milestone' : 'Step';
         document.querySelectorAll('[popover]:popover-open').forEach(popover => popover.hidePopover());
 
         const holder = document.createElement('div');
@@ -19,8 +21,8 @@ export function createInlineEditing({record, version, save, refresh, redraw, say
         let input, descriptionEditor;
         if (rich) {
             descriptionEditor = mountMilestoneDescription(holder, item, {
-                label: 'Milestone description',
-                placeholder: 'What are we trying to achieve?',
+                label: label + ' description',
+                placeholder: kind === 'milestone' ? 'What will this milestone mark?' : 'What needs to happen in this step?',
             });
             input = descriptionEditor.input;
         } else {
@@ -28,8 +30,8 @@ export function createInlineEditing({record, version, save, refresh, redraw, say
             input.className = 'milestone-inline-input';
             input.value = item.title || '';
             input.maxLength = 200;
-            input.setAttribute('aria-label', 'Milestone title');
-            input.placeholder = 'Give this step a name';
+            input.setAttribute('aria-label', label + ' title');
+            input.placeholder = `Give this ${kind} a name`;
             holder.append(input);
         }
 
@@ -62,7 +64,7 @@ export function createInlineEditing({record, version, save, refresh, redraw, say
                     await refresh();
                     versionItem = {...record(id)};
                     expectedVersion = version();
-                    error.textContent = 'Latest milestone loaded. Review your text, then save.';
+                    error.textContent = `Latest ${kind} loaded. Review your text, then save.`;
                     retry.remove();
                     input.focus();
                 } catch (err) {
@@ -89,7 +91,7 @@ export function createInlineEditing({record, version, save, refresh, redraw, say
                 await save({...versionItem, ...draft}, expectedVersion);
                 editing = null;
                 document.querySelector(`[data-mile="${id}"] [data-inline-field="${field}"]`)?.focus({preventScroll: true});
-                say('Milestone updated');
+                say(label + ' updated');
             } catch (err) {
                 error.textContent = err.message;
                 if (rich) descriptionEditor.setDisabled(false);

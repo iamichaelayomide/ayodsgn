@@ -204,3 +204,23 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
     .roadmap-track .path-marker .icon { width: 17px; height: 17px; }
     .roadmap-track .milestone-card:before { left: -11px; width: 10px; }
 }
+
+/* Roadmap milestones share the timeline and have their own marker. */
+.roadmap-section-header { flex-wrap: wrap; }
+.roadmap-count:empty { display: none; }
+.roadmap-section-actions { gap: 6px 16px; flex-wrap: wrap; }
+.roadmap-section-actions .text-action { border-radius: 6px; padding-inline: 5px; touch-action: manipulation; }
+.roadmap-section-actions .text-action:active { background: #e8ebf0; }
+.roadmap > [data-roadmap-kind="milestone"] .path-marker > button {
+    background: #fff;
+    color: #353b45;
+    box-shadow: 0 0 0 1px #b5bdc9, inset 0 0 0 1px #dce1e9;
+}
+.roadmap > [data-roadmap-kind="milestone"] .milestone-card { border-color: #cfd5df; }
+.roadmap > li .milestone-card footer > div { margin-left: auto; }
+@media (max-width: 550px) {
+    .roadmap-section-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, max-content); gap: 4px; }
+    .roadmap-section-actions .text-action { white-space: normal; text-align: left; }
+    .roadmap-section-actions [data-rename-section] { justify-self: start; }
+    .roadmap-count { white-space: normal; text-align: right; }
+}
