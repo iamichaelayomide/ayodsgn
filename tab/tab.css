@@ -45,3 +45,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .welcome-art img{mask-image:radial-gradient(ellipse at center,#000 52%,transparent 73%)}
 
 #mobile-navigation nav{justify-content:stretch;width:100%}#mobile-navigation nav button{width:100%}
+
+/* A quiet architectural finish, confined to the sign-in page. */
+.tab-welcome{position:relative;padding-bottom:max(56px,5vw)}
+.tab-welcome::after{content:"";position:absolute;inset:auto 0 0;height:26px;border-top:1px solid #24272d12;background:repeating-linear-gradient(115deg,transparent 0 9px,#24272d12 9px 10px);pointer-events:none}
+@media(max-width:700px){.tab-welcome::after{height:18px;background-size:auto;border-top-color:#24272d0d}}
