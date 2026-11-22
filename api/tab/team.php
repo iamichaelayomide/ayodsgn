@@ -79,11 +79,19 @@ final class TabTeam {
                     if(!$existing&&count($s[$kind])>=2000)throw new LifeError('Team item limit reached.');
                     $new=['id'=>$existing?$id:LifeStore::id(),'title'=>LifeStore::text($a['title']??'',200,$kind!=='milestones'),'description'=>LifeStore::text($a['description']??'',12000),'archived'=>$old['archived']??false,'createdAt'=>$old['createdAt']??LifeStore::now(),'updatedAt'=>LifeStore::now()];
                     if($new['archived'])throw new LifeError('Restore this item before editing.');
+                    if ($kind !== 'goals') {
+                        // Keep formatting on unrelated saves from older clients.
+                        if (array_key_exists('descriptionDelta', $a)) {
+                            $new['descriptionDelta'] = life_task_delta($a['descriptionDelta'], $new['description']);
+                        } elseif (isset($old['descriptionDelta']) && $old['description'] === $new['description']) {
+                            $new['descriptionDelta'] = $old['descriptionDelta'];
+                        }
+                    }
                     if($kind==='tasks'){
                         $stage=$a['stage']??($old['stage']??'backlog');if(!in_array($stage,self::STAGES,true))throw new LifeError('Choose a valid task status.');
                         $new+=['assignee'=>$this->owner(LifeStore::text($a['assignee']??'',254)),'dueDate'=>$this->date($a['dueDate']??''),'blocked'=>($a['blocked']??false)===true,'stage'=>$stage,'goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'milestoneId'=>$this->link($s,'milestones',LifeStore::text($a['milestoneId']??'',32))];
                         if($stage==='done'&&($old['stage']??'')!=='done'&&($me['role']!=='admin'||($old['stage']??'')!=='review'))throw new LifeError('Only admins can approve a task from Review to Done.',403);
-                        if(($old['stage']??'')==='done'){foreach(['title','description','assignee','dueDate','blocked','goalId','milestoneId'] as $field)if($old[$field]!==$new[$field])$new['stage']='review';}
+                        if(($old['stage']??'')==='done'){foreach(['title','description','descriptionDelta','assignee','dueDate','blocked','goalId','milestoneId'] as $field)if(($old[$field]??null)!==($new[$field]??null))$new['stage']='review';}
                         $new['approvedBy']=$new['stage']==='done'?(($old['approvedBy']??'')?:$me['email']):'';
                     }elseif($kind==='goals'){
                         $type=$a['type']??'month';if(!in_array($type,['quarter','month','week'],true))throw new LifeError('Choose a goal period.');$period=LifeStore::text($a['period']??'',10,true);
@@ -93,12 +101,6 @@ final class TabTeam {
                         foreach($s['goals'] as $child)if(!$child['archived']&&($child['parentId']??'')===$id&&$existing&&(($old['type']??'')!==$type||($old['period']??'')!==$period))throw new LifeError('Move linked goals before changing this period.');
                         $status=$a['status']??'todo';if(!in_array($status,['todo','progress','done'],true))throw new LifeError('Choose a goal status.');$new+=['type'=>$type,'period'=>$period,'parentId'=>$parentId,'status'=>$status];
                     }else{
-                        // Keep formatting on unrelated saves from older clients.
-                        if (array_key_exists('descriptionDelta', $a)) {
-                            $new['descriptionDelta'] = life_task_delta($a['descriptionDelta'], $new['description']);
-                        } elseif (isset($old['descriptionDelta']) && $old['description'] === $new['description']) {
-                            $new['descriptionDelta'] = $old['descriptionDelta'];
-                        }
                         $icon=$a['icon']??'flag';if(!in_array($icon,self::ICONS,true))throw new LifeError('Choose an available icon.');$new+=['goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'icon'=>$icon,'owner'=>$this->owner(LifeStore::text($a['owner']??'',254)),'targetDate'=>$this->date($a['targetDate']??''),'position'=>$old['position']??count($s['milestones'])];
                     }
                 }
