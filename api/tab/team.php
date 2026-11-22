@@ -93,6 +93,12 @@ final class TabTeam {
                         foreach($s['goals'] as $child)if(!$child['archived']&&($child['parentId']??'')===$id&&$existing&&(($old['type']??'')!==$type||($old['period']??'')!==$period))throw new LifeError('Move linked goals before changing this period.');
                         $status=$a['status']??'todo';if(!in_array($status,['todo','progress','done'],true))throw new LifeError('Choose a goal status.');$new+=['type'=>$type,'period'=>$period,'parentId'=>$parentId,'status'=>$status];
                     }else{
+                        // Keep formatting on unrelated saves from older clients.
+                        if (array_key_exists('descriptionDelta', $a)) {
+                            $new['descriptionDelta'] = life_task_delta($a['descriptionDelta'], $new['description']);
+                        } elseif (isset($old['descriptionDelta']) && $old['description'] === $new['description']) {
+                            $new['descriptionDelta'] = $old['descriptionDelta'];
+                        }
                         $icon=$a['icon']??'flag';if(!in_array($icon,self::ICONS,true))throw new LifeError('Choose an available icon.');$new+=['goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'icon'=>$icon,'owner'=>$this->owner(LifeStore::text($a['owner']??'',254)),'targetDate'=>$this->date($a['targetDate']??''),'position'=>$old['position']??count($s['milestones'])];
                     }
                 }

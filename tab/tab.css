@@ -62,3 +62,98 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .tab-auth #connect-actions{margin-top:0}.tab-auth #connect-error:not(:empty){margin:0 0 18px}
 
 .tab-auth.connect-card form input:not([type=checkbox]){font-weight:400;color:#30363f;border-color:#a5adb9;min-height:46px}
+
+/* Keep formatting controls attached to the content they change. */
+.milestone-description-editor {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #dce1e8;
+    border-radius: 10px;
+    background: var(--paper);
+}
+.milestone-description-editor:focus-within {
+    border-color: #858e9b;
+    box-shadow: 0 0 0 2px #24272d12;
+}
+.milestone-description-field { margin-bottom: 16px; }
+.milestone-description-field > span {
+    display: block;
+    margin-bottom: 7px;
+    color: #535c68;
+    font-size: 12px;
+    font-weight: 550;
+}
+.milestone-formatting {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 7px;
+    border-bottom: 1px solid var(--line);
+    background: #f8f9fb;
+}
+.milestone-formatting button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    min-height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #4f5865;
+    font-size: 15px;
+    line-height: 1;
+}
+.milestone-formatting .icon { width: 17px; height: 17px; }
+.milestone-formatting button[aria-pressed="true"] {
+    color: #20252c;
+    background: #e2e6ec;
+}
+.milestone-formatting button:focus-visible { outline-offset: 0; }
+.milestone-description-editor .ql-editor {
+    min-height: 104px;
+    max-height: min(320px, 45dvh);
+    padding: 11px 13px;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+.milestone-description-editor .ql-editor.ql-blank::before {
+    left: 13px;
+    right: 13px;
+    color: #737d8a;
+    font-style: normal;
+}
+.milestone-main .milestone-description {
+    margin-top: 9px;
+    color: #606b7b;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.milestone-main .milestone-description.placeholder { color: #768395; }
+.milestone-description p, .milestone-main .ql-editor p {
+    margin: 0;
+    color: inherit;
+    font: inherit;
+}
+.milestone-description ul, .milestone-description ol {
+    margin: .35em 0;
+    padding-inline-start: 1.45em;
+}
+.milestone-description li + li { margin-top: .2em; }
+@media (hover: hover) and (pointer: fine) {
+    .milestone-formatting button:hover { background: #eceef2; }
+    .milestone-formatting button[aria-pressed="true"]:hover { background: #d9dfe8; }
+}
+@media (max-width: 700px), (pointer: coarse) {
+    .milestone-formatting { gap: 2px; padding-inline: 4px; }
+    .milestone-formatting button { width: 44px; min-height: 44px; }
+    .milestone-description-editor .ql-editor { font-size: 16px; }
+}
+.inline-actions > div { display: flex; align-items: center; gap: 12px; }
+.inline-actions [data-cancel] { color: #647080; }
+.milestone-description-editor .ql-editor ol { padding-inline-start: 0; }

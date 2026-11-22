@@ -7,8 +7,10 @@ RewriteCond %{HTTP_HOST} ^life\.ayodsgn\.com$ [NC]
 RewriteRule ^\.well-known/oauth-authorization-server$ api/planner/discovery.php?type=server [L]
 RewriteCond %{HTTP:Authorization} ^(.*)$
 RewriteRule ^api/planner/ - [E=HTTP_AUTHORIZATION:%1]
-# Tab is a separate application, with a separate host-only session and team API.
+# Tab shares only the locally vendored editor assets with Life.
+# The personal workspace and its API stay blocked on the Tab host.
 RewriteCond %{HTTP_HOST} ^tab\.ayodsgn\.com$ [NC]
+RewriteCond %{REQUEST_URI} !^/life/vendor/quill/quill\.(?:js|core\.css)$
 RewriteRule ^(?:life|api/life)(?:/|$) - [F,L]
 RewriteCond %{HTTP_HOST} ^tab\.ayodsgn\.com$ [NC]
 RewriteRule ^$ tab/index.php [L]
