@@ -29,3 +29,11 @@ The first version deliberately has no email-send endpoint. Invitation messages m
 Browser verification uses a disposable SQLite database and exercises real Tab PHP endpoints, forms, comments, admin/member identities, invitation previews and desktop/320px/390px layouts. Physical phone keyboard/safe-area verification remains a hardware check.
 
 Rollback: revert the source commit to disable the feature. Leave additive Tab tables intact to retain team data. Do not delete personal or team tables during rollback.
+
+### Interaction regression checks
+
+`tests/tab-browser.mjs` runs the actual PHP API against a disposable SQLite database. It covers searchable people pickers, assignment, direct milestone editing, cancel/save/focus, conflict recovery, a poll arriving during an edit, sign-in copy, and 320px/390px overflow.
+
+Set `TAB_PHP_RUNTIME` to a package directory with `@php-wasm/node` and `@php-wasm/universal`, and `TAB_BROWSER_RUNTIME` to a package directory with `playwright`. Run `node tests/tab-browser.mjs` from the repository root. Optionally set `CHROMIUM_EXECUTABLE_PATH` and `TAB_TEST_OUTPUT`; otherwise Playwright's installed browser and a temporary output directory are used. No production records are created.
+
+Roadmap titles and descriptions support double-click editing or Enter when focused; visible Edit remains available for touch. Enter saves a title, Ctrl/Command+Enter saves a description, and Escape cancels. Concurrent changes preserve the draft and offer an explicit refresh before retrying.
