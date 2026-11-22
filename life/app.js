@@ -7,7 +7,7 @@ import {installPWA,removeLifeSubscriptions} from './pwa.js?v=craft-1';
 import {createTaskHistory} from './task-history.js?v=3';
 import {installCardDrag} from './card-drag.js?v=2';
 import {installEmailAuth} from './auth-entry.js?v=4';
-import {createAccountSettings,plannerTimezone} from './accounts.js?v=craft-1';
+import {createAccountSettings,plannerTimezone} from './accounts.js?v=ai-connections-1';
 import {installUploadPolish} from './upload-polish.js?v=craft-1';
 import {installDateControls,chooseDate} from './date-controls.js?v=craft-1';
 import {createAnalytics} from './analytics.js?v=3';
@@ -73,6 +73,7 @@ const emailAuth=installEmailAuth({request,onAuthenticated:()=>start()});
 async function start() {
   try {
     let session=await request('session'); csrf=session.csrf;
+    if(session.authenticated){const back=sessionStorage.getItem('life-ai-return');sessionStorage.removeItem('life-ai-return');if(back&&/^\/life\/connections\/(?:\?request=[a-f0-9]{32})?$/.test(back)){location.assign(back);return;}}
     accountSettings.refresh(session);emailAuth.refresh(session);setup=session.setupRequired;role=session.role||'owner';document.body.classList.toggle('partner-mode',role==='partner');
     $('setup-label').hidden=!setup; $('auth-submit').disabled=!$('policy-accept').checked; $('auth-submit').textContent=setup?'Create my private planner':'Sign in';
     if(setup&&new URLSearchParams(location.search).get('owner-access')==='1')$('auth-copy').textContent='Enter your one-time setup key and choose a passphrase of at least 14 characters.';

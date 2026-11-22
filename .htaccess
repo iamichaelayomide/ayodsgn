@@ -1,5 +1,12 @@
 RewriteEngine On
 Options -Indexes
+# OAuth discovery for account-scoped planner assistants.
+RewriteCond %{HTTP_HOST} ^life\.ayodsgn\.com$ [NC]
+RewriteRule ^\.well-known/oauth-protected-resource$ api/planner/discovery.php?type=resource [L]
+RewriteCond %{HTTP_HOST} ^life\.ayodsgn\.com$ [NC]
+RewriteRule ^\.well-known/oauth-authorization-server$ api/planner/discovery.php?type=server [L]
+RewriteCond %{HTTP:Authorization} ^(.*)$
+RewriteRule ^api/planner/ - [E=HTTP_AUTHORIZATION:%1]
 # Tab is a separate application, with a separate host-only session and team API.
 RewriteCond %{HTTP_HOST} ^tab\.ayodsgn\.com$ [NC]
 RewriteRule ^(?:life|api/life)(?:/|$) - [F,L]

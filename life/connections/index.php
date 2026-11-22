@@ -1,0 +1,4 @@
+<?php
+header('Cache-Control: no-store');header('Referrer-Policy: no-referrer');header('X-Content-Type-Options: nosniff');header('X-Frame-Options: DENY');header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'");
+?>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f8f9fb"><title>AI connections · Life</title><link rel="stylesheet" href="./connections.css?v=1"></head><body><main><a class="back" href="/">‹ Back to Life</a><header><span class="brand">Life<span>•</span></span><h1 id="title">AI connections</h1><p id="identity">Checking your account…</p></header><div id="message" role="status" aria-live="polite"></div><section id="content" aria-busy="true"></section></main><script type="module" src="./connections.js?v=1"></script></body></html>
