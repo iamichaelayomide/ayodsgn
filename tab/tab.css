@@ -43,3 +43,5 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 @media(max-width:700px){body{padding-bottom:0}.sidebar{display:none}.mobile-menu-toggle{display:inline-grid}.topbar{justify-content:flex-start;gap:10px}.topbar>div{margin-left:auto}.content{padding-bottom:max(30px,env(safe-area-inset-bottom))}#notice{bottom:calc(20px + env(safe-area-inset-bottom))}.tab-welcome{grid-template-columns:1fr;gap:12px;padding:28px 24px;min-height:100dvh;align-content:start}.welcome-copy{display:contents}.welcome-copy>.brand{grid-row:1}.welcome-copy>div{grid-row:3}.welcome-art{grid-row:2;max-width:360px;justify-self:center;margin:12px 0}.welcome-copy h1{font-size:34px;max-width:420px}.welcome-copy .primary{width:100%;margin-top:26px}.welcome-footnote{grid-row:4;margin-top:24px}.page-heading h1{font-size:25px}}
 
 .welcome-art img{mask-image:radial-gradient(ellipse at center,#000 52%,transparent 73%)}
+
+#mobile-navigation nav{justify-content:stretch;width:100%}#mobile-navigation nav button{width:100%}
