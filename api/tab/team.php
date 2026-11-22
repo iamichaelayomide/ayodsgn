@@ -145,12 +145,16 @@ final class TabTeam {
                     }else{
                         $icon=$a['icon']??'flag';if(!in_array($icon,self::ICONS,true))throw new LifeError('Choose an available icon.');$sectionId=LifeStore::text($a['sectionId']??($old['sectionId']??self::DEFAULT_ROADMAP_SECTION),32,true);
                         $this->index($s['roadmapSections'],$sectionId);
+                        $roadmapKind=$a['roadmapKind']??$old['roadmapKind']??'step';
+                        if (!in_array($roadmapKind,['step','milestone'],true)) throw new LifeError('Choose a step or milestone.');
+                        if ($roadmapKind==='milestone' && $new['title']==='') throw new LifeError('Give this milestone a name.');
+                        $extra['roadmapItemId']=$new['id'];
                         $position=$old['position']??0;
                         if ($sectionId!==($old['sectionId']??null)) {
                             $steps=array_filter($s['milestones'],fn($step)=>$step['sectionId']===$sectionId);
                             $position=max([-1,...array_column($steps,'position')])+1;
                         }
-                        $new+=['goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'icon'=>$icon,'owner'=>$this->owner(LifeStore::text($a['owner']??'',254)),'targetDate'=>$this->date($a['targetDate']??''),'sectionId'=>$sectionId,'position'=>$position];
+                        $new+=['goalId'=>$this->link($s,'goals',LifeStore::text($a['goalId']??'',32)),'icon'=>$icon,'owner'=>$this->owner(LifeStore::text($a['owner']??'',254)),'targetDate'=>$this->date($a['targetDate']??''),'sectionId'=>$sectionId,'position'=>$position,'roadmapKind'=>$roadmapKind];
                     }
                 }
                 $s[$kind][$i]=$new;$id=$new['id'];$title=$new['title']?:'Untitled milestone';foreach($new as $field=>$value)if(!in_array($field,['updatedAt','createdAt'],true)&&($old[$field]??null)!==$value)$changes[$field]=[$old[$field]??null,$value];
