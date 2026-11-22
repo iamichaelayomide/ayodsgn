@@ -27,6 +27,7 @@ export function createAccountSettings({request}) {
     <button type="button" data-disconnect hidden>Disconnect Calendar and Tasks</button>
     <div data-conflicts></div>
    </section>
+   <section class="connection-section"><h3>AI assistants</h3><p class="connection-note">Use your planner from ChatGPT or another compatible assistant.</p><a href="/life/connections/">Manage AI connections</a></section>
    <section class="connection-section" data-zone-settings>
     <h3>Timezone</h3>
     <form data-zone><label><span class="sr-only">Your timezone</span><select name="timezone" required></select></label><button type="submit">Save timezone</button></form>
